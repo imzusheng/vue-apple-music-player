@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-11 15:06:54
- * @LastEditTime: 2022-04-11 17:58:23
+ * @LastEditTime: 2022-04-12 09:51:14
  * @Description: 自定义指令，利用插件安装
  * @FilePath: \vite-music-player\src\common\directive.ts
  */
@@ -16,21 +16,29 @@ export const columnMatchDirective = {
       mounted(el: HTMLElement) {
         // 需要监听的media
         const columnMatch = {
-          '(max-width: 1200px)': 5,
-          '(max-width: 1068px)': 4,
-          '(max-width: 768px)': 3,
+          '(min-width: 1200px)': 6,
+          '(min-width: 1068px) and (max-width: 1200px)': 5,
+          '(min-width: 768px) and (max-width: 1068px)': 4,
+          '(min-width: 628px) and (max-width: 768px)': 3,
           '(max-width: 628px)': 2
         }
         const mediaChangeHandle = (e: MediaQueryListEvent) => {
-          const count = e.matches ? columnMatch[e.media] : columnMatch[e.media] + 1
-          store.commit('setcolumnCount', count)
+          if (e.matches) {
+            const count = columnMatch[e.media]
+            store.commit('setcolumnCount', count)
+            document.documentElement.style.setProperty('--column-count', count)
+          }
         }
         Object.keys(columnMatch).forEach(media => {
+          if (window.matchMedia(media).matches) {
+            // 初始化赋值
+            // const count = window.getComputedStyle(document.documentElement).getPropertyValue('--column-count')
+            const count = columnMatch[media]
+            store.commit('setcolumnCount', count)
+            document.documentElement.style.setProperty('--column-count', count)
+          }
           window.matchMedia(media).addEventListener('change', mediaChangeHandle)
         })
-        // 初始化赋值
-        const count = window.getComputedStyle(document.documentElement).getPropertyValue('--column-count')
-        store.commit('setcolumnCount', count)
       }
     })
   }

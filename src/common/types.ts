@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-11 22:59:54
- * @LastEditTime: 2022-04-12 08:12:14
+ * @LastEditTime: 2022-04-12 08:40:14
  * @Description: typescript的复用的类型、接口定义
  * @FilePath: \vite-music-player\src\common\types.ts
  */
@@ -23,8 +23,8 @@ interface DataItem {
 // 返回值中data
 interface Returns {
   // 返回数据
-  data: Array<DataItem>
-  // 当前函数名
+  data: Array<DataItem> | DataItem
+  // 当前返回类型|函数名
   type: string
 }
 

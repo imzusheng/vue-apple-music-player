@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-11 11:08:36
-LastEditTime: 2022-04-12 00:15:11
+LastEditTime: 2022-04-12 12:13:02
 Description: 歌单展示列表grid布局
 FilePath: \vite-music-player\src\components\SectionListGrid.vue
 -->
@@ -25,10 +25,12 @@ interface DataItem {
 }
 
 defineProps<{
+  // 是否显示播放按钮
+  playBtn?: boolean
   // 封面是否圆角
   round?: boolean
   // 点击更多时跳转
-  more: string
+  more?: string
   // 大标题
   sectionTitle: null | string
   // 列表数据
@@ -52,8 +54,13 @@ const toDetail = (routeName: string, payload: string | number) => {
       {{ sectionTitle }}
       <router-link
         class="list-sub-title"
-        v-if="listData.length > 7"
-        to="/"
+        v-if="listData.length > 6"
+        :to="{
+          name: 'more',
+          query: {
+            type: more
+          }
+        }"
         v-text="'更多'"
       />
     </h2>
@@ -70,7 +77,7 @@ const toDetail = (routeName: string, payload: string | number) => {
         <div class="list-item-poster">
           <div class="list-item-overlay">
             <!-- 播放按钮 -->
-            <button class="overlay-btn-play flex-center">
+            <button class="overlay-btn-play flex-center" v-if="playBtn">
               <img src="@/assets/player-controls-pause.svg" alt="" />
             </button>
           </div>
@@ -83,6 +90,7 @@ const toDetail = (routeName: string, payload: string | number) => {
             :alt="item.title"
           />
         </div>
+
         <!-- 详情 -->
         <div class="list-item-desc">
           <h3 class="list-item-desc-h3" :title="item.title">

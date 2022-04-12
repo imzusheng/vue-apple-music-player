@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-11 18:23:23
-LastEditTime: 2022-04-12 00:00:27
+LastEditTime: 2022-04-12 12:11:05
 Description: 主页
 FilePath: \vite-music-player\src\views\PageHome.vue
 -->
@@ -10,13 +10,13 @@ import SectionListGrid from '@/components/SectionListGrid.vue'
 import { reactive } from 'vue'
 import { mapActionsHelpers } from '@/common/util'
 
-const { getCommunity, getRecommend, getMv } = mapActionsHelpers(null, [
-  'getCommunity',
-  'getRecommend',
-  'getMv'
+const { getcommunitys, getrecommends, getmvs } = mapActionsHelpers(null, [
+  'getcommunitys',
+  'getrecommends',
+  'getmvs'
 ])
 
-Promise.allSettled([getCommunity(), getRecommend(), getMv()]).then(
+Promise.allSettled([getcommunitys(), getrecommends(), getmvs()]).then(
   (resArr: any) => {
     resArr.forEach(({ status, value }) => {
       if (status === 'fulfilled') {
@@ -27,9 +27,12 @@ Promise.allSettled([getCommunity(), getRecommend(), getMv()]).then(
 )
 
 const data = reactive({
-  community: [],
+  // 社区精选
+  communitys: [],
+  // 推荐歌单
   recommends: [],
-  recommendMv: []
+  // 推荐MV
+  mvs: []
 })
 </script>
 
@@ -38,17 +41,17 @@ const data = reactive({
     <section-list-grid
       :listData="data.recommends"
       sectionTitle="为你推荐"
-      more="''"
+      more="recommends"
     />
     <section-list-grid
-      :listData="data.community"
+      :listData="data.communitys"
       sectionTitle="社区精选"
-      more="''"
+      more="communitys"
     />
     <section-list-grid
-      :listData="data.recommendMv"
+      :listData="data.mvs"
       sectionTitle="推荐的MV"
-      more="''"
+      more="mvs"
     />
   </div>
 </template>

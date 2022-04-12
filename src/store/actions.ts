@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-11 09:15:16
- * @LastEditTime: 2022-04-12 08:18:39
+ * @LastEditTime: 2022-04-12 12:08:06
  * @Description: 所有请求
  * @FilePath: \vite-music-player\src\store\actions.ts
  */
@@ -13,81 +13,55 @@ import { Args, DataItem, Returns } from '@/common/types'
 
 // 定义参数默认值
 const initArgs: Args = {
-  limit: 30,
+  limit: 7,
   pageIndex: 0
 }
 
-export default {
-  // 社区精选 歌单
-  async getCommunity({}, args: Args): Promise<Returns> {
-    const resJson = await get(API.PLAYLIST.GET_COMMUNITY, Object.assign(initArgs, args))
-    const data: Array<DataItem> = resJson.playlists.map((v: any): DataItem => {
-      return {
-        title: v.name,
-        desc: `${timeStampConvert(v.trackUpdateTime)} • ${v.trackCount}首音乐`,
-        payload: v.id,
-        picUrl: v.coverImgUrl + '?param=180y180',
-        routeName: 'playlist'
-      }
-    })
+/**
+ * 无需参数的请求，也没有固定返回格式
+ */
+const notArgs = {
+  // 获取热门歌单分类
+  async getPlaylistHot({}): Promise<Returns> {
+    const resJson = await get(API.PLAYLIST.GET_PLAYLIST_HOT, {})
     return {
-      data,
-      type: 'community'
+      data: resJson.tags,
+      type: 'playlistHot'
     }
   },
-  // 今日推荐 歌单
-  async getRecommend({}, args: Args): Promise<Returns> {
-    const resJson = await get(API.PLAYLIST.GET_RECOMMENDS, Object.assign(initArgs, args))
-    const data: Array<DataItem> = resJson.result.map((v: any): DataItem => {
-      return {
-        title: v.name,
-        desc: `${timeStampConvert(v.trackNumberUpdateTime)} • ${v.trackCount}首音乐`,
-        payload: v.id,
-        picUrl: v.picUrl + '?param=180y180',
-        routeName: 'playlist'
-      }
-    })
-    return {
-      data,
-      type: 'recommends'
-    }
-  },
-  // 推荐MV
-  async getMv({}, args: Args): Promise<Returns> {
-    const resJson = await get(API.MV.GET_NEW_MV, Object.assign(initArgs, args))
-    const data: Array<DataItem> = resJson.data.map((v: any): DataItem => {
-      return {
-        title: v.name,
-        picUrl: v.cover + '?param=180y180',
-        desc: `${v.artistName} • ${countConvert(v.playCount)}次播放`,
-        payload: v.id,
-        routeName: 'mv'
-      }
-    })
-    return {
-      data,
-      type: 'recommendMv'
-    }
-  },
-
-  // 获取歌单详情
-  async getPlaylistDetail({}, id: string | number): Promise<any> {
-    const resJson = await get(API.PLAYLIST.GET_PLAYLIST_DETAIL, { id })
+  // 获取热门歌单分类
+  async getPlaylistDetail({}): Promise<any> {
+    const resJson = await get(API.PLAYLIST.GET_PLAYLIST_DETAIL, {})
     return resJson.playlist
-  },
+  }
+}
+
+/**
+ * 歌手相关请求
+ */
+const artist = {
   // 获取歌手信息
   async getArtistDetail({}, id: string | number): Promise<Returns> {
     const resJson = await get(API.ART.GET_ARTIST_DETAIL, { id })
+    const data: DataItem = {
+      routeName: 'artist',
+      title: resJson.data.artist.name,
+      picUrl: resJson.data.artist.cover + '?param=1600y900',
+      payload: resJson.data.artist.id,
+      desc: resJson.data.artist.briefDesc
+    }
     return {
-      data: resJson,
+      data: data,
       type: 'artistDetail'
     }
   },
   // 获取歌手粉丝
-  async getArtistFans({}, id: string | number): Promise<Returns> {
+  async getArtistFans({}, id: string | number): Promise<any> {
     const resJson = await get(API.ART.GET_ARTIST_FANS, { id })
     return {
-      data: resJson.data,
+      data: {
+        count: countConvert(resJson.data.fansCnt)
+      },
       type: 'artistFans'
     }
   },
@@ -159,4 +133,67 @@ export default {
       type: 'simi'
     }
   }
+}
+
+/**
+ * 首页推荐请求
+ */
+const recommend = {
+  // 社区精选 歌单
+  async getcommunitys({}, args: Args): Promise<Returns> {
+    const resJson = await get(API.PLAYLIST.GET_COMMUNITY, Object.assign(initArgs, args))
+    const data: Array<DataItem> = resJson.playlists.map((v: any): DataItem => {
+      return {
+        title: v.name,
+        desc: `${timeStampConvert(v.trackUpdateTime)} • ${v.trackCount}首音乐`,
+        payload: v.id,
+        picUrl: v.coverImgUrl + '?param=180y180',
+        routeName: 'playlist'
+      }
+    })
+    return {
+      data,
+      type: 'communitys'
+    }
+  },
+  // 今日推荐 歌单
+  async getrecommends({}, args: Args): Promise<Returns> {
+    const resJson = await get(API.PLAYLIST.GET_RECOMMENDS, Object.assign(initArgs, args))
+    const data: Array<DataItem> = resJson.result.map((v: any): DataItem => {
+      return {
+        title: v.name,
+        desc: `${timeStampConvert(v.trackNumberUpdateTime)} • ${v.trackCount}首音乐`,
+        payload: v.id,
+        picUrl: v.picUrl + '?param=180y180',
+        routeName: 'playlist'
+      }
+    })
+    return {
+      data,
+      type: 'recommends'
+    }
+  },
+  // 推荐MV
+  async getmvs({}, args: Args): Promise<Returns> {
+    const resJson = await get(API.MV.GET_NEW_MV, Object.assign(initArgs, args))
+    const data: Array<DataItem> = resJson.data.map((v: any): DataItem => {
+      return {
+        title: v.name,
+        picUrl: v.cover + '?param=180y180',
+        desc: `${v.artistName} • ${countConvert(v.playCount)}次播放`,
+        payload: v.id,
+        routeName: 'mv'
+      }
+    })
+    return {
+      data,
+      type: 'mvs'
+    }
+  }
+}
+
+export default {
+  ...notArgs,
+  ...artist,
+  ...recommend
 }

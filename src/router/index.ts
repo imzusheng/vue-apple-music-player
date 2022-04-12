@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 20:43:36
- * @LastEditTime: 2022-04-11 22:43:20
+ * @LastEditTime: 2022-04-12 12:10:43
  * @Description: 路由
  * @FilePath: \vite-music-player\src\router\index.ts
  */
@@ -15,12 +15,17 @@ const routes = [
     children: [
       {
         path: '',
-        name: 'pagehome',
+        name: 'pageHome',
         component: () => import('@/views/PageHome.vue')
       },
       {
         path: 'artist',
         name: 'artist',
+        component: () => import('@/views/DetailArtist.vue')
+      },
+      {
+        path: 'more',
+        name: 'more',
         component: () => import('@/views/DetailArtist.vue')
       }
     ]
@@ -36,6 +41,11 @@ const router = createRouter({
       top: 0
     }
   }
+})
+
+router.afterEach((to, from) => {
+  document.documentElement.style.setProperty('--animation-ratio', '0')
+  document.documentElement.style.setProperty('--animation-target', '0')
 })
 
 export default router
