@@ -1,11 +1,10 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 21:10:50
-LastEditTime: 2022-04-11 00:59:22
+LastEditTime: 2022-04-11 21:37:48
 Description: 默认布局
-FilePath: \vite-music-player\src\components\LayoutDefault.vue
+FilePath: \vite-music-player\src\views\LayoutDefault.vue
 -->
-
 <template>
   <div id="default-layout">
     <nav id="nav">
@@ -16,19 +15,35 @@ FilePath: \vite-music-player\src\components\LayoutDefault.vue
 
         <ul class="nav-list">
           <li class="nav-list-item">
-            <img class="nav-list-item-icon" src="../assets/icon-home.svg" alt="" />
+            <img
+              class="nav-list-item-icon"
+              src="../assets/icon-home.svg"
+              alt=""
+            />
             首页
           </li>
           <li class="nav-list-item">
-            <img class="nav-list-item-icon" src="../assets/icon-discovery.svg" alt="" />
+            <img
+              class="nav-list-item-icon"
+              src="../assets/icon-discovery.svg"
+              alt=""
+            />
             探索
           </li>
           <li class="nav-list-item">
-            <img class="nav-list-item-icon" src="../assets/icon-library.svg" alt="" />
+            <img
+              class="nav-list-item-icon"
+              src="../assets/icon-library.svg"
+              alt=""
+            />
             媒体库
           </li>
           <li class="nav-list-item">
-            <img class="nav-list-item-icon" src="../assets/icon-search.svg" alt="" />
+            <img
+              class="nav-list-item-icon"
+              src="../assets/icon-search.svg"
+              alt=""
+            />
             搜索
           </li>
         </ul>
@@ -36,19 +51,23 @@ FilePath: \vite-music-player\src\components\LayoutDefault.vue
     </nav>
 
     <main id="main">
-      <header id="header"></header>
+      <header id="header" ref="header">
+        <div class="header-action flex-center">
+          <button class="header-action-prev flex-center">
+            <img src="@/assets/icon-prev.svg" alt="" />
+          </button>
+          <button class="header-action-next flex-center">
+            <img src="@/assets/icon-next.svg" alt="" />
+          </button>
+        </div>
+      </header>
+
+      <router-view />
+
       <div id="player"></div>
     </main>
   </div>
 </template>
-
-<script setup lang="ts">
-import store from '../store'
-
-store.dispatch('getCommunity').then((res) => {
-  console.log(res)
-})
-</script>
 
 <style lang="less">
 #default-layout {
@@ -57,11 +76,12 @@ store.dispatch('getCommunity').then((res) => {
   display: flex;
 
   #nav {
-    min-width: 220px;
-    max-width: 300px;
-    width: 20vw;
+    flex-shrink: 0;
+    width: 240px;
     height: 100vh;
     background: rgba(246, 246, 246, 1);
+    position: fixed;
+    z-index: 1;
     .nav-spacing {
       padding: 16px;
       height: 100%;
@@ -97,14 +117,33 @@ store.dispatch('getCommunity').then((res) => {
   }
 
   #main {
-    height: 100vh;
     width: 100%;
+    padding-left: 240px;
     position: relative;
 
     #header {
+      position: fixed;
       width: 100%;
-      height: 72px;
-      background: rgba(240, 240, 240, 1);
+      width: 100%;
+      height: var(--header-height);
+      background: #f6f6f6;
+      z-index: 999;
+      // opacity: 0.1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .header-action {
+        margin: 0 16px;
+        .header-action-prev,
+        .header-action-next {
+          border: none;
+          background: rgba(0, 0, 0, 0.1);
+          padding: 8px;
+          border-radius: 50%;
+          margin: 0 10px;
+          cursor: pointer;
+        }
+      }
     }
 
     #player {
