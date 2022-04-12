@@ -1,13 +1,22 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 21:10:50
-LastEditTime: 2022-04-12 11:29:36
+LastEditTime: 2022-04-12 15:29:44
 Description: 默认布局
 FilePath: \vite-music-player\src\views\LayoutDefault.vue
 -->
 <script lang="ts" setup>
 import TheNavigationLeft from '@/components/TheNavigationLeft.vue'
 import TheHeader from '@/components/TheHeader.vue'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+const viewKey = computed(() => {
+  const payload = route.query.payload ?? ''
+  return Date.now().toString() + payload
+})
 </script>
 
 
@@ -20,7 +29,9 @@ import TheHeader from '@/components/TheHeader.vue'
       <!-- 头部 -->
       <the-header />
 
-      <router-view />
+      <router-view v-slot="{ Component }" :key="viewKey">
+        <component :is="Component" />
+      </router-view>
 
       <!-- 播放器 -->
       <div id="player"></div>

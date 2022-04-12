@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-11 09:15:16
- * @LastEditTime: 2022-04-12 12:08:06
+ * @LastEditTime: 2022-04-12 15:27:11
  * @Description: 所有请求
  * @FilePath: \vite-music-player\src\store\actions.ts
  */
@@ -52,7 +52,7 @@ const artist = {
     }
     return {
       data: data,
-      type: 'artistDetail'
+      type: 'ArtistDetail'
     }
   },
   // 获取歌手粉丝
@@ -62,12 +62,12 @@ const artist = {
       data: {
         count: countConvert(resJson.data.fansCnt)
       },
-      type: 'artistFans'
+      type: 'ArtistFans'
     }
   },
   // 获取歌手专辑
-  async getArtistAlbum({}, id: string | number): Promise<Returns> {
-    const resJson = await get(API.ART.GET_ARTIST_ALBUM, { id })
+  async getArtistAlbum({}, args: any): Promise<Returns> {
+    const resJson = await get(API.ART.GET_ARTIST_ALBUM, args)
     const data: Array<DataItem> = resJson.hotAlbums.map((v: any): DataItem => {
       return {
         title: v.name,
@@ -79,12 +79,12 @@ const artist = {
     })
     return {
       data,
-      type: 'albums'
+      type: 'ArtistAlbum'
     }
   },
   // 获取歌手MV
-  async getArtistMV({}, id: string | number): Promise<Returns> {
-    const resJson = await get(API.ART.GET_ARTIST_MV, { id })
+  async getArtistMv({}, args: any): Promise<Returns> {
+    const resJson = await get(API.ART.GET_ARTIST_MV, args)
     const data: Array<DataItem> = resJson.mvs.map((v: any): DataItem => {
       return {
         title: v.name,
@@ -96,29 +96,29 @@ const artist = {
     })
     return {
       data,
-      type: 'mvs'
+      type: 'ArtistMv'
     }
   },
   // 获取歌手视频
-  async getArtistVideo({}, id: string | number): Promise<Returns> {
-    const resJson = await get(API.ART.GET_ARTIST_VIDEO, { id })
+  async getArtistVideo({}, args: any): Promise<Returns> {
+    const resJson = await get(API.ART.GET_ARTIST_VIDEO, args)
     const data: Array<DataItem> = resJson.data.records.map((v: any): DataItem => {
       return {
         title: v.resource.mlogBaseData.text,
-        desc: countConvert(v.resource.mlogExtVO.playCount) + '万次观看',
+        desc: countConvert(v.resource.mlogExtVO.playCount) + '次观看',
         routeName: 'video',
-        picUrl: v.resource.mlogBaseData.coverUrl + '?param=200y200',
+        picUrl: (v.picUrl ? v.imgurl : v.resource.mlogBaseData.coverUrl) + '?param=200y200',
         payload: v.id
       }
     })
     return {
       data,
-      type: 'videos'
+      type: 'ArtistVideo'
     }
   },
   // 获取相似歌手
-  async getArtistSimi({}, id: string | number): Promise<Returns> {
-    const resJson = await get(API.ART.GET_ARTIST_SIMI, { id })
+  async getArtistSimi({}, args: any): Promise<Returns> {
+    const resJson = await get(API.ART.GET_ARTIST_SIMI, args)
     const data: Array<DataItem> = resJson.artists.map((v: any): DataItem => {
       return {
         title: v.name,
@@ -130,7 +130,7 @@ const artist = {
     })
     return {
       data,
-      type: 'simi'
+      type: 'ArtistSimi'
     }
   }
 }
@@ -188,6 +188,23 @@ const recommend = {
     return {
       data,
       type: 'mvs'
+    }
+  },
+  // 推荐热门歌手
+  async getHotArtists({}, args: Args): Promise<Returns> {
+    const resJson = await get(API.ART.GET_HOT_ARTISTS, Object.assign(initArgs, args))
+    const data: Array<DataItem> = resJson.artists.map((v: any): DataItem => {
+      return {
+        title: v.name,
+        picUrl: v.img1v1Url + '?param=180y180',
+        desc: '艺人',
+        payload: v.id,
+        routeName: 'artist'
+      }
+    })
+    return {
+      data,
+      type: 'HotArtists'
     }
   }
 }

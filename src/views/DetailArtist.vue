@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-11 18:15:50
-LastEditTime: 2022-04-12 11:26:49
+LastEditTime: 2022-04-12 15:29:54
 Description: 歌单详情页
 FilePath: \vite-music-player\src\views\DetailArtist.vue
 -->
@@ -11,6 +11,10 @@ import { useRoute } from 'vue-router'
 import { onMounted, onUnmounted, onUpdated, reactive, ref } from 'vue'
 import { mapActionsHelpers } from '@/common/util'
 import SectionListGrid from '@/components/SectionListGrid.vue'
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+// 以下动画
+////////////////////////////////////////////////////////////////
 
 const artistContentRef = ref<any>()
 const infoRef = ref<any>()
@@ -53,55 +57,41 @@ const animationHandler = () => {
 }
 
 onMounted(() => {
+  console.log('==================>onMounted')
   // 监听动画
   document.addEventListener('scroll', animationHandler)
 })
 
 onUpdated(() => {
+  console.log('==================>onUpdated')
   // 每次更新页面时，设定css变量--content-mg-top
   const mgTop = actionRef.value.offsetHeight + infoRef.value.offsetHeight + 'px'
   artistContentRef.value.style.setProperty('--content-mg-top', `-${mgTop}`)
 })
 
 onUnmounted(() => {
+  console.log('==================>onUnmounted')
   document.removeEventListener('scroll', animationHandler)
 })
 
+////////////////////////////////////////////////////////////////////////////////////////////////
 // 以下获取数据
+////////////////////////////////////////////////////////////////
+
 const route = useRoute()
 const id = route.query.payload
+// 歌手信息
 const data = reactive<any>({
-  artistDetail: {},
-  artistFans: {},
-  albums: [],
-  videos: [],
-  mvs: [],
-  simi: []
+  ArtistDetail: {},
+  ArtistFans: {}
 })
-const {
-  getArtistDetail,
-  getArtistFans,
-  getArtistAlbum,
-  getArtistMV,
-  getArtistVideo,
-  getArtistSimi
-} = mapActionsHelpers(null, [
+// 取出action函数
+const { getArtistDetail, getArtistFans } = mapActionsHelpers(null, [
   'getArtistDetail',
-  'getArtistFans',
-  'getArtistAlbum',
-  'getArtistMV',
-  'getArtistVideo',
-  'getArtistSimi'
+  'getArtistFans'
 ])
-
-Promise.allSettled([
-  getArtistDetail(id),
-  getArtistFans(id),
-  getArtistAlbum(id),
-  getArtistMV(id),
-  getArtistVideo(id),
-  getArtistSimi(id)
-]).then((resArr) => {
+// 批量请求
+Promise.allSettled([getArtistDetail(id), getArtistFans(id)]).then((resArr) => {
   resArr.forEach((res: any) => {
     if (res.status === 'fulfilled') {
       data[res.value.type] = res.value.data
@@ -113,7 +103,7 @@ Promise.allSettled([
 <template>
   <div
     id="detail-artist"
-    :style="{ '--poster-url': `url(${data.artistDetail.picUrl})` }"
+    :style="{ '--poster-url': `url(${data.ArtistDetail.picUrl})` }"
   >
     <!-- 海报 -->
     <div class="artist-banner">
@@ -126,8 +116,8 @@ Promise.allSettled([
       <div class="artist-artist-info" ref="infoRef">
         <div class="artist-artist-info-spacing">
           <div class="artist-info-main">
-            <span class="artist-info-name">{{ data.artistDetail.title }}</span>
-            <span class="artist-info-desc">{{ data.artistDetail.desc }}</span>
+            <span class="artist-info-name">{{ data.ArtistDetail.title }}</span>
+            <span class="artist-info-desc">{{ data.ArtistDetail.desc }}</span>
           </div>
         </div>
       </div>
@@ -139,7 +129,7 @@ Promise.allSettled([
             <img class="icon" src="@/assets/icon-song-play.svg" alt="" />
           </button>
           <button aria-label="关注" class="action-btn-subscribe">
-            订阅 {{ data.artistFans.count }}
+            订阅 {{ data.ArtistFans.count }}
           </button>
         </div>
       </div>
@@ -147,25 +137,29 @@ Promise.allSettled([
       <!-- 歌手作品列表 -->
       <div class="artist-list">
         <section-list-grid
-          :listData="data.albums"
+          action="ArtistAlbum"
+          :actionParams="{ id }"
           sectionTitle="专辑"
-          more="''"
         />
         <section-list-grid
-          :listData="data.mvs"
+          action="ArtistMv"
+          :actionParams="{ id }"
           sectionTitle="MV"
-          more="'asdasd'"
         />
         <section-list-grid
-          :listData="data.videos"
+          action="ArtistVideo"
+          :actionParams="{
+            id,
+            order: 1,
+            size: 7
+          }"
           sectionTitle="视频"
-          more="''"
         />
         <section-list-grid
-          :listData="data.simi"
-          :round="true"
+          action="ArtistSimi"
+          :actionParams="{ id }"
           sectionTitle="粉丝也喜欢"
-          more="''"
+          :round="true"
         />
       </div>
     </section>

@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 23:22:44
- * @LastEditTime: 2022-04-12 12:04:03
+ * @LastEditTime: 2022-04-12 13:18:36
  * @Description: vuex
  * @FilePath: \vite-music-player\src\store\index.ts
  */

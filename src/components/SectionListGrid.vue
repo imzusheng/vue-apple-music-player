@@ -1,41 +1,42 @@
 <!--
 Author: zusheng
 Date: 2022-04-11 11:08:36
-LastEditTime: 2022-04-12 12:13:02
+LastEditTime: 2022-04-12 13:26:51
 Description: 歌单展示列表grid布局
 FilePath: \vite-music-player\src\components\SectionListGrid.vue
 -->
 <script lang="ts" setup>
 import { useStore } from '@/store'
+import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
-const store = useStore()
-const router = useRouter()
+import SectionListItem from '@/components/SectionListItem.vue'
 
-interface DataItem {
-  // 标题
-  title: string
-  // 参数类似与id
-  payload: string | number
-  // 封面url
-  picUrl: string
-  // 小标题
-  desc: string
-  // 路由名
-  routeName: string
-}
-
-defineProps<{
+const props = defineProps<{
+  // 获取数据的action名字
+  action: string
+  // 调用action的参数
+  actionParams?: any
   // 是否显示播放按钮
   playBtn?: boolean
   // 封面是否圆角
   round?: boolean
-  // 点击更多时跳转
-  more?: string
   // 大标题
-  sectionTitle: null | string
-  // 列表数据
-  listData: Array<DataItem>
+  sectionTitle: string
 }>()
+
+const emit = defineEmits(['onload'])
+
+const store = useStore()
+const router = useRouter()
+const listData = reactive<any>({
+  data: []
+})
+
+store.dispatch(`get${props.action}`, props.actionParams).then((res) => {
+  listData.data = res.data
+  // 加载完成后调用绑定的onload方法
+  emit('onload', props.action)
+})
 
 const toDetail = (routeName: string, payload: string | number) => {
   router.push({
@@ -48,17 +49,17 @@ const toDetail = (routeName: string, payload: string | number) => {
 </script>
 
 <template>
-  <section class="section-list-grid" v-if="listData.length > 0">
+  <section class="section-list-grid" v-if="listData.data.length > 0">
     <!-- 大标题 -->
     <h2 class="list-title" v-if="sectionTitle">
       {{ sectionTitle }}
       <router-link
         class="list-sub-title"
-        v-if="listData.length > 6"
+        v-if="listData.data.length > 6"
         :to="{
           name: 'more',
           query: {
-            type: more
+            type: props.action
           }
         }"
         v-text="'更多'"
@@ -67,41 +68,21 @@ const toDetail = (routeName: string, payload: string | number) => {
 
     <!-- 列表 -->
     <ul class="list">
-      <li
-        v-for="item in listData.slice(0, store.state.columnCount)"
-        class="list-item"
+      <template
+        v-for="item in listData.data.slice(0, store.state.columnCount)"
         :key="item.payload"
-        @click="toDetail(item.routeName, item.payload)"
       >
-        <!-- 遮罩 -->
-        <div class="list-item-poster">
-          <div class="list-item-overlay">
-            <!-- 播放按钮 -->
-            <button class="overlay-btn-play flex-center" v-if="playBtn">
-              <img src="@/assets/player-controls-pause.svg" alt="" />
-            </button>
-          </div>
-          <!-- 封面 -->
-          <img
-            v-lazy:[item.picUrl]
-            class="list-item-poster"
-            src="@/assets/empty_white.png"
-            :style="{ borderRadius: round ? '50%' : '3px' }"
-            :alt="item.title"
-          />
-        </div>
-
-        <!-- 详情 -->
-        <div class="list-item-desc">
-          <h3 class="list-item-desc-h3" :title="item.title">
-            {{ item.title }}
-          </h3>
-          <p class="list-item-desc-p" :title="item.desc">{{ item.desc }}</p>
-        </div>
-      </li>
+        <section-list-item
+          @click="toDetail(item.routeName, item.payload)"
+          :playBtn="props.playBtn"
+          :round="props.round"
+          :data="item"
+        />
+      </template>
     </ul>
   </section>
 </template>
+
 
 <style lang="less">
 .section-list-grid {
@@ -125,80 +106,6 @@ const toDetail = (routeName: string, payload: string | number) => {
     display: grid;
     gap: 24px;
     grid-template-columns: repeat(var(--column-count), 1fr);
-    // li
-    .list-item {
-      overflow: hidden;
-      border-radius: 3px;
-      white-space: nowrap;
-      // padding: 16px;
-      // background: rgba(250, 251, 253, 1);
-      // box-shadow: 7px 7px 20px rgba(0, 0, 0, 0.1),
-      //   -7px -7px 20px rgba(200, 200, 200, 0.2);
-      // transition: all 0.2s;
-
-      // img
-      .list-item-poster {
-        cursor: pointer;
-        width: 100%;
-        // 由于img默认inline-block，会造成间隙
-        display: block;
-        border-radius: 3px;
-        position: relative;
-        overflow: hidden;
-        // img遮罩
-        .list-item-overlay {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          z-index: 1;
-          opacity: 0;
-          transition: all 0.2s;
-          background-image: linear-gradient(
-            rgba(255, 255, 255, 0.1),
-            rgba(255, 255, 255, 0.4)
-          );
-          .overlay-btn-play {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            height: 50px;
-            width: 50px;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            background: rgba(0, 0, 0, 0.4);
-          }
-        }
-
-        // 发生了什么：遮罩层出现、播放按钮出现
-        .list-item-overlay:hover {
-          opacity: 1;
-        }
-      }
-
-      // desc
-      .list-item-desc {
-        padding: 10px 0 4px;
-        .list-item-desc-h3:hover {
-          cursor: pointer;
-          text-decoration: underline;
-        }
-        .list-item-desc-h3 {
-          font-size: 15px;
-          color: rgba(0, 0, 0, 0.8);
-          text-overflow: ellipsis;
-          overflow: hidden;
-        }
-        .list-item-desc-p {
-          font-size: 13px;
-          color: rgba(0, 0, 0, 0.6);
-          text-overflow: ellipsis;
-          overflow: hidden;
-        }
-      }
-    }
   }
 }
 </style>
