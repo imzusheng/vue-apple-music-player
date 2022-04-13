@@ -1,12 +1,17 @@
 <!--
 Author: zusheng
 Date: 2022-04-11 18:23:23
-LastEditTime: 2022-04-13 09:36:25
+LastEditTime: 2022-04-13 13:05:49
 Description: 主页
 FilePath: \vite-music-player\src\views\PageHome.vue
 -->
 <script setup lang="ts">
 import SectionListGrid from '@/components/SectionListGrid.vue'
+import { useStore } from '@/store'
+
+const store = useStore()
+store.commit('setLoading', true)
+const befDate = Date.now()
 
 // TODO 加载完成后回调，后期做全局加载进度条时用
 const onloadArr: Array<string> = []
@@ -15,8 +20,12 @@ const sectionOnload = (payload: any) => {
     onloadArr.push('')
   } else {
     onloadArr.shift()
+    if (onloadArr.length === 0) {
+      if (Date.now() - befDate < 400)
+        setTimeout(() => store.commit('setLoading', false), 400)
+      else store.commit('setLoading', false)
+    }
   }
-  // console.log(onloadArr.length)
 }
 </script>
 
@@ -38,7 +47,7 @@ const sectionOnload = (payload: any) => {
     />
     <section-list-grid
       @onload="sectionOnload"
-      sectionTitle="专辑"
+      sectionTitle="专辑和单曲"
       subTitle="新发行"
       :playBtn="true"
       action="NewAlbum"
@@ -65,12 +74,21 @@ const sectionOnload = (payload: any) => {
     />
     <section-list-grid
       @onload="sectionOnload"
-      sectionTitle="播客"
+      subTitle="个性推荐"
+      sectionTitle="电台"
       :playBtn="true"
       action="RecommendsDj"
     />
     <section-list-grid
       @onload="sectionOnload"
+      subTitle="个性推荐"
+      sectionTitle="电台节目"
+      :playBtn="true"
+      action="HotDjp"
+    />
+    <section-list-grid
+      @onload="sectionOnload"
+      subTitle="热门"
       sectionTitle="电台节目"
       :playBtn="true"
       action="RecommendsDjp"

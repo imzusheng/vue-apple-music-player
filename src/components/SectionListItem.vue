@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 12:12:08
-LastEditTime: 2022-04-13 00:29:14
+LastEditTime: 2022-04-13 12:59:10
 Description: li单项
 FilePath: \vite-music-player\src\components\SectionListItem.vue
 -->
@@ -42,7 +42,7 @@ const props = defineProps<{
         {{ props.data.title }}
       </h3>
       <p class="list-item-desc-p" :title="props.data.desc">
-        {{ props.data.desc }}
+        {{ props.data.desc.length === 0 ? props.data.title : props.data.desc }}
       </p>
     </div>
   </li>

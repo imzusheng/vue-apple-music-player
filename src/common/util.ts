@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 23:39:46
- * @LastEditTime: 2022-04-12 21:29:21
+ * @LastEditTime: 2022-04-13 16:02:30
  * @Description:
  * @FilePath: \vite-music-player\src\common\util.ts
  */
@@ -73,13 +73,17 @@ export const blobToBase64 = (blob: Blob): Promise<string> => {
 }
 
 /**
+ * 使mapActions语法糖可用
+ *
  * 注意: createNamespacedHelpers提供的辅助函数内部依旧是使用this.$store.xxx的方式去获取对应的store值
  * 所以如果是在script setup中使用的时候，需要自己手动将this绑定为类似于之前的{$store: store}这类对象
  * 以便于createNamespacedHelpers提供的辅助函数内部可以获取正确的state值
- * @param namespaced
+ * @param namespaced 命名空间
  * @param actions
  */
 export const mapActionsHelpers = (namespaced: string | null, actions: Array<string>): any => {
+  if (actions.length === 0) return {}
+
   let namespacedMapActions = namespaced ? createNamespacedHelpers(namespaced).mapActions : mapActions
 
   const fnList = namespacedMapActions(actions)
@@ -90,4 +94,14 @@ export const mapActionsHelpers = (namespaced: string | null, actions: Array<stri
     })
   })
   return fnList
+}
+
+/**
+ * 获取 [min,max]的随机数
+ * Math.floor(Math.random()*10) 可均衡获取 0 到 9 的随机整数
+ * @param min
+ * @param max
+ */
+export const getRandomIndex = (min: number, max: number): number => {
+  return Math.floor(Math.random() * (max - min + 1) + min)
 }

@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 20:43:36
- * @LastEditTime: 2022-04-12 21:28:13
+ * @LastEditTime: 2022-04-14 00:03:06
  * @Description: 路由
  * @FilePath: \vite-music-player\src\router\index.ts
  */
@@ -16,9 +16,14 @@ const routes = [
     children: [
       {
         path: '',
-        name: 'pageHome',
+        name: 'home',
         meta: { description: '主页' },
         component: () => import('@/views/PageHome.vue')
+      },
+      {
+        path: 'discovery',
+        name: 'discovery',
+        component: () => import('@/views/pageDiscovery.vue')
       },
       {
         path: 'artist',
@@ -37,6 +42,24 @@ const routes = [
         name: 'playlist',
         meta: { description: '歌单详情' },
         component: () => import('@/views/DetailPlaylist.vue')
+      },
+      {
+        path: 'song',
+        name: 'song',
+        meta: { description: '专辑单曲详情' },
+        component: () => import('@/views/DetailAlbum.vue')
+      },
+      {
+        path: 'djp',
+        name: 'djp',
+        meta: { description: '电台节目详情' },
+        component: () => import('@/views/DetailDjp.vue')
+      },
+      {
+        path: 'dj',
+        name: 'dj',
+        meta: { description: '电台详情' },
+        component: () => import('@/views/DetailDj.vue')
       },
       {
         path: 'more',
@@ -59,7 +82,7 @@ const router = createRouter({
   }
 })
 
-router.afterEach((to, from) => {
+router.beforeResolve(async to => {
   if (store.state.error.status) {
     store.commit('setError', {
       status: false

@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 11:22:11
-LastEditTime: 2022-04-12 18:13:41
+LastEditTime: 2022-04-13 12:32:57
 Description: 头部
 FilePath: \vite-music-player\src\components\TheHeader.vue
 -->
@@ -39,19 +39,21 @@ provide('getHeaderRef', () => {
 <style lang="less">
 #header {
   position: fixed;
-  width: 100%;
-  width: 100%;
+  width: calc(100% - var(--nav-left-width));
   height: var(--header-height);
   background: rgba(246, 246, 246, calc(var(--animation-ratio) * 1));
   z-index: 999;
   display: flex;
-  justify-content: space-between;
   align-items: center;
   .header-action {
-    margin: 0 16px;
+    width: 100%;
+    padding: 0 16px;
+    display: flex;
+    justify-content: flex-start;
     .header-action-prev,
     .header-action-next,
     .header-action-play {
+      flex-shrink: 0;
       border: none;
       background: rgba(0, 0, 0, 0.1);
       padding: 8px;
@@ -74,10 +76,13 @@ provide('getHeaderRef', () => {
     .artist-action-title {
       font-size: 26px;
       font-weight: 700;
-      padding-left: 16px;
+      padding: 0 32px 0 16px;
       opacity: var(--animation-target);
       transition: opacity 0.2s;
       transition-delay: 0.02s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 }

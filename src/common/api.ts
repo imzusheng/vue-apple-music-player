@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 23:39:53
- * @LastEditTime: 2022-04-13 00:16:35
+ * @LastEditTime: 2022-04-13 23:22:13
  * @Description: api文件
  * @FilePath: \vite-music-player\src\common\api.ts
  */
@@ -10,6 +10,13 @@ const API_ROOT = process.env.NODE_ENV === 'development' ? 'https://music.zusheng
 // 'https://netease-cloud-music-f4u1p2cjb-imzusheng.vercel.app'
 
 export default {
+  // 未分类
+  // 所有榜单详情
+  GET_TOPLIST_DETAIL: '/toplist/detail',
+
+  // 获取banner图片
+  GET_BANNER: '/banner?type=0',
+
   // 用户相关
   USER: {
     // 用户信息
@@ -42,16 +49,24 @@ export default {
 
   // 电台/播客相关
   DJ: {
-    // 电台详情
+    // 电台详情 rid
     GET_DJ_DETAIL: '/dj/detail',
-    // 电台节目-播放清单
+
+    // 播放清单 rid 似乎电台和电台节目都可以通用
     GET_DJP: '/dj/program',
-    // 电台节目详情-单条
+
+    // 电台节目-详情-单条(传电台节目内单曲ID) id
     GET_DJP_DETAIL: '/dj/program/detail',
-    // 推荐电台
-    GET_RECOMMENDS_DJ: '/personalized/djprogram',
-    // 推荐电台节目
+
+    // 电台节目-个性推荐
+    GET_HOT_DJP: '/personalized/djprogram',
+
+    // 电台节目-推荐
     GET_RECOMMENDS_DJP: '/program/recommend',
+
+    // 电台-个性推荐
+    GET_RECOMMENDS_DJ: '/dj/personalize/recommend',
+
     // 独家精选推荐（不知道是什么分类）
     GET_RECOMMENDS_PRIVATE: '/personalized/privatecontent/list'
   },
@@ -68,10 +83,12 @@ export default {
 
   // 专辑相关
   ALBUM: {
-    // 最新专辑
-    GET_NEW_ALBUM: '/album/newest',
     // 获取专辑信息
     GET_ALBUM_DETAIL: '/album',
+
+    // 最新专辑
+    GET_NEW_ALBUM: '/album/newest',
+
     // 获取专辑所有歌曲
     GET_ALBUM_All: '/album/track/all'
   },

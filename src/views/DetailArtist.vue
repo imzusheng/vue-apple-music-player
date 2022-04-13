@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-11 18:15:50
-LastEditTime: 2022-04-12 20:18:02
+LastEditTime: 2022-04-13 11:27:27
 Description: 歌单详情页
 FilePath: \vite-music-player\src\views\DetailArtist.vue
 -->
@@ -22,7 +22,12 @@ const route = useRoute()
 const id = route.query.payload
 // 歌手信息
 const data = reactive<any>({
-  ArtistDetail: {},
+  ArtistDetail: {
+    title: '',
+    desc: '',
+    picUrl: '',
+    sub: ''
+  },
   ArtistFans: {}
 })
 // 取出action函数
@@ -37,7 +42,6 @@ Promise.allSettled([getArtistDetail(id), getArtistFans(id)]).then((resArr) => {
       data[res.value.type] = res.value.data
     }
   })
-  store.commit('setHeaderText', data.ArtistDetail.title)
 })
 </script>
 

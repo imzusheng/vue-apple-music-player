@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 23:22:44
- * @LastEditTime: 2022-04-12 21:28:53
+ * @LastEditTime: 2022-04-13 13:33:21
  * @Description: vuex
  * @FilePath: \vite-music-player\src\store\index.ts
  */
@@ -16,12 +16,15 @@ export interface State {
   headerText: string
   error: {
     status: boolean
-    msg: string
+    msg?: string
+    info?: string
   }
 }
 
-// 定义 injection key
 export const key: InjectionKey<Store<State>> = Symbol()
+
+// 定义 injection key
+// export const key: InjectionKey<Store<State>> = Symbol()
 
 export const store = createStore<State>({
   strict: process.env.NODE_ENV !== 'production',
@@ -38,7 +41,8 @@ export const store = createStore<State>({
     // 错误页面
     error: {
       status: false,
-      msg: ''
+      msg: '',
+      info: ''
     }
   },
   getters: {},
@@ -52,9 +56,10 @@ export const store = createStore<State>({
     setcolumnCount(state, payload) {
       state.columnCount = payload
     },
-    setError(state, { status = false, msg = '' }) {
+    setError(state, { status = false, msg = '', info = '' }) {
       state.error.status = status
       state.error.msg = msg
+      state.error.info = info
     }
   },
   actions,

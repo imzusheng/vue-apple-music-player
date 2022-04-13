@@ -1,23 +1,28 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 16:04:42
-LastEditTime: 2022-04-12 20:50:49
+LastEditTime: 2022-04-13 12:25:41
 Description: 专辑详情
 FilePath: \vite-music-player\src\views\DetailAlbum.vue
 -->
 <script lang="ts" setup>
 import { mapActionsHelpers, durationConvert, pickUpName } from '@/common/util'
-import { reactive, toRaw } from 'vue'
+import { reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import TheDetailFrame from '@/components/TheDetailFrame.vue'
 import TableListSongs from '@/components/TableListSongs.vue'
-import { TableListSongsTypes } from '@/common/types'
+import { SongTableRow } from '@/common/types'
 
 const route = useRoute()
 const { getAlbumAll } = mapActionsHelpers(null, ['getAlbumAll'])
 const albumInfo = reactive<any>({
   // 专辑信息
-  data: {},
+  data: {
+    name: '',
+    description: '',
+    picUrl: '',
+    size: ''
+  },
   // 专辑内歌曲
   songs: []
 })
@@ -25,7 +30,7 @@ const id = route.query.payload
 
 getAlbumAll(id).then((res: any) => {
   albumInfo.data = res.album
-  albumInfo.songs = res.songs.map((v: any): TableListSongsTypes => {
+  albumInfo.songs = res.songs.map((v: any): SongTableRow => {
     return {
       artist: pickUpName(v.ar),
       title: v.name,

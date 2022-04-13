@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 20:53:25
-LastEditTime: 2022-04-12 21:30:41
+LastEditTime: 2022-04-13 13:34:57
 Description: 错误提示页面
 FilePath: \vite-music-player\src\views\PageError.vue
 -->
@@ -34,7 +34,7 @@ const goBack = () => {
           d="M12 3a9 9 0 100 18 9 9 0 000-18zM1 12C1 5.925 5.925 1 12 1s11 4.925 11 11-4.925 11-11 11S1 18.075 1 12z"
         ></path>
       </svg>
-      <h2 class="error-msg">
+      <h2 class="error-msg" :title="store.state.error.info">
         {{ store.state.error.msg || '出现了不可描述的错误' }}
       </h2>
       <button class="error-back" @click="goBack">返回上一页</button>
@@ -55,12 +55,18 @@ const goBack = () => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    padding: 32px;
     .error-icon {
       fill: rgba(255, 200, 40, 0.5);
     }
     .error-msg {
       margin-top: 6px;
       font-size: 36px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      display: -webkit-box;
+      overflow: hidden;
     }
     .error-back {
       margin-top: 24px;

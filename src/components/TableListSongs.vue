@@ -1,22 +1,22 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 18:47:25
-LastEditTime: 2022-04-13 09:14:33
+LastEditTime: 2022-04-13 18:12:57
 Description: 歌曲表格展示 单击切歌，有XL/L/M/S四种尺寸
-                L: 序号，封面，歌名，专辑，发布时间，时长
-                L: 序号，封面，歌名，专辑，时长
-                M: 序号，封面，歌名，时长
+                L: 封面，歌名，专辑，发布时间，时长
+                L: 封面，歌名，专辑，时长
+                M: 封面，歌名，时长
                 S: 封面，歌名，时长
 FilePath: \vite-music-player\src\components\TableListSongs.vue
 -->
 
 <script lang="ts" setup>
 import { computed, watchEffect } from 'vue'
-import { TableListSongsTypes } from '@/common/types'
+import { SongTableRow } from '@/common/types'
 
 const props = defineProps<{
   // 数据
-  songs: Array<TableListSongsTypes>
+  songs: Array<SongTableRow>
 
   // 表格尺寸 L/M/S
   size: string
@@ -103,8 +103,9 @@ const props = defineProps<{
                 src="../assets/vip.svg"
               />
             </div>
+            <!-- 作者名 -->
             <div
-              v-if="['XL', 'L'].includes(size.toUpperCase())"
+              v-if="['XL', 'L', 'M'].includes(size.toUpperCase())"
               :title="listItem.artist"
               class="table-desc-art table-cell-ellipsis"
             >

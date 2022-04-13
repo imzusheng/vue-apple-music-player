@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-11 11:08:36
-LastEditTime: 2022-04-13 09:34:12
+LastEditTime: 2022-04-13 18:44:57
 Description: 歌单展示列表grid布局
 FilePath: \vite-music-player\src\components\SectionListGrid.vue
 -->
@@ -10,6 +10,7 @@ import { useStore } from '@/store'
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import SectionListItem from '@/components/SectionListItem.vue'
+import SectionTitle from '@/components/SectionTitle.vue'
 
 const { action, actionParams } = defineProps<{
   // 获取数据的action名字
@@ -47,11 +48,19 @@ const listData = reactive<any>({
   data: []
 })
 
-store.dispatch(`get${action}`, actionParams).then((res) => {
-  listData.data = res.data
-  // 加载完成后调用绑定的onload方法
-  emit('onload', action)
-})
+store
+  .dispatch(`get${action}`, actionParams)
+  .then((res) => {
+    listData.data = res.data
+    // 加载完成后调用绑定的onload方法
+    emit('onload', action)
+  })
+  .catch((err: any) => {
+    store.commit('setError', {
+      status: true,
+      info: err.stack
+    })
+  })
 
 const toDetail = (routeName: string, payload: string | number) => {
   router.push({
@@ -66,23 +75,11 @@ const toDetail = (routeName: string, payload: string | number) => {
 <template>
   <section class="section-list-grid" v-if="listData.data.length > 0">
     <!-- 大标题 -->
-    <div class="list-title" v-if="sectionTitle">
-      <div class="list-title-content">
-        <p class="list-title-sub" v-if="subTitle">{{ subTitle }}</p>
-        <h2 class="list-title-h2">{{ sectionTitle }}</h2>
-      </div>
-      <router-link
-        class="list-title-more"
-        v-if="listData.data.length > 6 || more"
-        :to="{
-          name: 'more',
-          query: {
-            type: action
-          }
-        }"
-        v-text="'查看更多'"
-      />
-    </div>
+    <section-title
+      :sectionTitle="sectionTitle"
+      :subTitle="subTitle"
+      :actionName="listData.data.length > 6 || more ? action : null"
+    ></section-title>
 
     <!-- 列表 -->
     <ul class="list">

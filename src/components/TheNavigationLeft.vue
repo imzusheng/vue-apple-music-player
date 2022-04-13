@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 11:17:48
-LastEditTime: 2022-04-12 15:54:57
+LastEditTime: 2022-04-13 15:35:47
 Description: 左侧导航栏
 FilePath: \vite-music-player\src\components\TheNavigationLeft.vue
 -->
@@ -12,19 +12,19 @@ import iconLibrary from '@/assets/icon-library.svg'
 import iconSearch from '@/assets/icon-search.svg'
 
 const navConfig = [
-  { title: '首页', icon: iconHome, routerName: 'pageHome' },
-  { title: '探索', icon: iconDiscovery, routerName: 'pageHome' },
-  { title: '媒体库', icon: iconLibrary, routerName: 'pageHome' },
-  { title: '搜索', icon: iconSearch, routerName: 'pageHome' }
+  { title: '首页', icon: iconHome, routerName: 'home' },
+  { title: '探索', icon: iconDiscovery, routerName: 'discovery' },
+  { title: '媒体库', icon: iconLibrary, routerName: 'home' },
+  { title: '搜索', icon: iconSearch, routerName: 'home' }
 ]
 </script>
 
 <template>
   <nav id="nav">
     <div class="nav-spacing">
-      <div class="logo">
+      <router-link class="logo" :to="{ name: 'home' }">
         <img class="logo-img" src="../assets/logo_b.png" alt="" />
-      </div>
+      </router-link>
 
       <ul class="nav-list">
         <li class="nav-list-item" v-for="item in navConfig" :key="item.title">
@@ -51,6 +51,7 @@ const navConfig = [
     height: 100%;
 
     .logo {
+      display: block;
       width: 100%;
       padding: 16px;
       .logo-img {

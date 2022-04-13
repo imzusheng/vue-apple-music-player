@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 17:31:44
-LastEditTime: 2022-04-13 09:45:54
+LastEditTime: 2022-04-14 00:10:53
 Description: detail页面的基本框架
 FilePath: \vite-music-player\src\components\TheDetailFrame.vue
 -->
@@ -32,7 +32,11 @@ store.commit('setLoading', true)
 ////////////////////////////////
 
 watchEffect(() => {
+  // 所有数据是同时传入的，有了picUrl说明其他也传入了
   if (!props.picUrl) return
+
+  store.commit('setHeaderText', props.title)
+
   fetch(props.picUrl).then(async (res) => {
     const imgBlob = await res.blob()
     const base64 = await blobToBase64(imgBlob)
@@ -135,6 +139,9 @@ onUnmounted(() => {
               <img class="icon" src="@/assets/icon-song-play.svg" alt="" />
             </button>
             <button aria-label="关注" class="action-btn-subscribe">
+              共12首音乐
+            </button>
+            <button aria-label="关注" class="action-btn-subscribe">
               订阅 132.1万
             </button>
           </div>
@@ -196,6 +203,7 @@ onUnmounted(() => {
     position: relative;
     z-index: 2;
     margin-top: var(--content-mg-top);
+    overflow: hidden;
 
     // 歌手信息
     .section-frame-info {
@@ -225,7 +233,7 @@ onUnmounted(() => {
           }
           .frame-info-sub {
             color: rgba(255, 255, 255, 1);
-            font-weight: 400;
+            font-weight: 600;
             margin-bottom: 20px;
           }
           .frame-info-desc {
@@ -242,10 +250,11 @@ onUnmounted(() => {
     }
 
     .section-frame-content {
+      // height: calc(100% + var(--content-mg-top));
       .section-frame-bg {
         position: absolute;
         width: 100%;
-        height: calc(100% + var(--content-mg-top));
+        height: 100%;
         z-index: -1;
         background-image: linear-gradient(
           rgba(255, 255, 255, 0.6) 0,
@@ -266,10 +275,10 @@ onUnmounted(() => {
         display: flex;
         align-items: center;
         .action-btn-play {
+          margin-right: 16px;
           border: none;
           outline: none;
           cursor: pointer;
-          margin-right: 32px;
           width: 56px;
           height: 56px;
           border-radius: 50%;
@@ -281,9 +290,12 @@ onUnmounted(() => {
         }
         .action-btn-subscribe {
           padding: 6px 16px;
-          background: transparent;
-          border: 1px solid rgba(0, 0, 0, 0.6);
-          border-radius: 4px;
+          margin-left: 16px;
+          // background: transparent;
+          // border: 1px solid rgba(0, 0, 0, 0.6);
+          border: none;
+          background-color: rgba(0, 0, 0, 0.05);
+          border-radius: 16px;
           cursor: pointer;
         }
       }

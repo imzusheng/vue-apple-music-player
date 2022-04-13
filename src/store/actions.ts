@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-11 09:15:16
- * @LastEditTime: 2022-04-13 09:36:37
+ * @LastEditTime: 2022-04-13 23:59:29
  * @Description: 所有请求
  * @FilePath: \vite-music-player\src\store\actions.ts
  */
@@ -9,7 +9,7 @@ import API from '@/common/api'
 import { countConvert, timeStampConvert, pickUpName, durationConvert } from '@/common/util'
 import moment from 'moment'
 import { get } from '@/common/apiService'
-import { Args, DataItem, Returns, TableListSongsTypes } from '@/common/types'
+import { Args, RmdItem, ResRmd, SongTableRow } from '@/common/types'
 
 // 定义参数默认值
 const initArgs: Args = {
@@ -22,17 +22,41 @@ const initArgs: Args = {
  */
 const notArgs = {
   // 获取热门歌单分类
-  async getPlaylistHot({}): Promise<Returns> {
+  async getPlaylistHot({}): Promise<any> {
     const resJson = await get(API.PLAYLIST.GET_PLAYLIST_HOT, {})
     return {
-      data: resJson.tags,
-      type: 'playlistHot'
+      data: resJson.tags
     }
   },
   // 获取热门歌单分类
   async getPlaylistDetail({}): Promise<any> {
     const resJson = await get(API.PLAYLIST.GET_PLAYLIST_DETAIL, {})
     return resJson.playlist
+  },
+  // 所有榜单详情
+  async getToplistDetail({}): Promise<any> {
+    const resJson = await get(API.GET_TOPLIST_DETAIL, {})
+    return resJson
+  },
+  // 获取banner图片
+  async getBanner({}): Promise<any> {
+    const resJson = await get(API.GET_BANNER, {})
+    return resJson.banners.slice(0, 3).map((v: any) => {
+      let payload: any
+
+      if (v.targetId === 0 && v.url) {
+        payload = v.url.substring(v.url.indexOf('id=') + 3)
+      } else {
+        payload = v.targetId
+      }
+
+      return {
+        payload,
+        picUrl: v.imageUrl,
+        type: v.targetType,
+        title: v.typeTitle
+      }
+    })
   }
 }
 
@@ -43,6 +67,22 @@ const album = {
   // 获取专辑内所有歌曲
   async getAlbumAll({}, id: string | number): Promise<any> {
     return await get(API.ALBUM.GET_ALBUM_All, { id })
+  },
+
+  // 获取专辑信息
+  async getAlbumDetail({}, id: string | number): Promise<any> {
+    const data = await get(API.ALBUM.GET_ALBUM_DETAIL, { id })
+
+    console.log(data)
+
+    return {
+      // 歌曲id集合
+      trackIds: data.album.trackIds.map((v: any) => v.id),
+      title: data.album.name,
+      desc: data.album.description,
+      picUrl: data.album.coverImgUrl + '?param=800y800',
+      sub: `共${data.album.trackCount}首音乐`
+    }
   }
 }
 
@@ -53,7 +93,7 @@ const song = {
   // 获取单曲详情
   async getSongsDetail({}, ids: string): Promise<any> {
     const resJson = await get(API.SONG.GET_SONG_DETAIL, { ids })
-    const data: Array<TableListSongsTypes> = resJson.songs.map((v: any): TableListSongsTypes => {
+    const data: Array<SongTableRow> = resJson.songs.map((v: any): SongTableRow => {
       return {
         // 作者名
         artist: pickUpName(v.ar),
@@ -78,21 +118,13 @@ const song = {
       }
     })
     return data
+  },
+  // 通过单曲获取专辑详情
+  async getAlbumThroughSongs({}, ids: string): Promise<any> {
+    const resJson = await get(API.SONG.GET_SONG_DETAIL, { ids })
+    const song = resJson.songs[0]
+    return song.al.id
   }
-  // 获取单曲详情
-  // getSongDetail({ state }, ids) {
-  //   return new Promise(resolve => {
-  //     fetchToJson(`${API.SONG.GET_SONG_DETAIL}?ids=${ids}`).then(resJson => {
-  //       const songs = resJson.songs.map(v => {
-  //         v.duration = v.dt
-  //         v.album = v.al.name
-  //         v.picUrl = v.al.picUrl + '?param=180y180'
-  //         return v
-  //       })
-  //       resolve(songs)
-  //     })
-  //   })
-  // }
 }
 
 /**
@@ -115,13 +147,13 @@ const playlist = {
 }
 
 /**
- * 歌手相关请求
+ * 歌手
  */
 const artist = {
   // 获取歌手信息
-  async getArtistDetail({}, id: string | number): Promise<Returns> {
+  async getArtistDetail({}, id: string | number): Promise<ResRmd> {
     const resJson = await get(API.ART.GET_ARTIST_DETAIL, { id })
-    const data: DataItem = {
+    const data: RmdItem = {
       routeName: 'artist',
       title: resJson.data.artist.name,
       picUrl: resJson.data.artist.cover + '?param=800y800',
@@ -144,9 +176,9 @@ const artist = {
     }
   },
   // 获取歌手专辑
-  async getArtistAlbum({}, args: any): Promise<Returns> {
+  async getArtistAlbum({}, args: any): Promise<ResRmd> {
     const resJson = await get(API.ART.GET_ARTIST_ALBUM, args)
-    const data: Array<DataItem> = resJson.hotAlbums.map((v: any): DataItem => {
+    const data: Array<RmdItem> = resJson.hotAlbums.map((v: any): RmdItem => {
       return {
         title: v.name,
         desc: `${moment(v.publishTime).year()} • ${v.type === 'Single' ? (v.type = '单曲') : v.type}`,
@@ -161,9 +193,9 @@ const artist = {
     }
   },
   // 获取歌手MV
-  async getArtistMv({}, args: any): Promise<Returns> {
+  async getArtistMv({}, args: any): Promise<ResRmd> {
     const resJson = await get(API.ART.GET_ARTIST_MV, args)
-    const data: Array<DataItem> = resJson.mvs.map((v: any): DataItem => {
+    const data: Array<RmdItem> = resJson.mvs.map((v: any): RmdItem => {
       return {
         title: v.name,
         desc: `${countConvert(v.playCount)}次观看`,
@@ -178,9 +210,9 @@ const artist = {
     }
   },
   // 获取歌手视频
-  async getArtistVideo({}, args: any): Promise<Returns> {
+  async getArtistVideo({}, args: any): Promise<ResRmd> {
     const resJson = await get(API.ART.GET_ARTIST_VIDEO, args)
-    const data: Array<DataItem> = resJson.data.records.map((v: any): DataItem => {
+    const data: Array<RmdItem> = resJson.data.records.map((v: any): RmdItem => {
       return {
         title: v.resource.mlogBaseData.text,
         desc: countConvert(v.resource.mlogExtVO.playCount) + '次观看',
@@ -195,9 +227,9 @@ const artist = {
     }
   },
   // 获取相似歌手
-  async getArtistSimi({}, args: any): Promise<Returns> {
+  async getArtistSimi({}, args: any): Promise<ResRmd> {
     const resJson = await get(API.ART.GET_ARTIST_SIMI, args)
-    const data: Array<DataItem> = resJson.artists.map((v: any): DataItem => {
+    const data: Array<RmdItem> = resJson.artists.map((v: any): RmdItem => {
       return {
         title: v.name,
         desc: '艺人',
@@ -214,13 +246,63 @@ const artist = {
 }
 
 /**
+ * 电台
+ */
+const radio = {
+  // 电台节目详情-单曲详情 id
+  async getDjpDetail({}, args: Args): Promise<any> {
+    const resJson = await get(API.DJ.GET_DJP_DETAIL, Object.assign(initArgs, args))
+    // 单曲详情没啥用，需要节目ID然后再获取整个节目列表
+    return {
+      title: resJson.program.radio.name,
+      desc: resJson.program.radio.desc,
+      picUrl: resJson.program.radio.picUrl + '?param=800y800',
+      sub: resJson.program.radio.category,
+      radioId: resJson.program.radio.id
+    }
+  },
+  // 电台节目详情-单曲详情 id
+  async getDjDetail({}, args: Args): Promise<any> {
+    const resJson = await get(API.DJ.GET_DJ_DETAIL, Object.assign(initArgs, args))
+    // 单曲详情没啥用，需要节目ID然后再获取整个节目列表
+
+    return {
+      title: resJson.data.name,
+      desc: resJson.data.desc,
+      picUrl: resJson.data.picUrl + '?param=800y800',
+      sub: resJson.data.category,
+      radioId: resJson.data.id
+    }
+  },
+  // 电台节目详情-节目详情 rid
+  async getDjpListDetail({}, args: Args): Promise<any> {
+    const resJson = await get(API.DJ.GET_DJP, Object.assign(initArgs, args))
+    const data: Array<SongTableRow> = resJson.programs.map((row: any): SongTableRow => {
+      return {
+        artist: row.dj.nickname,
+        title: row.mainSong.name,
+        album: row.radio?.name || row.mainSong.album.name,
+        picUrl: row.coverUrl + '?param=50y50',
+        duration: durationConvert(row.duration / 1000),
+        fee: row.fee
+      }
+    })
+
+    return {
+      data,
+      more: resJson.more
+    }
+  }
+}
+
+/**
  * 首页推荐请求
  */
 const recommend = {
   // 社区精选 歌单
-  async getcommunitys({}, args: Args): Promise<Returns> {
+  async getcommunitys({}, args: Args): Promise<ResRmd> {
     const resJson = await get(API.PLAYLIST.GET_COMMUNITY, Object.assign(initArgs, args))
-    const data: Array<DataItem> = resJson.playlists.map((v: any): DataItem => {
+    const data: Array<RmdItem> = resJson.playlists.map((v: any): RmdItem => {
       return {
         title: v.name,
         desc: `${timeStampConvert(v.trackUpdateTime)} • ${v.trackCount}首音乐`,
@@ -235,9 +317,9 @@ const recommend = {
     }
   },
   // 今日推荐 歌单
-  async getrecommends({}, args: Args): Promise<Returns> {
+  async getrecommends({}, args: Args): Promise<ResRmd> {
     const resJson = await get(API.PLAYLIST.GET_RECOMMENDS, Object.assign(initArgs, args))
-    const data: Array<DataItem> = resJson.result.map((v: any): DataItem => {
+    const data: Array<RmdItem> = resJson.result.map((v: any): RmdItem => {
       return {
         title: v.name,
         desc: `${timeStampConvert(v.trackNumberUpdateTime)} • ${v.trackCount}首音乐`,
@@ -252,9 +334,9 @@ const recommend = {
     }
   },
   // 推荐MV
-  async getmvs({}, args: Args): Promise<Returns> {
+  async getmvs({}, args: Args): Promise<ResRmd> {
     const resJson = await get(API.MV.GET_NEW_MV, Object.assign(initArgs, args))
-    const data: Array<DataItem> = resJson.data.map((v: any): DataItem => {
+    const data: Array<RmdItem> = resJson.data.map((v: any): RmdItem => {
       return {
         title: v.name,
         picUrl: v.cover + '?param=180y180',
@@ -269,9 +351,9 @@ const recommend = {
     }
   },
   // 推荐热门歌手
-  async getHotArtists({}, args: Args): Promise<Returns> {
+  async getHotArtists({}, args: Args): Promise<ResRmd> {
     const resJson = await get(API.ART.GET_HOT_ARTISTS, Object.assign(initArgs, args))
-    const data: Array<DataItem> = resJson.artists.map((v: any): DataItem => {
+    const data: Array<RmdItem> = resJson.artists.map((v: any): RmdItem => {
       return {
         title: v.name,
         picUrl: v.img1v1Url + '?param=180y180',
@@ -285,29 +367,29 @@ const recommend = {
       type: 'HotArtists'
     }
   },
-  // 推荐DJ
-  async getRecommendsDj({}, args: Args): Promise<Returns> {
-    const resJson = await get(API.DJ.GET_RECOMMENDS_DJ, Object.assign(initArgs, args))
+  // 热门电台节目
+  async getHotDjp({}, args: Args): Promise<ResRmd> {
+    const resJson = await get(API.DJ.GET_HOT_DJP, Object.assign(initArgs, args))
 
-    const data: Array<DataItem> = resJson.result.map((v: any): DataItem => {
+    const data: Array<RmdItem> = resJson.result.map((v: any): RmdItem => {
       return {
         title: v.name,
         picUrl: v.picUrl + '?param=180y180',
         desc: v.copywriter,
         payload: v.id,
-        routeName: 'dj'
+        routeName: 'djp'
       }
     })
     return {
       data,
-      type: 'RecommendsDj'
+      type: 'HotDjp'
     }
   },
-  // 推荐DJ
-  async getRecommendsDjp({}, args: Args): Promise<Returns> {
+  // 推荐电台节目
+  async getRecommendsDjp({}, args: Args): Promise<ResRmd> {
     const resJson = await get(API.DJ.GET_RECOMMENDS_DJP, Object.assign(initArgs, args))
 
-    const data: Array<DataItem> = resJson.programs.map((v: any): DataItem => {
+    const data: Array<RmdItem> = resJson.programs.map((v: any): RmdItem => {
       return {
         title: v.name,
         picUrl: v.coverUrl + '?param=180y180',
@@ -321,11 +403,29 @@ const recommend = {
       type: 'RecommendsDjp'
     }
   },
+  // 个性推荐电台
+  async getRecommendsDj({}, args: Args): Promise<ResRmd> {
+    const resJson = await get(API.DJ.GET_RECOMMENDS_DJ, Object.assign(initArgs, args))
+
+    const data: Array<RmdItem> = resJson.data.map((v: any): RmdItem => {
+      return {
+        title: v.name,
+        picUrl: v.picUrl + '?param=180y180',
+        desc: v.desc,
+        payload: v.id,
+        routeName: 'dj'
+      }
+    })
+    return {
+      data,
+      type: 'RecommendsDj'
+    }
+  },
   // 最新专辑
-  async getNewAlbum({}, args: Args): Promise<Returns> {
+  async getNewAlbum({}, args: Args): Promise<ResRmd> {
     const resJson = await get(API.ALBUM.GET_NEW_ALBUM, Object.assign(initArgs, args))
 
-    const data: Array<DataItem> = resJson.albums.map((v: any): DataItem => {
+    const data: Array<RmdItem> = resJson.albums.map((v: any): RmdItem => {
       return {
         title: v.name,
         picUrl: v.picUrl + '?param=180y180',
@@ -340,10 +440,10 @@ const recommend = {
     }
   },
   // 精品歌单
-  async getPlaylistHq({}, args: Args): Promise<Returns> {
+  async getPlaylistHq({}, args: Args): Promise<ResRmd> {
     const resJson = await get(API.PLAYLIST.GET_PLAYLIST_HQ, Object.assign(initArgs, args))
 
-    const data: Array<DataItem> = resJson.playlists.map((v: any): DataItem => {
+    const data: Array<RmdItem> = resJson.playlists.map((v: any): RmdItem => {
       return {
         title: v.name,
         picUrl: v.coverImgUrl + '?param=180y180',
@@ -358,10 +458,10 @@ const recommend = {
     }
   },
   // 独家精选
-  async getRecommendsPrivate({}, args: Args): Promise<Returns> {
+  async getRecommendsPrivate({}, args: Args): Promise<ResRmd> {
     const resJson = await get(API.DJ.GET_RECOMMENDS_PRIVATE, Object.assign(initArgs, args))
 
-    const data: Array<DataItem> = resJson.result.map((v: any): DataItem => {
+    const data: Array<RmdItem> = resJson.result.map((v: any): RmdItem => {
       return {
         title: v.name,
         picUrl: v.sPicUrl + '?param=320y180',
@@ -380,6 +480,7 @@ const recommend = {
 export default {
   ...notArgs,
   ...song,
+  ...radio,
   ...album,
   ...artist,
   ...playlist,
