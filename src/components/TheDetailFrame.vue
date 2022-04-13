@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 17:31:44
-LastEditTime: 2022-04-14 00:10:53
+LastEditTime: 2022-04-14 00:23:31
 Description: detail页面的基本框架
 FilePath: \vite-music-player\src\components\TheDetailFrame.vue
 -->
@@ -9,7 +9,7 @@ FilePath: \vite-music-player\src\components\TheDetailFrame.vue
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref, nextTick, watchEffect } from 'vue'
 import { useStore } from '@/store'
-import { blobToBase64 } from '@/common/util'
+import { blobToBase64, throttle } from '@/common/util'
 
 const props = defineProps<{
   // 标题
@@ -72,16 +72,23 @@ const animationHandler = () => {
   const headerTarget = documentHeight - 120
   // 动画产生值
   let curValue: any, showValue: any
+
   // 头部按钮显示动画
   if (headerTarget > curScrollTop) {
     showValue = 1 - (headerTarget - curScrollTop) / headerTarget
   } else {
     showValue = 1
   }
-  document.documentElement.style.setProperty(
-    '--animation-target',
-    showValue === 1 ? showValue : '0'
-  )
+
+  const curShowValue =
+    document.documentElement.style.getPropertyValue('--animation-target')
+  // 避免重复赋值
+  if (curShowValue !== showValue) {
+    document.documentElement.style.setProperty(
+      '--animation-target',
+      showValue === 1 ? showValue : '0'
+    )
+  }
 
   // 其他动画
   if (targetHeight > curScrollTop) {
@@ -89,19 +96,28 @@ const animationHandler = () => {
   } else {
     curValue = 1
   }
-  document.documentElement.style.setProperty(
-    '--animation-ratio',
-    curValue.toFixed(3)
-  )
+
+  const curRatio =
+    document.documentElement.style.getPropertyValue('--animation-ratio')
+  // 避免重复赋值
+  if (curRatio !== curValue) {
+    document.documentElement.style.setProperty(
+      '--animation-ratio',
+      curValue.toFixed(3)
+    )
+  }
 }
+
+// 套上防抖
+const throttleScrollHandler = throttle(animationHandler, 1000 / 60)
 
 onMounted(() => {
   // 监听动画
-  document.addEventListener('scroll', animationHandler)
+  document.addEventListener('scroll', throttleScrollHandler)
 })
 
 onUnmounted(() => {
-  document.removeEventListener('scroll', animationHandler)
+  document.removeEventListener('scroll', throttleScrollHandler)
 })
 </script>
 

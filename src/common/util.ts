@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 23:39:46
- * @LastEditTime: 2022-04-13 16:02:30
+ * @LastEditTime: 2022-04-14 00:20:56
  * @Description:
  * @FilePath: \vite-music-player\src\common\util.ts
  */
@@ -104,4 +104,28 @@ export const mapActionsHelpers = (namespaced: string | null, actions: Array<stri
  */
 export const getRandomIndex = (min: number, max: number): number => {
   return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
+/**
+ * 防抖
+ * @param func
+ * @param delay
+ */
+export const throttle = (func: Function, delay: number) => {
+  let last: any, timer: any
+
+  return function () {
+    const now = Date.now()
+
+    if (last && now - last < delay) {
+      clearTimeout(timer)
+      timer = setTimeout(function () {
+        last = now
+        func()
+      }, delay)
+    } else {
+      last = now
+      func()
+    }
+  }
 }
