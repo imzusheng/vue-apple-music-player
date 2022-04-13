@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-11 11:08:36
-LastEditTime: 2022-04-12 13:26:51
+LastEditTime: 2022-04-13 09:34:12
 Description: 歌单展示列表grid布局
 FilePath: \vite-music-player\src\components\SectionListGrid.vue
 -->
@@ -11,20 +11,35 @@ import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import SectionListItem from '@/components/SectionListItem.vue'
 
-const props = defineProps<{
+const { action, actionParams } = defineProps<{
   // 获取数据的action名字
   action: string
-  // 调用action的参数
-  actionParams?: any
-  // 是否显示播放按钮
-  playBtn?: boolean
-  // 封面是否圆角
-  round?: boolean
+
   // 大标题
   sectionTitle: string
+
+  // 强制显示查看更多的按钮（原本是自动计算）
+  more?: boolean
+
+  // 小标题
+  subTitle?: string
+
+  // 调用action的参数
+  actionParams?: object
+
+  // 是否显示播放按钮
+  playBtn?: boolean
+
+  // 封面是否圆角
+  round?: boolean
+
+  // 大小倍率，如果为2则占用column列数*2
+  // sizeRatio?: number
 }>()
 
 const emit = defineEmits(['onload'])
+
+emit('onload', null)
 
 const store = useStore()
 const router = useRouter()
@@ -32,10 +47,10 @@ const listData = reactive<any>({
   data: []
 })
 
-store.dispatch(`get${props.action}`, props.actionParams).then((res) => {
+store.dispatch(`get${action}`, actionParams).then((res) => {
   listData.data = res.data
   // 加载完成后调用绑定的onload方法
-  emit('onload', props.action)
+  emit('onload', action)
 })
 
 const toDetail = (routeName: string, payload: string | number) => {
@@ -51,20 +66,23 @@ const toDetail = (routeName: string, payload: string | number) => {
 <template>
   <section class="section-list-grid" v-if="listData.data.length > 0">
     <!-- 大标题 -->
-    <h2 class="list-title" v-if="sectionTitle">
-      {{ sectionTitle }}
+    <div class="list-title" v-if="sectionTitle">
+      <div class="list-title-content">
+        <p class="list-title-sub" v-if="subTitle">{{ subTitle }}</p>
+        <h2 class="list-title-h2">{{ sectionTitle }}</h2>
+      </div>
       <router-link
-        class="list-sub-title"
-        v-if="listData.data.length > 6"
+        class="list-title-more"
+        v-if="listData.data.length > 6 || more"
         :to="{
           name: 'more',
           query: {
-            type: props.action
+            type: action
           }
         }"
-        v-text="'更多'"
+        v-text="'查看更多'"
       />
-    </h2>
+    </div>
 
     <!-- 列表 -->
     <ul class="list">
@@ -74,8 +92,8 @@ const toDetail = (routeName: string, payload: string | number) => {
       >
         <section-list-item
           @click="toDetail(item.routeName, item.payload)"
-          :playBtn="props.playBtn"
-          :round="props.round"
+          :playBtn="playBtn"
+          :round="round"
           :data="item"
         />
       </template>
@@ -89,12 +107,28 @@ const toDetail = (routeName: string, payload: string | number) => {
   margin-bottom: 72px;
   // h2
   .list-title {
-    font-size: 28px;
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
     padding: 16px 0;
-    .list-sub-title {
+    .list-title-content {
+      .list-title-h2 {
+        font-size: 28px;
+        font-weight: 700;
+        line-height: calc(28px * 1.6);
+      }
+      .list-title-sub {
+        font-size: 16px;
+        font-weight: 400;
+        color: rgba(0, 0, 0, 0.45);
+      }
+    }
+    .list-title-more {
       font-size: 16px;
       margin-left: 16px;
       font-weight: 400;
+      line-height: calc((28px * 1.6) - 8px);
       color: rgba(0, 0, 0, 0.8);
       &:hover {
         text-decoration: underline;
@@ -105,7 +139,7 @@ const toDetail = (routeName: string, payload: string | number) => {
   .list {
     display: grid;
     gap: 24px;
-    grid-template-columns: repeat(var(--column-count), 1fr);
+    grid-template-columns: repeat(calc(var(--column-count)), 1fr);
   }
 }
 </style>

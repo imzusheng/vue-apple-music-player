@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 12:12:08
-LastEditTime: 2022-04-12 13:07:15
+LastEditTime: 2022-04-13 00:29:14
 Description: li单项
 FilePath: \vite-music-player\src\components\SectionListItem.vue
 -->
@@ -17,7 +17,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <li class="list-item">
+  <li class="list-item user-not-select">
     <!-- 遮罩 -->
     <div class="list-item-poster">
       <div class="list-item-overlay">
@@ -54,6 +54,9 @@ const props = defineProps<{
   overflow: hidden;
   border-radius: 3px;
   white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   // padding: 16px;
   // background: rgba(250, 251, 253, 1);
   // box-shadow: 7px 7px 20px rgba(0, 0, 0, 0.1),
@@ -64,8 +67,11 @@ const props = defineProps<{
   .list-item-poster {
     cursor: pointer;
     width: 100%;
+    height: auto;
+    object-fit: cover;
     // 由于img默认inline-block，会造成间隙
-    display: block;
+    display: flex;
+    flex: 1;
     border-radius: 3px;
     position: relative;
     overflow: hidden;

@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 11:17:48
-LastEditTime: 2022-04-12 11:19:07
+LastEditTime: 2022-04-12 15:54:57
 Description: 左侧导航栏
 FilePath: \vite-music-player\src\components\TheNavigationLeft.vue
 -->
@@ -41,7 +41,7 @@ const navConfig = [
 <style lang="less">
 #nav {
   flex-shrink: 0;
-  width: 240px;
+  width: var(--nav-left-width);
   height: 100vh;
   background: rgba(246, 246, 246, 1);
   position: fixed;

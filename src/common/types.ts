@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-11 22:59:54
- * @LastEditTime: 2022-04-12 08:40:14
+ * @LastEditTime: 2022-04-12 21:50:16
  * @Description: typescript的复用的类型、接口定义
  * @FilePath: \vite-music-player\src\common\types.ts
  */
@@ -38,4 +38,28 @@ interface Args {
   pageIndex?: number
 }
 
-export type { Returns, DataItem, Args }
+// 歌单表格组件
+interface TableListSongsTypes {
+  // 作者名
+  artist: string
+
+  // 歌曲封面
+  picUrl: string
+
+  // 歌曲名
+  title: string
+
+  // 来自专辑
+  album: string
+
+  // 发布时间 年
+  publishTime?: string
+
+  // 歌曲时长，单位分钟
+  duration: string
+
+  // 是否需要会员
+  fee: string
+}
+
+export type { Returns, DataItem, Args, TableListSongsTypes }

@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 23:39:53
- * @LastEditTime: 2022-04-12 11:36:04
+ * @LastEditTime: 2022-04-13 00:16:35
  * @Description: api文件
  * @FilePath: \vite-music-player\src\common\api.ts
  */
@@ -49,7 +49,11 @@ export default {
     // 电台节目详情-单条
     GET_DJP_DETAIL: '/dj/program/detail',
     // 推荐电台
-    GET_RECOMMENDS_DJ: '/personalized/djprogram'
+    GET_RECOMMENDS_DJ: '/personalized/djprogram',
+    // 推荐电台节目
+    GET_RECOMMENDS_DJP: '/program/recommend',
+    // 独家精选推荐（不知道是什么分类）
+    GET_RECOMMENDS_PRIVATE: '/personalized/privatecontent/list'
   },
 
   // 单曲
@@ -64,6 +68,8 @@ export default {
 
   // 专辑相关
   ALBUM: {
+    // 最新专辑
+    GET_NEW_ALBUM: '/album/newest',
     // 获取专辑信息
     GET_ALBUM_DETAIL: '/album',
     // 获取专辑所有歌曲
@@ -99,7 +105,9 @@ export default {
     // 歌单详情
     GET_PLAYLIST_DETAIL: '/playlist/detail',
     // 获取热门歌单分类
-    GET_PLAYLIST_HOT: '/playlist/hot'
+    GET_PLAYLIST_HOT: '/playlist/hot',
+    // 获取精品歌单
+    GET_PLAYLIST_HQ: '/top/playlist/highquality'
   },
 
   // MV相关
@@ -122,6 +130,9 @@ export default {
 
   // 视频相关
   VIDEO: {
+    // 推荐视频
+    GET_RECOMMENDS_VIDEO: 'video/timeline/recommend',
+    // 视频详情
     GET_VIDEO_DETAIL: '/video/detail'
   },
 

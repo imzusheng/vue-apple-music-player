@@ -1,12 +1,13 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 20:15:36
-LastEditTime: 2022-04-12 10:37:34
+LastEditTime: 2022-04-12 20:11:34
 Description: 入口
 FilePath: \vite-music-player\src\App.vue
 -->
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+</script>
 
 <template>
   <!-- v-columnMatch指令 js响应式布局，计算gird列数 -->
@@ -34,7 +35,7 @@ FilePath: \vite-music-player\src\App.vue
 
 html {
   overflow-y: scroll;
-  scrollbar-color: rgba(255, 255, 255, 0.1) rgb(12, 12, 12);
+  scrollbar-color: rgba(0, 0, 0, 0.2) #fff;
   scrollbar-width: auto;
 }
 
@@ -47,6 +48,8 @@ html {
 }
 
 :root {
+  // 左侧导航栏宽度
+  --nav-left-width: 240px;
   // grid布局列数
   --column-count: 5;
   // 头部高度
@@ -99,7 +102,7 @@ html {
 ::-webkit-scrollbar {
   width: 14px;
   height: 14px;
-  background-color: #121212;
+  background-color: #fff;
 }
 
 /*定义滚动条轨道 内阴影+圆角*/
@@ -110,7 +113,7 @@ html {
 /*定义滑块 内阴影+圆角*/
 ::-webkit-scrollbar-thumb {
   border-radius: 1px;
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 ::-webkit-input-placeholder {

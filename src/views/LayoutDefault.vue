@@ -1,16 +1,20 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 21:10:50
-LastEditTime: 2022-04-12 15:29:44
+LastEditTime: 2022-04-12 21:23:18
 Description: 默认布局
 FilePath: \vite-music-player\src\views\LayoutDefault.vue
 -->
 <script lang="ts" setup>
 import TheNavigationLeft from '@/components/TheNavigationLeft.vue'
+import TheLoading from '@/components/TheLoading.vue'
 import TheHeader from '@/components/TheHeader.vue'
+import PageError from '@/views/PageError.vue'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useStore } from '@/store'
 
+const store = useStore()
 const route = useRoute()
 
 const viewKey = computed(() => {
@@ -29,7 +33,14 @@ const viewKey = computed(() => {
       <!-- 头部 -->
       <the-header />
 
-      <router-view v-slot="{ Component }" :key="viewKey">
+      <the-loading v-if="store.state.loading" />
+      <page-error v-if="store.state.error.status" />
+
+      <router-view
+        v-show="!store.state.loading && !store.state.error.status"
+        v-slot="{ Component }"
+        :key="viewKey"
+      >
         <component :is="Component" />
       </router-view>
 
@@ -46,8 +57,8 @@ const viewKey = computed(() => {
   display: flex;
 
   #main {
-    width: 100%;
-    padding-left: 240px;
+    width: calc(100% - var(--nav-left-width));
+    margin-left: var(--nav-left-width);
     position: relative;
 
     #player {

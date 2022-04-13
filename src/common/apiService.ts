@@ -1,11 +1,12 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 23:43:21
- * @LastEditTime: 2022-04-12 11:44:52
+ * @LastEditTime: 2022-04-12 21:21:00
  * @Description: API服务
  * @FilePath: \vite-music-player\src\common\apiService.ts
  */
 import axios from 'axios'
+import { store } from '@/store'
 
 axios.defaults.baseURL = process.env.NODE_ENV === 'development' ? 'https://music.zusheng.club' : 'https://music.zusheng.club'
 axios.defaults.headers['X-Requested-With'] = 'XMLHttpRequest'
@@ -41,8 +42,13 @@ export const get = (url: string, params: any): Promise<any> => {
         resolve(data)
       })
       .catch(err => {
+        const msg = err?.response?.data?.msg || err?.response?.data?.message || ''
+        store.commit('setLoading', false)
+        store.commit('setError', {
+          status: true,
+          msg
+        })
         resolve(null)
-        console.error('get-error', err)
       })
   })
 }
