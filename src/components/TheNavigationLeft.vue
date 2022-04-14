@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 11:17:48
-LastEditTime: 2022-04-13 15:35:47
+LastEditTime: 2022-04-14 15:55:40
 Description: 左侧导航栏
 FilePath: \vite-music-player\src\components\TheNavigationLeft.vue
 -->
@@ -84,6 +84,11 @@ const navConfig = [
           background: rgba(0, 0, 0, 0.1);
         }
       }
+    }
+  }
+  @media screen and (max-width: 728px) {
+    & {
+      display: none;
     }
   }
 }

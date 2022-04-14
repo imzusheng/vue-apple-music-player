@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 17:31:44
-LastEditTime: 2022-04-14 00:23:31
+LastEditTime: 2022-04-14 09:00:11
 Description: detail页面的基本框架
 FilePath: \vite-music-player\src\components\TheDetailFrame.vue
 -->
@@ -37,19 +37,28 @@ watchEffect(() => {
 
   store.commit('setHeaderText', props.title)
 
-  fetch(props.picUrl).then(async (res) => {
-    const imgBlob = await res.blob()
-    const base64 = await blobToBase64(imgBlob)
+  store.commit('setLoading', false)
 
-    posterRef.value.style.backgroundImage = `url(${base64})`
-    store.commit('setLoading', false)
-    nextTick(() => {
-      // 每次更新页面时，设定css变量--content-mg-top
-      const mgTop =
-        actionRef.value.offsetHeight + infoRef.value.offsetHeight + 'px'
-      artistContentRef.value.style.setProperty('--content-mg-top', `-${mgTop}`)
-    })
+  nextTick(() => {
+    // 每次更新页面时，设定css变量--content-mg-top
+    const mgTop =
+      actionRef.value.offsetHeight + infoRef.value.offsetHeight + 'px'
+    artistContentRef.value.style.setProperty('--content-mg-top', `-${mgTop}`)
   })
+
+  // fetch(props.picUrl).then(async (res) => {
+  //   const imgBlob = await res.blob()
+  //   const base64 = await blobToBase64(imgBlob)
+  //   // base64过长
+  //   posterRef.value.style.backgroundImage = `url(${base64})`
+  //   store.commit('setLoading', false)
+  //   nextTick(() => {
+  //     // 每次更新页面时，设定css变量--content-mg-top
+  //     const mgTop =
+  //       actionRef.value.offsetHeight + infoRef.value.offsetHeight + 'px'
+  //     artistContentRef.value.style.setProperty('--content-mg-top', `-${mgTop}`)
+  //   })
+  // })
 })
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,10 +75,12 @@ const animationHandler = () => {
   const documentHeight = document.documentElement.clientHeight
   // 当前滚动条高度
   const curScrollTop = document.documentElement.scrollTop
+
   // 动画完成节点
   const targetHeight = documentHeight * 0.7
   // 头部标题显示触发点
   const headerTarget = documentHeight - 120
+
   // 动画产生值
   let curValue: any, showValue: any
 
@@ -80,16 +91,6 @@ const animationHandler = () => {
     showValue = 1
   }
 
-  const curShowValue =
-    document.documentElement.style.getPropertyValue('--animation-target')
-  // 避免重复赋值
-  if (curShowValue !== showValue) {
-    document.documentElement.style.setProperty(
-      '--animation-target',
-      showValue === 1 ? showValue : '0'
-    )
-  }
-
   // 其他动画
   if (targetHeight > curScrollTop) {
     curValue = 1 - (targetHeight - curScrollTop) / targetHeight
@@ -97,15 +98,15 @@ const animationHandler = () => {
     curValue = 1
   }
 
-  const curRatio =
-    document.documentElement.style.getPropertyValue('--animation-ratio')
-  // 避免重复赋值
-  if (curRatio !== curValue) {
-    document.documentElement.style.setProperty(
-      '--animation-ratio',
-      curValue.toFixed(3)
-    )
-  }
+  document.documentElement.style.setProperty(
+    '--animation-target',
+    showValue === 1 ? showValue : '0'
+  )
+
+  document.documentElement.style.setProperty(
+    '--animation-ratio',
+    curValue.toFixed(3)
+  )
 }
 
 // 套上防抖
@@ -126,6 +127,7 @@ onUnmounted(() => {
     <!-- 海报 -->
     <div class="frame-banner">
       <div
+        :style="{ backgroundImage: `url(${props.picUrl})` }"
         v-show="props.picUrl"
         class="frame-banner-poster"
         ref="posterRef"

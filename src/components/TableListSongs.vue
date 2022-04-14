@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 18:47:25
-LastEditTime: 2022-04-13 18:12:57
+LastEditTime: 2022-04-14 14:20:42
 Description: 歌曲表格展示 单击切歌，有XL/L/M/S四种尺寸
                 L: 封面，歌名，专辑，发布时间，时长
                 L: 封面，歌名，专辑，时长
@@ -11,8 +11,8 @@ FilePath: \vite-music-player\src\components\TableListSongs.vue
 -->
 
 <script lang="ts" setup>
-import { computed, watchEffect } from 'vue'
 import { SongTableRow } from '@/common/types'
+import InfiniteList from './InfiniteList.vue'
 
 const props = defineProps<{
   // 数据
@@ -24,25 +24,6 @@ const props = defineProps<{
   // 表头是否显示
   title: boolean
 }>()
-
-//   computed: {
-//     getSongDt () {
-//       return function (time) {
-//         return durationConvert(time / 1000)
-//       }
-//     },
-//     getName () {
-//       return function (name) {
-//         return pickUpName(name)
-//       }
-//     },
-//     getPubTime () {
-//       return function (time) {
-//         if (!time) return '未知'
-//         else return moment(time).format('YYYY')
-//       }
-//     }
-//   }
 </script>
 
 <template>
@@ -59,84 +40,81 @@ const props = defineProps<{
       <div v-if="['XL'].includes(props.size.toUpperCase())">发布时间</div>
       <div>时长</div>
     </div>
-    <!-- 数据 -->
-    <ul class="song-table">
-      <li
-        v-for="(listItem, listIndex) in props.songs"
-        :key="`songs-${listIndex}`"
-        :class="`table-row-size-${props.size.toLowerCase()}`"
-        class="table-row"
-      >
-        <!-- @click="play(listItem)" -->
+    <!-- 数据 ul-->
 
-        <!-- 序号 -->
+    <infinite-list class="song-table" :listData="props.songs">
+      <template #default="{ listItem }">
         <div
-          v-if="['XL', 'L', 'M'].includes(size.toUpperCase())"
-          class="table-cell-index"
+          :class="`table-row-size-${props.size.toLowerCase()}`"
+          class="table-row"
         >
-          <span class="playlist-table-index"> {{ listIndex + 1 }}</span>
-          <span class="playlist-table-icon">
-            <img alt="" src="../assets/icon-song-play-black.svg" />
-          </span>
-        </div>
-
-        <!-- 歌曲名字和作者 -->
-        <div class="table-cell-desc table-cell-ellipsis">
-          <img
-            v-lazy:[listItem.picUrl]
-            class="table-cell-desc-pic"
-            src="../assets/empty_white.png"
-            alt=""
-          />
-          <div class="table-cell-desc-info table-cell-ellipsis">
-            <!-- 歌名 -->
-            <div class="table-desc-name">
-              <span :title="listItem.title" class="table-cell-ellipsis">
-                {{ listItem.title }}</span
-              >
-              <!-- vip图标 -->
-              <img
-                v-if="['1'].includes(listItem.fee)"
-                ref=""
-                alt=""
-                class="table-cell-desc-vip"
-                src="../assets/vip.svg"
-              />
-            </div>
-            <!-- 作者名 -->
-            <div
-              v-if="['XL', 'L', 'M'].includes(size.toUpperCase())"
-              :title="listItem.artist"
-              class="table-desc-art table-cell-ellipsis"
-            >
-              {{ listItem.artist }}
-            </div>
-          </div>
-        </div>
-
-        <!-- 专辑名 -->
-        <div
-          v-if="['XL', 'L'].includes(size.toUpperCase())"
-          class="table-cell-ellipsis table-cell-album"
-        >
+          <!-- 序号 -->
           <div
-            :title="listItem.album"
-            class="table-cell-ellipsis table-cell-album"
-            style="display: block"
+            v-if="['XL', 'L', 'M'].includes(props.size.toUpperCase())"
+            class="table-cell-index"
           >
-            {{ listItem.album }}
+            <span class="playlist-table-index"> {{ listItem.idx }}</span>
+            <span class="playlist-table-icon">
+              <img alt="" src="../assets/icon-song-play-black.svg" />
+            </span>
           </div>
-        </div>
 
-        <!-- 发布时间 -->
-        <div v-if="['XL'].includes(size.toUpperCase())" class="table-cell-pub">
-          {{ listItem.publishTime }}
-        </div>
+          <!-- 歌曲名字和作者 -->
+          <div class="table-cell-desc table-cell-ellipsis">
+            <img class="table-cell-desc-pic" :src="listItem.picUrl" alt="" />
+            <div class="table-cell-desc-info table-cell-ellipsis">
+              <!-- 歌名 -->
+              <div class="table-desc-name">
+                <span :title="listItem.title" class="table-cell-ellipsis">
+                  {{ listItem.title }}</span
+                >
+                <!-- vip图标 -->
+                <img
+                  v-if="['1'].includes(listItem.fee)"
+                  ref=""
+                  alt=""
+                  class="table-cell-desc-vip"
+                  src="../assets/vip.svg"
+                />
+              </div>
+              <!-- 作者名 -->
+              <div
+                v-if="['XL', 'L', 'M'].includes(size.toUpperCase())"
+                :title="listItem.artist"
+                class="table-desc-art table-cell-ellipsis"
+              >
+                {{ listItem.artist }}
+              </div>
+            </div>
+          </div>
 
-        <!-- 时长 -->
-        <div class="table-cell-dt">{{ listItem.duration }}</div>
-      </li>
-    </ul>
+          <!-- 专辑名 -->
+          <div
+            v-if="['XL', 'L'].includes(props.size.toUpperCase())"
+            class="table-cell-ellipsis table-cell-album"
+          >
+            <div
+              :title="listItem.album"
+              class="table-cell-ellipsis table-cell-album"
+              style="display: block"
+            >
+              {{ listItem.album }}
+            </div>
+          </div>
+
+          <!-- 发布时间 -->
+          <div
+            v-if="['XL'].includes(props.size.toUpperCase())"
+            class="table-cell-pub"
+          >
+            {{ listItem.publishTime }}
+          </div>
+
+          <!-- 时长 -->
+          <div class="table-cell-dt">{{ listItem.duration }}</div>
+        </div>
+      </template>
+    </infinite-list>
   </div>
 </template>
 

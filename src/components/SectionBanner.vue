@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-13 22:41:51
-LastEditTime: 2022-04-13 23:45:44
+LastEditTime: 2022-04-14 15:49:57
 Description: 海报展示组件
 FilePath: \vite-music-player\src\components\SectionBanner.vue
 -->
@@ -77,7 +77,7 @@ const toDetail = (payload: any) => {
   overflow: hidden;
   border-radius: 4px;
   position: relative;
-  padding: 10px 10px 60px;
+  padding: 40px 40px 80px;
   cursor: pointer;
 
   // 模糊背景
@@ -114,8 +114,8 @@ const toDetail = (payload: any) => {
 
   .banner-pictrue-box {
     position: relative;
-    padding: 50px 40px 0;
-    --border-style: 2px solid rgba(255, 255, 255, 1);
+    padding: 50px 80px 0;
+    --border-style: 3px solid rgba(255, 255, 255, 1);
     // 海报标题
     .banner-title {
       position: absolute;
@@ -129,7 +129,7 @@ const toDetail = (payload: any) => {
     .banner-picture {
       width: 100%;
       display: block;
-      border: 2px solid #fff;
+      border: 3px solid #fff;
     }
     // 相机框框
     .banner-frame-1,
@@ -164,6 +164,24 @@ const toDetail = (payload: any) => {
       left: 0;
       border-bottom: var(--border-style);
       border-left: var(--border-style);
+    }
+  }
+
+  @media screen and (max-width: 1200px) {
+    & {
+      padding: 20px 20px 50px;
+      .banner-pictrue-box {
+        padding: 40px 50px 0;
+      }
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    & {
+      padding: 10px 10px 40px;
+      .banner-pictrue-box {
+        padding: 30px 40px 0;
+      }
     }
   }
 }

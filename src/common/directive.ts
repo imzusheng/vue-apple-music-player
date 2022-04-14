@@ -1,11 +1,12 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-11 15:06:54
- * @LastEditTime: 2022-04-12 09:51:14
+ * @LastEditTime: 2022-04-14 11:56:33
  * @Description: 自定义指令，利用插件安装
  * @FilePath: \vite-music-player\src\common\directive.ts
  */
 import { store } from '@/store'
+import { provide } from 'vue'
 
 // 指令v-columnMatch 为了监听media变化，动态设置grid布局的列数
 export const columnMatchDirective = {
@@ -58,7 +59,6 @@ export const lazyloadDirective = {
         const intersectionObserver = new IntersectionObserver(
           entries => {
             entries.forEach((item: any) => {
-              binding.value = 'hahaha'
               // 图片出现，挂上src
               if (item.intersectionRatio > 0) {
                 // 停止观察

@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 21:10:50
-LastEditTime: 2022-04-13 12:34:48
+LastEditTime: 2022-04-14 15:56:06
 Description: 默认布局
 FilePath: \vite-music-player\src\views\LayoutDefault.vue
 -->
@@ -57,6 +57,7 @@ const viewKey = computed(() => {
   display: flex;
 
   #main {
+    min-width: 350px;
     width: calc(100% - var(--nav-left-width));
     margin-left: var(--nav-left-width);
     position: relative;
@@ -69,6 +70,12 @@ const viewKey = computed(() => {
       bottom: 0;
       right: 0;
       border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+  }
+  @media screen and (max-width: 728px) {
+    #main {
+      width: 100%;
+      margin-left: 0;
     }
   }
 }

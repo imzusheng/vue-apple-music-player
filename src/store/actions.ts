@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-11 09:15:16
- * @LastEditTime: 2022-04-13 23:59:29
+ * @LastEditTime: 2022-04-14 16:10:36
  * @Description: 所有请求
  * @FilePath: \vite-music-player\src\store\actions.ts
  */
@@ -41,7 +41,7 @@ const notArgs = {
   // 获取banner图片
   async getBanner({}): Promise<any> {
     const resJson = await get(API.GET_BANNER, {})
-    return resJson.banners.slice(0, 3).map((v: any) => {
+    return resJson.banners.map((v: any) => {
       let payload: any
 
       if (v.targetId === 0 && v.url) {

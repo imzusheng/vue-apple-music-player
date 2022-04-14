@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 16:04:42
-LastEditTime: 2022-04-13 12:25:41
+LastEditTime: 2022-04-14 16:09:20
 Description: 专辑详情
 FilePath: \vite-music-player\src\views\DetailAlbum.vue
 -->
@@ -14,7 +14,10 @@ import TableListSongs from '@/components/TableListSongs.vue'
 import { SongTableRow } from '@/common/types'
 
 const route = useRoute()
-const { getAlbumAll } = mapActionsHelpers(null, ['getAlbumAll'])
+const { getAlbumAll, getAlbumThroughSongs } = mapActionsHelpers(null, [
+  'getAlbumAll',
+  'getAlbumThroughSongs'
+])
 const albumInfo = reactive<any>({
   // 专辑信息
   data: {
@@ -26,21 +29,31 @@ const albumInfo = reactive<any>({
   // 专辑内歌曲
   songs: []
 })
-const id = route.query.payload
+let id = route.query.payload
 
-getAlbumAll(id).then((res: any) => {
-  albumInfo.data = res.album
-  albumInfo.songs = res.songs.map((v: any): SongTableRow => {
-    return {
-      artist: pickUpName(v.ar),
-      title: v.name,
-      album: v.al.name,
-      picUrl: v.al.picUrl + '?param=50y50',
-      duration: durationConvert(v.dt / 1000),
-      fee: v.fee.toString()
-    }
+getData()
+
+async function getData() {
+  if (route.name === 'song') {
+    const albumId = await getAlbumThroughSongs(id).then((albumId: any) => {
+      id = albumId
+    })
+  }
+
+  getAlbumAll(id).then((res: any) => {
+    albumInfo.data = res.album
+    albumInfo.songs = res.songs.map((v: any): SongTableRow => {
+      return {
+        artist: pickUpName(v.ar),
+        title: v.name,
+        album: v.al.name,
+        picUrl: v.al.picUrl + '?param=50y50',
+        duration: durationConvert(v.dt / 1000),
+        fee: v.fee.toString()
+      }
+    })
   })
-})
+}
 </script>
 
 

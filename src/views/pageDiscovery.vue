@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-13 15:29:38
-LastEditTime: 2022-04-13 23:38:13
+LastEditTime: 2022-04-14 16:07:41
 Description: 探索页面
 FilePath: \vite-music-player\src\views\pageDiscovery.vue
 -->
@@ -24,6 +24,7 @@ const { getToplistDetail, getPlaylistDetail, getSongsDetail, getBanner } =
 
 const data = reactive<any>({
   list: [],
+  curBannerIdx: getRandomIndex(0, 9),
   banners: []
 })
 
@@ -44,26 +45,19 @@ getPlaylistDetail(playlistId)
   .then((res: any) => {
     data.list = res
   })
-
-// 获取榜单
-// getToplistDetail().then((res: any) => {
-//   data.list = res.list
-//   console.log(res)
-// })
 </script>
 
 <template>
   <div id="page-discovery" class="spacing">
     <div class="discovery-banner">
-      <template v-for="item in data.banners" :key="item.payload">
-        <section-banner
-          :payload="item.payload"
-          :title="item.title"
-          :desc="''"
-          :pic-url="item.picUrl"
-          :type="item.type"
-        />
-      </template>
+      <section-banner
+        v-if="data.banners.length > 0"
+        :payload="data.banners[data.curBannerIdx].payload"
+        :title="data.banners[data.curBannerIdx].title"
+        :desc="''"
+        :pic-url="data.banners[data.curBannerIdx].picUrl"
+        :type="data.banners[data.curBannerIdx].type"
+      />
     </div>
 
     <section-list-grid
@@ -95,9 +89,6 @@ getPlaylistDetail(playlistId)
 <style lang="less">
 #page-discovery {
   .discovery-banner {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
     margin-bottom: 24px;
   }
 
