@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 16:04:42
-LastEditTime: 2022-04-14 16:09:20
+LastEditTime: 2022-04-14 18:10:01
 Description: 专辑详情
 FilePath: \vite-music-player\src\views\DetailAlbum.vue
 -->
@@ -66,7 +66,12 @@ async function getData() {
       :sub="`共${albumInfo.data.size}首音乐`"
     >
       <template #list>
-        <table-list-songs :songs="albumInfo.songs" size="L" :title="true" />
+        <table-list-songs
+          :virtualScroll="true"
+          :songs="albumInfo.songs"
+          size="L"
+          :title="true"
+        />
       </template>
     </the-detail-frame>
   </div>

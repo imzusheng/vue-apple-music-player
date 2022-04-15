@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-13 10:05:17
-LastEditTime: 2022-04-13 12:49:45
+LastEditTime: 2022-04-14 18:10:10
 Description: 电台节目详情页
 FilePath: \vite-music-player\src\views\DetailDjp.vue
 -->
@@ -60,7 +60,12 @@ getDjpDetail({ id }).then((res: any) => {
       :picUrl="data.info.picUrl"
     >
       <template #list>
-        <table-list-songs :songs="data.songs" size="L" :title="true" />
+        <table-list-songs
+          :virtualScroll="true"
+          :songs="data.songs"
+          size="L"
+          :title="true"
+        />
       </template>
     </the-detail-frame>
   </div>

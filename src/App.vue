@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 20:15:36
-LastEditTime: 2022-04-13 19:09:53
+LastEditTime: 2022-04-14 18:26:53
 Description: 入口
 FilePath: \vite-music-player\src\App.vue
 -->
@@ -50,37 +50,44 @@ html {
 :root {
   // 左侧导航栏宽度
   --nav-left-width: 240px;
+
   // grid布局列数
   --column-count: 5;
+
   // 头部高度
   --header-height: 72px;
+
   // 动画进度
   --animation-ratio: 0;
+
   // 动画触发点，一般是100vh高度
   --animation-target: 0;
+
   // 主题色
   --theme-color: rgba(212, 42, 42, 0.8);
 
-  // 用js做了媒体查询，暂时不用你
-  // @media screen and (min-width: 1200px) {
-  //   --column-count: 6;
-  // }
+  // gap间隙
+  --grid-gap: 24px;
 
-  // @media screen and (max-width: 1200px) {
-  //   --column-count: 5;
-  // }
+  // 页面两边距
+  --page-spacing: 32px;
 
-  // @media screen and (max-width: 1068px) {
-  //   --column-count: 4;
-  // }
+  @media screen and (min-width: 1200px) {
+  }
 
-  // @media screen and (max-width: 768px) {
-  //   --column-count: 3;
-  // }
+  @media screen and (max-width: 1200px) {
+  }
 
-  // @media screen and (max-width: 628px) {
-  //   --column-count: 2;
-  // }
+  @media screen and (max-width: 1068px) {
+  }
+
+  @media screen and (max-width: 768px) {
+    --grid-gap: 10px;
+    --page-spacing: 16px;
+  }
+
+  @media screen and (max-width: 628px) {
+  }
 }
 
 .flex-center {
@@ -96,7 +103,8 @@ html {
 }
 
 .spacing {
-  padding: calc(var(--header-height) + 16px) 32px 32px;
+  padding: calc(var(--header-height) + 16px) var(--page-spacing)
+    var(--page-spacing);
 }
 
 ::-webkit-scrollbar {

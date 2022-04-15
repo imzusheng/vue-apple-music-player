@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 23:39:53
- * @LastEditTime: 2022-04-13 23:22:13
+ * @LastEditTime: 2022-04-15 09:21:41
  * @Description: api文件
  * @FilePath: \vite-music-player\src\common\api.ts
  */
@@ -73,7 +73,9 @@ export default {
 
   // 单曲
   SONG: {
-    // 新歌
+    // 新歌速递
+    GET_NEW_SONGS: '/top/song',
+    // 新歌-个性推荐
     GET_PERSON_NEWSONG: '/personalized/newsong',
     // 单曲详情
     GET_SONG_DETAIL: '/song/detail',
@@ -110,7 +112,10 @@ export default {
     // 相似歌手
     GET_ARTIST_SIMI: '/simi/artist',
     // 歌手热门单曲
-    GET_ARTIST_SONG: '/artists'
+    GET_ARTIST_SONG: '/artists',
+
+    // 歌手排行榜 type : 地区 1: 华语 2: 欧美 3: 韩国 4: 日本
+    GET_TOPLIST_ARTIST: '/toplist/artist'
   },
 
   // 歌单相关
@@ -129,6 +134,8 @@ export default {
 
   // MV相关
   MV: {
+    // MV排行
+    GET_TOP_MV: '/top/mv',
     // 最新MV
     GET_NEW_MV: '/mv/first',
     // 推荐MV

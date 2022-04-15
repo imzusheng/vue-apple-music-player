@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-11 11:08:36
-LastEditTime: 2022-04-13 18:44:57
+LastEditTime: 2022-04-14 18:25:34
 Description: 歌单展示列表grid布局
 FilePath: \vite-music-player\src\components\SectionListGrid.vue
 -->
@@ -132,10 +132,11 @@ const toDetail = (routeName: string, payload: string | number) => {
       }
     }
   }
+
   // ul
   .list {
     display: grid;
-    gap: 24px;
+    gap: var(--grid-gap);
     grid-template-columns: repeat(calc(var(--column-count)), 1fr);
   }
 }

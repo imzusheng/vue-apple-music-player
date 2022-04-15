@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-11 22:59:54
- * @LastEditTime: 2022-04-13 23:51:25
+ * @LastEditTime: 2022-04-15 08:31:27
  * @Description: typescript的复用的类型、接口定义
  * @FilePath: \vite-music-player\src\common\types.ts
  */
@@ -23,7 +23,7 @@ interface RmdItem {
 // recommend请求中的返回值
 interface ResRmd {
   // 返回数据
-  data: Array<RmdItem> | RmdItem
+  data: Array<RmdItem> | RmdItem | any
   // 当前返回类型|函数名
   type: string
 }

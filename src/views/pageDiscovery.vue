@@ -1,36 +1,127 @@
 <!--
 Author: zusheng
 Date: 2022-04-13 15:29:38
-LastEditTime: 2022-04-14 16:07:41
+LastEditTime: 2022-04-15 09:42:07
 Description: 探索页面
 FilePath: \vite-music-player\src\views\pageDiscovery.vue
 -->
 <script setup lang="ts">
-import { mapActionsHelpers, getRandomIndex, pickUpName } from '@/common/util'
+import {
+  mapActionsHelpers,
+  getRandomIndex,
+  pickUpName,
+  getMainColor
+} from '@/common/util'
 import TableListSongs from '@/components/TableListSongs.vue'
 import SectionTitle from '@/components/SectionTitle.vue'
 import SectionListGrid from '@/components/SectionListGrid.vue'
+import CardMv from '@/components/CardMv.vue'
+import CardArtist from '@/components/CardArtist.vue'
+import CardPlaylist from '@/components/CardPlaylist.vue'
 import SectionBanner from '@/components/SectionBanner.vue'
 import { reactive } from 'vue'
 import { Toplist } from '@/common/types'
 
-const { getToplistDetail, getPlaylistDetail, getSongsDetail, getBanner } =
-  mapActionsHelpers(null, [
-    'getToplistDetail',
-    'getPlaylistDetail',
-    'getSongsDetail',
-    'getBanner'
-  ])
+const {
+  getToplistDetail,
+  getPlaylistDetail,
+  getToplistArtist,
+  getSongsDetail,
+  getBanner,
+  getNewSongs,
+  getTopMv
+} = mapActionsHelpers(null, [
+  'getToplistDetail',
+  'getPlaylistDetail',
+  'getToplistArtist',
+  'getSongsDetail',
+  'getNewSongs',
+  'getBanner',
+  'getTopMv'
+])
 
 const data = reactive<any>({
   list: [],
-  curBannerIdx: getRandomIndex(0, 9),
-  banners: []
+
+  // 海报
+  banner: {
+    payload: '',
+    title: '',
+    picUrl: '',
+    type: 1,
+    desc: ''
+  },
+
+  // 新歌速递
+  newSongs: {
+    all: {
+      list: [],
+      sub: '',
+      pic: ''
+    },
+    jk: {
+      list: [],
+      sub: '',
+      pic: ''
+    }
+  },
+  // 新歌热榜卡片的副标题
+  newSongsSub: '',
+  // 新歌热榜卡片的封面
+  newSongsPic: '',
+
+  // 歌手排行榜
+  toplistArtist: {
+    // 欧美
+    occident: [],
+    // 日韩
+    jk: [],
+    // 国内
+    china: []
+  },
+
+  // 欧美歌手排行榜
+
+  // mv
+  mvs: []
 })
 
 // 获取banner图片
 getBanner().then((res: any) => {
-  data.banners = res
+  const banners = res
+  const curBannerIdx = getRandomIndex(0, res.length - 1)
+  Object.assign(data.banner, banners[curBannerIdx])
+})
+
+// 新歌排行
+getNewSongs({ type: 0 }).then((res: any) => {
+  data.newSongs.all.list = res.slice(0, 5)
+  data.newSongs.all.sub = res.map((v: any) => v.artist).join('、')
+  data.newSongs.all.pic = res[0].picUrl
+})
+// 日本新歌排行
+getNewSongs({ type: 8 }).then((res: any) => {
+  data.newSongs.jk.list = res.slice(0, 5)
+  data.newSongs.jk.sub = res.map((v: any) => v.artist).join('、')
+  data.newSongs.jk.pic = res[0].picUrl
+})
+
+// mv排行
+getTopMv({ limit: 3 }).then((res: any) => {
+  data.mvs = res
+})
+
+// 欧美歌手排行榜
+getToplistArtist({ type: 2 }).then((res: any) => {
+  data.toplistArtist.occident = res.data.slice(0, 3)
+})
+// 日韩歌手排行榜
+getToplistArtist({ type: 3 }).then((res: any) => {
+  data.toplistArtist.jk = res.data.slice(0, 3)
+})
+// 国内歌手排行榜
+getToplistArtist({ type: 1 }).then((res: any) => {
+  data.toplistArtist.china = res.data.slice(0, 3)
 })
 
 const playlistId = Toplist.飙升榜
@@ -49,62 +140,186 @@ getPlaylistDetail(playlistId)
 
 <template>
   <div id="page-discovery" class="spacing">
+    <!-- 海报 -->
     <div class="discovery-banner">
       <section-banner
-        v-if="data.banners.length > 0"
-        :payload="data.banners[data.curBannerIdx].payload"
-        :title="data.banners[data.curBannerIdx].title"
+        :payload="data.banner.payload"
+        :title="data.banner.title"
+        :picUrl="data.banner.picUrl"
+        :type="data.banner.type"
         :desc="''"
-        :pic-url="data.banners[data.curBannerIdx].picUrl"
-        :type="data.banners[data.curBannerIdx].type"
       />
     </div>
 
-    <section-list-grid
-      sectionTitle="为你推荐"
-      subTitle="精选歌单"
-      :playBtn="true"
-      action="recommends"
-    />
-    <section-list-grid
-      sectionTitle="官方推荐"
-      subTitle="高品质歌单"
-      :playBtn="true"
-      action="PlaylistHq"
-    />
+    <!--
+      新歌速递 + 最热歌手/粉丝最爱
+    -->
     <section class="discovery-toplist">
-      <div class="discovery-card">
-        <section-title
-          class="discovery-card-title"
-          :action-name="null"
-          section-title="热门歌曲排行"
-        />
-        <table-list-songs :songs="data.list" :title="false" size="m" />
+      <!--
+        新歌速递
+      -->
+      <div class="discovery-card toplist-grid-l">
+        <card-playlist
+          title="新歌热榜"
+          :subTitle="data.newSongs.all.sub"
+          :picUrl="data.newSongs.all.pic"
+        >
+          <template #default>
+            <table-list-songs
+              v-if="data.newSongs.all.list.length > 0"
+              :virtualScroll="false"
+              :songs="data.newSongs.all.list"
+              :title="false"
+              size="m"
+            />
+          </template>
+        </card-playlist>
       </div>
-      <div class="discovery-card"></div>
+
+      <!--
+        最热歌手/粉丝最爱
+      -->
+      <div class="discovery-card toplist-grid-r">
+        <card-artist
+          title="国内热门歌手"
+          :desc="data.toplistArtist.china.map((v) => v.title).join('、')"
+          :imgA="data.toplistArtist.china[0]?.picUrl"
+          :imgB="data.toplistArtist.china[1]?.picUrl"
+          :imgC="data.toplistArtist.china[2]?.picUrl"
+        />
+      </div>
+    </section>
+
+    <!--
+      mv热榜
+    -->
+    <section class="discovery-mv">
+      <template v-for="item in data.mvs" :key="item.payload">
+        <card-mv
+          :pic-url="item.picUrl"
+          :title="item.title"
+          :artist="item.artist"
+          :desc="item.desc"
+          :area="item.area"
+        />
+      </template>
+    </section>
+
+    <!--
+      榜单
+    -->
+    <section class="discovery-toplist newBg">
+      <!--
+        最热歌手/粉丝最爱
+      -->
+      <div class="discovery-card toplist-grid-l-2">
+        <card-artist
+          title="日韩歌手榜单"
+          :desc="data.toplistArtist.jk.map((v) => v.title).join('、')"
+          :imgA="data.toplistArtist.jk[0]?.picUrl"
+          :imgB="data.toplistArtist.jk[1]?.picUrl"
+          :imgC="data.toplistArtist.jk[2]?.picUrl"
+        />
+        <!-- <card-artist
+          title="欧美歌手榜单"
+          :desc="data.toplistArtist.occident.map((v) => v.title).join('、')"
+          :imgA="data.toplistArtist.occident[0]?.picUrl"
+          :imgB="data.toplistArtist.occident[1]?.picUrl"
+          :imgC="data.toplistArtist.occident[2]?.picUrl"
+        /> -->
+      </div>
+
+      <!--
+        新歌速递
+      -->
+      <div class="discovery-card toplist-grid-r-2">
+        <card-playlist
+          title="日本流行音乐"
+          :subTitle="data.newSongs.jk.sub"
+          :picUrl="data.newSongs.jk.pic"
+        >
+          <template #default>
+            <table-list-songs
+              v-if="data.newSongs.jk.list.length > 0"
+              :virtualScroll="false"
+              :songs="data.newSongs.jk.list"
+              :title="false"
+              size="m"
+            />
+          </template>
+        </card-playlist>
+      </div>
     </section>
   </div>
 </template>
 
 <style lang="less">
 #page-discovery {
+  // 海报
   .discovery-banner {
     margin-bottom: 24px;
   }
 
+  // 新歌热榜
   .discovery-toplist {
-    display: grid;
-    gap: 24px;
-    grid-template-columns: 1fr 1fr;
     margin-bottom: 24px;
+    display: grid;
+    grid-gap: 24px;
+    grid-template-columns: repeat(12, 1fr);
+
     .discovery-card {
-      border-radius: 6px;
-      padding: 16px 16px 32px;
-      background: rgba(200, 200, 200, 0.1);
-      .discovery-card-title {
-        padding-left: 10px;
+      border-radius: 12px;
+      background: rgba(246, 246, 246, 1);
+      overflow: hidden;
+    }
+
+    .toplist-grid-l {
+      grid-column: 1/9;
+    }
+
+    .toplist-grid-r {
+      grid-column: 9/-1;
+    }
+
+    .toplist-grid-l-2 {
+      grid-column: 1/5;
+      .toplist-artist {
+        background-color: rgba(199, 205, 203, 1);
+        .artist-poster-sub-l {
+          position: absolute;
+          top: -18px;
+          left: -18px;
+          width: 92px;
+          height: 92px;
+          border-radius: 50%;
+          border: 8px solid rgba(199, 205, 203, 1) !important;
+        }
+        .artist-poster-sub-r {
+          position: absolute;
+          right: -9px;
+          bottom: -9px;
+          width: 92px;
+          height: 92px;
+          border-radius: 50%;
+          border: 8px solid rgba(199, 205, 203, 1) !important;
+        }
+        .toplist-artist-desc {
+          background-color: rgba(100, 100, 100, 0.1);
+        }
       }
     }
+
+    .toplist-grid-r-2 {
+      grid-column: 5/-1;
+    }
+  }
+
+  // mv
+  .discovery-mv {
+    display: grid;
+    gap: 24px;
+    grid-template-columns: repeat(3, 1fr);
+    margin-bottom: 24px;
   }
 
   .color-1 {

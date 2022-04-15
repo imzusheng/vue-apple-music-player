@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 20:51:30
-LastEditTime: 2022-04-14 14:28:29
+LastEditTime: 2022-04-14 18:10:13
 Description: 专辑详情
 FilePath: \vite-music-player\src\views\DetailPlaylist.vue
 -->
@@ -56,7 +56,12 @@ getPlaylistDetail(id)
       :sub="`${playlistInfo.data.sub}`"
     >
       <template #list>
-        <table-list-songs :songs="playlistInfo.songs" size="L" :title="true" />
+        <table-list-songs
+          :virtualScroll="true"
+          :songs="playlistInfo.songs"
+          size="L"
+          :title="true"
+        />
       </template>
     </the-detail-frame>
   </div>

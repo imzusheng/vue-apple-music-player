@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 18:47:25
-LastEditTime: 2022-04-14 14:20:42
+LastEditTime: 2022-04-14 21:04:26
 Description: 歌曲表格展示 单击切歌，有XL/L/M/S四种尺寸
                 L: 封面，歌名，专辑，发布时间，时长
                 L: 封面，歌名，专辑，时长
@@ -23,18 +23,27 @@ const props = defineProps<{
 
   // 表头是否显示
   title: boolean
+
+  // 是否使用虚拟滚动条
+  virtualScroll: boolean
+
+  // 是否显示序号
+  index?: boolean
 }>()
 </script>
 
 <template>
-  <div class="song-table-wrap">
+  <div
+    class="song-table-wrap"
+    :class="{ 'song-table-hide-index': !props.index }"
+  >
     <!-- 表头 -->
     <div
       v-if="props.title"
-      :class="`table-title-size-${props.size.toLowerCase()}`"
       class="song-table-title"
+      :class="`table-title-size-${props.size.toLowerCase()}`"
     >
-      <div v-if="['XL', 'L', 'M'].includes(props.size.toUpperCase())">#</div>
+      <div v-if="props.index">#</div>
       <div>标题</div>
       <div v-if="['XL', 'L'].includes(props.size.toUpperCase())">专辑</div>
       <div v-if="['XL'].includes(props.size.toUpperCase())">发布时间</div>
@@ -42,17 +51,19 @@ const props = defineProps<{
     </div>
     <!-- 数据 ul-->
 
-    <infinite-list class="song-table" :listData="props.songs">
+    <!-- 使用了虚拟滚动条 -->
+    <infinite-list
+      v-if="virtualScroll"
+      class="song-table"
+      :listData="props.songs"
+    >
       <template #default="{ listItem }">
         <div
-          :class="`table-row-size-${props.size.toLowerCase()}`"
           class="table-row"
+          :class="`table-title-size-${props.size.toLowerCase()}`"
         >
           <!-- 序号 -->
-          <div
-            v-if="['XL', 'L', 'M'].includes(props.size.toUpperCase())"
-            class="table-cell-index"
-          >
+          <div v-if="props.index" class="table-cell-index">
             <span class="playlist-table-index"> {{ listItem.idx }}</span>
             <span class="playlist-table-icon">
               <img alt="" src="../assets/icon-song-play-black.svg" />
@@ -115,6 +126,83 @@ const props = defineProps<{
         </div>
       </template>
     </infinite-list>
+
+    <!-- 未使用虚拟滚动条 -->
+    <ul v-else class="song-table">
+      <li
+        v-for="(listItem, listIndex) in props.songs"
+        :key="`songs-${listIndex}`"
+        :class="`table-row-size-${props.size.toLowerCase()}`"
+        class="table-row"
+      >
+        <!-- 序号 -->
+        <div v-if="props.index" class="table-cell-index">
+          <span class="playlist-table-index"> {{ listIndex + 1 }}</span>
+          <span class="playlist-table-icon">
+            <img alt="" src="../assets/icon-song-play-black.svg" />
+          </span>
+        </div>
+
+        <!-- 歌曲名字和作者 -->
+        <div class="table-cell-desc table-cell-ellipsis">
+          <img
+            v-lazy:[listItem.picUrl]
+            class="table-cell-desc-pic"
+            src="../assets/empty_white.png"
+            alt=""
+          />
+          <div class="table-cell-desc-info table-cell-ellipsis">
+            <!-- 歌名 -->
+            <div class="table-desc-name">
+              <span :title="listItem.title" class="table-cell-ellipsis">
+                {{ listItem.title }}</span
+              >
+              <!-- vip图标 -->
+              <img
+                v-if="['1'].includes(listItem.fee)"
+                ref=""
+                alt=""
+                class="table-cell-desc-vip"
+                src="../assets/vip.svg"
+              />
+            </div>
+            <!-- 作者名 -->
+            <div
+              v-if="['XL', 'L', 'M'].includes(props.size.toUpperCase())"
+              :title="listItem.artist"
+              class="table-desc-art table-cell-ellipsis"
+            >
+              {{ listItem.artist }}
+            </div>
+          </div>
+        </div>
+
+        <!-- 专辑名 -->
+        <div
+          v-if="['XL', 'L'].includes(props.size.toUpperCase())"
+          class="table-cell-ellipsis table-cell-album"
+        >
+          <div
+            :title="listItem.album"
+            class="table-cell-ellipsis table-cell-album"
+            style="display: block"
+          >
+            {{ listItem.album }}
+          </div>
+        </div>
+
+        <!-- 发布时间 -->
+        <div
+          v-if="['XL'].includes(props.size.toUpperCase())"
+          class="table-cell-pub"
+        >
+          {{ listItem.publishTime }}
+        </div>
+
+        <!-- 时长 -->
+        <div class="table-cell-dt">{{ listItem.duration }}</div>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -365,6 +453,53 @@ const props = defineProps<{
         }
       }
     }
+  }
+}
+
+// 无序号的样式
+.song-table-hide-index {
+  // 表头无序号样式
+  .table-title-size-xl {
+    padding: 16px;
+    grid-template-columns:
+      [first] 6fr
+      [var1] 4fr
+      [var2] 3fr
+      [last] minmax(120px, 1fr) !important;
+  }
+  .table-title-size-l {
+    padding: 16px;
+    grid-template-columns:
+      [first] 6fr
+      [var1] 4fr
+      [last] minmax(120px, 1fr) !important;
+  }
+  .table-title-size-m {
+    grid-template-columns:
+      [name] auto
+      [last] minmax(120px, 1fr) !important;
+  }
+
+  // 行无序号样式
+  .table-row-size-xl {
+    padding: 16px;
+    grid-template-columns:
+      [first] 6fr
+      [var1] 4fr
+      [var2] 3fr
+      [last] minmax(120px, 1fr) !important;
+  }
+  .table-row-size-l {
+    grid-template-columns:
+      [first] 6fr
+      [var1] 4fr
+      [last] minmax(120px, 1fr) !important;
+  }
+  // 中等尺寸,去掉专辑
+  .table-row-size-m {
+    grid-template-columns:
+      [name] auto
+      [last] minmax(120px, 1fr) !important;
   }
 }
 </style>

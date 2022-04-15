@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-11 09:15:16
- * @LastEditTime: 2022-04-14 16:10:36
+ * @LastEditTime: 2022-04-15 08:42:32
  * @Description: 所有请求
  * @FilePath: \vite-music-player\src\store\actions.ts
  */
@@ -61,6 +61,34 @@ const notArgs = {
 }
 
 /**
+ * MV
+ */
+interface Mv {
+  title: string
+  payload: string | number
+  artist: string
+  area: string
+  desc: string
+  picUrl: string
+}
+const mv = {
+  // MV排行
+  async getTopMv({}, args: Args): Promise<Array<Mv>> {
+    const resJson = await get(API.MV.GET_TOP_MV, Object.assign(initArgs, args))
+    return resJson.data.map((v: any): Mv => {
+      return {
+        title: v.name,
+        payload: v.id,
+        artist: v.artistName,
+        area: v.mv.area,
+        desc: v.mv.desc,
+        picUrl: v.cover + '?param=320y180'
+      }
+    })
+  }
+}
+
+/**
  * 专辑相关请求
  */
 const album = {
@@ -89,11 +117,33 @@ const album = {
 /**
  * 单曲
  */
+interface Song {
+  // 作者名
+  artist: string
+
+  // 歌曲封面
+  picUrl: string
+
+  // 歌曲名
+  title: string
+
+  // 来自专辑
+  album: string
+
+  // 发布时间 年
+  publishTime: string
+
+  // 歌曲时长，单位分钟
+  duration: string
+
+  // 是否需要会员
+  fee: string | number
+}
 const song = {
   // 获取单曲详情
-  async getSongsDetail({}, ids: string): Promise<any> {
+  async getSongsDetail({}, ids: string): Promise<Array<Song>> {
     const resJson = await get(API.SONG.GET_SONG_DETAIL, { ids })
-    const data: Array<SongTableRow> = resJson.songs.map((v: any): SongTableRow => {
+    const data: Array<Song> = resJson.songs.map((v: any): Song => {
       return {
         // 作者名
         artist: pickUpName(v.ar),
@@ -112,6 +162,36 @@ const song = {
 
         // 歌曲时长，单位分钟
         duration: durationConvert(v.dt / 1000),
+
+        // 是否需要会员
+        fee: v.fee.toString()
+      }
+    })
+    return data
+  },
+  // 新歌速递
+  async getNewSongs({}, { type = 0 }): Promise<Array<Song>> {
+    const resJson = await get(API.SONG.GET_NEW_SONGS, { type })
+
+    const data: Array<Song> = resJson.data.map((v: any): Song => {
+      return {
+        // 作者名
+        artist: pickUpName(v.artists),
+
+        // 歌曲封面
+        picUrl: v.album.picUrl + '?param=150y150&quality=79',
+
+        // 歌曲名
+        title: v.name,
+
+        // 来自专辑
+        album: v.album.name,
+
+        // 发布时间 年
+        publishTime: moment(v.album.publishTime).year().toString(),
+
+        // 歌曲时长，单位分钟
+        duration: durationConvert(v.duration / 1000),
 
         // 是否需要会员
         fee: v.fee.toString()
@@ -149,11 +229,42 @@ const playlist = {
 /**
  * 歌手
  */
+interface Artist {
+  // 描述/副标题
+  desc: string
+  // 点击跳转需要传递的id值
+  payload: string
+  // 图片url
+  picUrl: string
+  // 点击跳转的路由参数
+  routeName: string
+  // 小标题
+  title: string
+}
 const artist = {
+  // 歌手排行榜
+  async getToplistArtist({}, { type = 0 }): Promise<ResRmd> {
+    const resJson = await get(API.ART.GET_TOPLIST_ARTIST, { type })
+
+    const data: Array<Artist> = resJson.list.artists.map((v: any): Artist => {
+      return {
+        routeName: 'artist',
+        title: v.name,
+        picUrl: v.img1v1Url + '?param=200y200',
+        payload: v.id,
+        desc: ''
+      }
+    })
+
+    return {
+      data: data,
+      type: 'ToplistArtist'
+    }
+  },
   // 获取歌手信息
   async getArtistDetail({}, id: string | number): Promise<ResRmd> {
     const resJson = await get(API.ART.GET_ARTIST_DETAIL, { id })
-    const data: RmdItem = {
+    const data: Artist = {
       routeName: 'artist',
       title: resJson.data.artist.name,
       picUrl: resJson.data.artist.cover + '?param=800y800',
@@ -166,7 +277,7 @@ const artist = {
     }
   },
   // 获取歌手粉丝
-  async getArtistFans({}, id: string | number): Promise<any> {
+  async getArtistFans({}, id: string | number): Promise<ResRmd> {
     const resJson = await get(API.ART.GET_ARTIST_FANS, { id })
     return {
       data: {
@@ -479,6 +590,7 @@ const recommend = {
 
 export default {
   ...notArgs,
+  ...mv,
   ...song,
   ...radio,
   ...album,

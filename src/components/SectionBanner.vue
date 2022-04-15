@@ -1,17 +1,18 @@
 <!--
 Author: zusheng
 Date: 2022-04-13 22:41:51
-LastEditTime: 2022-04-14 15:49:57
+LastEditTime: 2022-04-15 09:08:57
 Description: 海报展示组件
 FilePath: \vite-music-player\src\components\SectionBanner.vue
 -->
 
 <script lang="ts" setup>
 import { useRouter } from 'vue-router'
+import { ref, watchEffect } from 'vue'
 
 const router = useRouter()
 
-const props = defineProps<{
+const { picUrl = '', type } = defineProps<{
   payload: string | number
   picUrl: string
   title: string
@@ -22,7 +23,7 @@ const props = defineProps<{
 // 前往详情页
 const toDetail = (payload: any) => {
   // 1为单曲，10为专辑
-  if (props.type === 1) {
+  if (type === 1) {
     router.push({
       name: 'song',
       query: {
@@ -38,27 +39,34 @@ const toDetail = (payload: any) => {
     })
   }
 }
+
+const bannerloading = ref<boolean>(true)
+
+const bannerOnload = () => {
+  bannerloading.value = false
+}
+
+watchEffect(() => {
+  if (picUrl) {
+    bannerloading.value = true
+  }
+})
 </script>
 
 <template>
-  <div
-    v-show="props.picUrl"
-    class="banner-block"
-    @click="toDetail(props.payload)"
-  >
+  <div v-if="picUrl.length > 0" class="banner-block" @click="toDetail(payload)">
     <!-- 背景 -->
     <div
       class="banner-blur-bg"
-      :style="{ backgroundImage: `url(${props.picUrl}?imageView&blur=40x20)` }"
+      :style="{ backgroundImage: `url(${picUrl}?imageView&blur=40x20)` }"
     ></div>
+
     <!-- 海报描述 -->
-    <div class="banner-desc">{{ props.title }}</div>
+    <div class="banner-desc">{{ title }}</div>
     <div class="banner-pictrue-box">
       <!-- 海报标题 -->
       <div class="banner-title">
-        {{ props.type === 1 ? '单曲' : '专辑' }}&nbsp;&nbsp;&nbsp;{{
-          props.desc
-        }}
+        {{ type === 1 ? '单曲' : '专辑' }}&nbsp;&nbsp;&nbsp;{{ desc }}
       </div>
 
       <!-- 相机框框 -->
@@ -66,7 +74,20 @@ const toDetail = (payload: any) => {
       <span class="banner-frame-2"></span>
       <span class="banner-frame-3"></span>
       <span class="banner-frame-4"></span>
-      <img class="banner-picture" :src="props.picUrl" alt="" />
+
+      <img
+        v-if="bannerloading"
+        class="banner-picture"
+        src="@/assets/empty-banner.jpg"
+        alt=""
+      />
+      <img
+        v-show="!bannerloading"
+        @load="bannerOnload"
+        class="banner-picture"
+        :src="picUrl + '?imageView&quality=90'"
+        alt=""
+      />
     </div>
   </div>
 </template>
@@ -75,7 +96,7 @@ const toDetail = (payload: any) => {
 .banner-block {
   width: 100%;
   overflow: hidden;
-  border-radius: 4px;
+  border-radius: 12px;
   position: relative;
   padding: 40px 40px 80px;
   cursor: pointer;
