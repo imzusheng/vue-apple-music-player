@@ -1,44 +1,33 @@
 <!--
 Author: zusheng
 Date: 2022-04-13 15:29:38
-LastEditTime: 2022-04-15 09:42:07
+LastEditTime: 2022-04-15 12:46:56
 Description: 探索页面
 FilePath: \vite-music-player\src\views\pageDiscovery.vue
 -->
 <script setup lang="ts">
-import {
-  mapActionsHelpers,
-  getRandomIndex,
-  pickUpName,
-  getMainColor
-} from '@/common/util'
+import { mapActionsHelpers, getRandomIndex } from '@/common/util'
 import TableListSongs from '@/components/TableListSongs.vue'
 import SectionTitle from '@/components/SectionTitle.vue'
-import SectionListGrid from '@/components/SectionListGrid.vue'
 import CardMv from '@/components/CardMv.vue'
 import CardArtist from '@/components/CardArtist.vue'
 import CardPlaylist from '@/components/CardPlaylist.vue'
 import SectionBanner from '@/components/SectionBanner.vue'
-import { reactive } from 'vue'
-import { Toplist } from '@/common/types'
+import { useStore } from '@/store'
+import { reactive, watchEffect, ref } from 'vue'
 
-const {
-  getToplistDetail,
-  getPlaylistDetail,
-  getToplistArtist,
-  getSongsDetail,
-  getBanner,
-  getNewSongs,
-  getTopMv
-} = mapActionsHelpers(null, [
-  'getToplistDetail',
-  'getPlaylistDetail',
-  'getToplistArtist',
-  'getSongsDetail',
-  'getNewSongs',
-  'getBanner',
-  'getTopMv'
-])
+const { getToplistDetail, getToplistArtist, getNewSongs, getBanner, getTopMv } =
+  mapActionsHelpers(null, [
+    'getToplistDetail',
+    'getPlaylistDetail',
+    'getToplistArtist',
+    'getSongsDetail',
+    'getNewSongs',
+    'getBanner',
+    'getTopMv'
+  ])
+
+const store = useStore()
 
 const data = reactive<any>({
   list: [],
@@ -63,12 +52,13 @@ const data = reactive<any>({
       list: [],
       sub: '',
       pic: ''
+    },
+    occident: {
+      list: [],
+      sub: '',
+      pic: ''
     }
   },
-  // 新歌热榜卡片的副标题
-  newSongsSub: '',
-  // 新歌热榜卡片的封面
-  newSongsPic: '',
 
   // 歌手排行榜
   toplistArtist: {
@@ -80,14 +70,24 @@ const data = reactive<any>({
     china: []
   },
 
-  // 欧美歌手排行榜
-
   // mv
   mvs: []
 })
 
+// 标记请求是否完成
+const loadings = reactive<any>([])
+loadings.push(new Array(9).fill('target'))
+store.commit('setLoading', true)
+
+watchEffect(() => {
+  if (loadings.length === 0) {
+    store.commit('setLoading', false)
+  }
+})
+
 // 获取banner图片
 getBanner().then((res: any) => {
+  loadings.shift()
   const banners = res
   const curBannerIdx = getRandomIndex(0, res.length - 1)
   Object.assign(data.banner, banners[curBannerIdx])
@@ -95,47 +95,65 @@ getBanner().then((res: any) => {
 
 // 新歌排行
 getNewSongs({ type: 0 }).then((res: any) => {
+  loadings.shift()
   data.newSongs.all.list = res.slice(0, 5)
   data.newSongs.all.sub = res.map((v: any) => v.artist).join('、')
   data.newSongs.all.pic = res[0].picUrl
 })
 // 日本新歌排行
 getNewSongs({ type: 8 }).then((res: any) => {
+  loadings.shift()
   data.newSongs.jk.list = res.slice(0, 5)
   data.newSongs.jk.sub = res.map((v: any) => v.artist).join('、')
   data.newSongs.jk.pic = res[0].picUrl
 })
+// 欧美新歌排行
+getNewSongs({ type: 96 }).then((res: any) => {
+  loadings.shift()
+  data.newSongs.occident.list = res.slice(0, 5)
+  data.newSongs.occident.sub = res.map((v: any) => v.artist).join('、')
+  data.newSongs.occident.pic = res[0].picUrl
+})
 
 // mv排行
 getTopMv({ limit: 3 }).then((res: any) => {
+  loadings.shift()
   data.mvs = res
 })
 
 // 欧美歌手排行榜
 getToplistArtist({ type: 2 }).then((res: any) => {
+  loadings.shift()
   data.toplistArtist.occident = res.data.slice(0, 3)
 })
 // 日韩歌手排行榜
 getToplistArtist({ type: 3 }).then((res: any) => {
+  loadings.shift()
   data.toplistArtist.jk = res.data.slice(0, 3)
 })
 // 国内歌手排行榜
 getToplistArtist({ type: 1 }).then((res: any) => {
+  loadings.shift()
   data.toplistArtist.china = res.data.slice(0, 3)
 })
 
-const playlistId = Toplist.飙升榜
+// 获取所有榜单详情
+getToplistDetail().then((res: any) => {
+  loadings.shift()
+  data.list = res.list
+})
 
+// const playlistId = Toplist.飙升榜
 // 获取歌单详情里的trackIds,
 // 再通过ids获取所有歌曲
-getPlaylistDetail(playlistId)
-  .then((res: any) => {
-    const trackIds = res.trackIds.slice(0, 5).toString()
-    return getSongsDetail(trackIds)
-  })
-  .then((res: any) => {
-    data.list = res
-  })
+// getPlaylistDetail(playlistId)
+//   .then((res: any) => {
+//     const trackIds = res.trackIds.slice(0, 5).toString()
+//     return getSongsDetail(trackIds)
+//   })
+//   .then((res: any) => {
+//     data.list = res
+//   })
 </script>
 
 <template>
@@ -206,9 +224,9 @@ getPlaylistDetail(playlistId)
     </section>
 
     <!--
-      榜单
+      最热歌手/粉丝最爱 + 新歌速递
     -->
-    <section class="discovery-toplist newBg">
+    <section class="discovery-toplist">
       <!--
         最热歌手/粉丝最爱
       -->
@@ -250,21 +268,118 @@ getPlaylistDetail(playlistId)
         </card-playlist>
       </div>
     </section>
+
+    <!--
+      新碟上架
+    -->
+    <section class="discovery-newAlbum">
+      <div class="newAlbum-block">
+        <img
+          class="newAlbum-block-poster"
+          src="https://p4.music.126.net/atBpo8-tvdx-bb2dQPk5Aw==/109951167290068170.jpg?param=300y300"
+          alt=""
+        />
+        <div class="newAlbum-block-desc">
+          <h3 class="newAlbum-block-desc-h3">国内热门专辑</h3>
+          <p class="newAlbum-block-desc-p">陈奕迅、林君佳、薛之谦</p>
+        </div>
+      </div>
+
+      <div class="newAlbum-block">
+        <img
+          class="newAlbum-block-poster"
+          src="https://p3.music.126.net/hwp80HtHSowQKkI4BVlEvw==/109951167284428374.jpg?param=300y300"
+          alt=""
+        />
+        <div class="newAlbum-block-desc">
+          <h3 class="newAlbum-block-desc-h3">国内热门专辑</h3>
+          <p class="newAlbum-block-desc-p">陈奕迅、林君佳、薛之谦</p>
+        </div>
+      </div>
+
+      <div class="newAlbum-block">
+        <img
+          class="newAlbum-block-poster"
+          src="https://p4.music.126.net/PqQdNjn2pRlqMOXxJuZuoA==/109951167287881659.jpg?param=300y300"
+          alt=""
+        />
+        <div class="newAlbum-block-desc">
+          <h3 class="newAlbum-block-desc-h3">国内热门专辑</h3>
+          <p class="newAlbum-block-desc-p">陈奕迅、林君佳、薛之谦</p>
+        </div>
+      </div>
+    </section>
+
+    <!--
+      新歌速递 + 最热歌手/粉丝最爱
+    -->
+    <section class="discovery-toplist">
+      <!--
+        新歌速递
+      -->
+      <div class="discovery-card toplist-grid-l">
+        <card-playlist
+          title="欧美流行"
+          :subTitle="data.newSongs.occident.sub"
+          :picUrl="data.newSongs.occident.pic"
+        >
+          <template #default>
+            <table-list-songs
+              v-if="data.newSongs.occident.list.length > 0"
+              :virtualScroll="false"
+              :songs="data.newSongs.occident.list"
+              :title="false"
+              size="m"
+            />
+          </template>
+        </card-playlist>
+      </div>
+
+      <!--
+        最热歌手/粉丝最爱
+      -->
+      <div class="discovery-card toplist-grid-r">
+        <card-artist
+          title="欧美热门歌手"
+          :desc="data.toplistArtist.occident.map((v) => v.title).join('、')"
+          :imgA="data.toplistArtist.occident[0]?.picUrl"
+          :imgB="data.toplistArtist.occident[1]?.picUrl"
+          :imgC="data.toplistArtist.occident[2]?.picUrl"
+        />
+      </div>
+    </section>
+
+    <!--
+      分类
+    -->
+    <section class="discovery-category">
+      <section-title sectionTitle="排行榜" subTitle="" actionName="" />
+      <div
+        v-for="(item, idx) in data.list"
+        :key="`category${idx}`"
+        class="discovery-category-item"
+        :class="`color-${getRandomIndex(0, 9)}`"
+      >
+        {{ item.name }}
+      </div>
+    </section>
   </div>
 </template>
 
 <style lang="less">
 #page-discovery {
+  --discovery-gap: 24px;
+
   // 海报
   .discovery-banner {
-    margin-bottom: 24px;
+    margin-bottom: var(--discovery-gap);
   }
 
   // 新歌热榜
   .discovery-toplist {
-    margin-bottom: 24px;
     display: grid;
-    grid-gap: 24px;
+    margin-bottom: var(--discovery-gap);
+    grid-gap: var(--discovery-gap);
     grid-template-columns: repeat(12, 1fr);
 
     .discovery-card {
@@ -283,30 +398,6 @@ getPlaylistDetail(playlistId)
 
     .toplist-grid-l-2 {
       grid-column: 1/5;
-      .toplist-artist {
-        background-color: rgba(199, 205, 203, 1);
-        .artist-poster-sub-l {
-          position: absolute;
-          top: -18px;
-          left: -18px;
-          width: 92px;
-          height: 92px;
-          border-radius: 50%;
-          border: 8px solid rgba(199, 205, 203, 1) !important;
-        }
-        .artist-poster-sub-r {
-          position: absolute;
-          right: -9px;
-          bottom: -9px;
-          width: 92px;
-          height: 92px;
-          border-radius: 50%;
-          border: 8px solid rgba(199, 205, 203, 1) !important;
-        }
-        .toplist-artist-desc {
-          background-color: rgba(100, 100, 100, 0.1);
-        }
-      }
     }
 
     .toplist-grid-r-2 {
@@ -315,42 +406,116 @@ getPlaylistDetail(playlistId)
   }
 
   // mv
-  .discovery-mv {
+  .discovery-mv,
+  .discovery-newAlbum {
     display: grid;
-    gap: 24px;
+    gap: var(--discovery-gap);
     grid-template-columns: repeat(3, 1fr);
-    margin-bottom: 24px;
+    margin-bottom: var(--discovery-gap);
+  }
+
+  // 新碟上架
+  .discovery-newAlbum {
+    width: 100%;
+    .newAlbum-block {
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      .newAlbum-block-poster {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        mask-image: linear-gradient(rgba(0, 0, 0, 1) 60%, rgba(0, 0, 0, 0.3));
+        -webkit-mask-image: linear-gradient(
+          rgba(0, 0, 0, 1) 60%,
+          rgba(0, 0, 0, 0.3)
+        );
+      }
+      .newAlbum-block-desc {
+        width: 100%;
+        left: 0;
+        bottom: 0;
+        position: absolute;
+        z-index: 1;
+        // background: rgba(0, 0, 0, 0.6);
+        background: linear-gradient(rgba(0, 0, 0, 0.5) 30%, rgba(0, 0, 0, 0.7));
+        padding: 30px 0 20px;
+        > .newAlbum-block-desc-h3 {
+          text-align: center;
+          font-size: 18px;
+          font-weight: 400;
+          color: #fff;
+          margin-bottom: 3px;
+        }
+        > .newAlbum-block-desc-p {
+          text-align: center;
+          font-size: 14px;
+          color: rgba(255, 255, 255, 0.8);
+        }
+      }
+    }
+  }
+
+  .discovery-category {
+    display: flex;
+    flex-wrap: wrap;
+    .discovery-category-item {
+      cursor: pointer;
+      padding: 10px 20px;
+      margin: 6px;
+      border-radius: 6px;
+      position: relative;
+      overflow: hidden;
+      background: rgba(246, 246, 246, 1);
+      &::after {
+        content: '';
+        position: absolute;
+        background: var(--color);
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: -1;
+        transition: clip-path 0.12s;
+        clip-path: inset(0px calc(100% - 6px) 0px 0);
+      }
+      &:hover::after {
+        clip-path: inset(0px 0px 0px 0);
+      }
+    }
   }
 
   .color-1 {
-    --color: rgba(255, 137, 131, 1);
+    --color: rgba(255, 137, 131, 0.51);
   }
   .color-2 {
-    --color: rgba(164, 255, 164, 1);
+    --color: rgba(164, 255, 164, 0.51);
   }
   .color-3 {
-    --color: rgba(204, 0, 0, 1);
+    --color: rgba(204, 0, 0, 0.51);
   }
   .color-4 {
-    --color: rgba(51, 125, 255, 1);
+    --color: rgba(51, 125, 255, 0.51);
   }
   .color-5 {
-    --color: rgba(255, 194, 0, 1);
+    --color: rgba(255, 194, 0, 0.51);
   }
   .color-6 {
-    --color: rgba(77, 238, 255, 1);
+    --color: rgba(77, 238, 255, 0.51);
   }
   .color-7 {
-    --color: rgba(164, 197, 255, 1);
+    --color: rgba(164, 197, 255, 0.51);
   }
   .color-8 {
-    --color: rgba(0, 146, 191, 1);
+    --color: rgba(0, 146, 191, 0.51);
   }
   .color-9 {
-    --color: rgba(123, 62, 219, 1);
+    --color: rgba(123, 62, 219, 0.51);
   }
   .color-0 {
-    --color: rgba(0, 165, 19, 1);
+    --color: rgba(0, 165, 19, 0.51);
   }
 }
 </style>

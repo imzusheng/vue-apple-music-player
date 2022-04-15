@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-11 09:15:16
- * @LastEditTime: 2022-04-15 08:42:32
+ * @LastEditTime: 2022-04-15 12:01:08
  * @Description: 所有请求
  * @FilePath: \vite-music-player\src\store\actions.ts
  */
@@ -439,6 +439,7 @@ const recommend = {
         routeName: 'playlist'
       }
     })
+
     return {
       data,
       type: 'recommends'

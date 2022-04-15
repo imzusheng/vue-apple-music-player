@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 17:31:44
-LastEditTime: 2022-04-14 09:00:11
+LastEditTime: 2022-04-15 12:22:19
 Description: detail页面的基本框架
 FilePath: \vite-music-player\src\components\TheDetailFrame.vue
 -->
@@ -79,7 +79,7 @@ const animationHandler = () => {
   // 动画完成节点
   const targetHeight = documentHeight * 0.7
   // 头部标题显示触发点
-  const headerTarget = documentHeight - 120
+  const headerTarget = documentHeight - 120 - 36
 
   // 动画产生值
   let curValue: any, showValue: any

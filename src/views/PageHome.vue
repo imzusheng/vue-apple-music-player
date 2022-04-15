@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-11 18:23:23
-LastEditTime: 2022-04-13 13:05:49
+LastEditTime: 2022-04-15 12:01:28
 Description: 主页
 FilePath: \vite-music-player\src\views\PageHome.vue
 -->
@@ -36,6 +36,7 @@ const sectionOnload = (payload: any) => {
       sectionTitle="为你推荐"
       subTitle="精选歌单"
       :playBtn="true"
+      :actionParams="{ limit: 7 }"
       action="recommends"
     />
     <section-list-grid
@@ -43,6 +44,7 @@ const sectionOnload = (payload: any) => {
       sectionTitle="官方推荐"
       subTitle="高品质歌单"
       :playBtn="true"
+      :actionParams="{ limit: 7 }"
       action="PlaylistHq"
     />
     <section-list-grid
@@ -50,6 +52,7 @@ const sectionOnload = (payload: any) => {
       sectionTitle="专辑和单曲"
       subTitle="新发行"
       :playBtn="true"
+      :actionParams="{ limit: 7 }"
       action="NewAlbum"
     />
     <section-list-grid
@@ -57,6 +60,7 @@ const sectionOnload = (payload: any) => {
       sectionTitle="社区精选"
       subTitle="精选歌单"
       :playBtn="true"
+      :actionParams="{ limit: 7 }"
       action="communitys"
     />
     <section-list-grid
@@ -70,6 +74,7 @@ const sectionOnload = (payload: any) => {
       sectionTitle="热门歌手"
       :playBtn="false"
       :round="true"
+      :actionParams="{ limit: 7 }"
       action="HotArtists"
     />
     <section-list-grid
@@ -77,6 +82,7 @@ const sectionOnload = (payload: any) => {
       subTitle="个性推荐"
       sectionTitle="电台"
       :playBtn="true"
+      :actionParams="{ limit: 7 }"
       action="RecommendsDj"
     />
     <section-list-grid
@@ -84,6 +90,7 @@ const sectionOnload = (payload: any) => {
       subTitle="个性推荐"
       sectionTitle="电台节目"
       :playBtn="true"
+      :actionParams="{ limit: 7 }"
       action="HotDjp"
     />
     <section-list-grid
@@ -91,6 +98,7 @@ const sectionOnload = (payload: any) => {
       subTitle="热门"
       sectionTitle="电台节目"
       :playBtn="true"
+      :actionParams="{ limit: 7 }"
       action="RecommendsDjp"
     />
     <section-list-grid

@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 11:17:48
-LastEditTime: 2022-04-14 15:55:40
+LastEditTime: 2022-04-15 13:22:10
 Description: 左侧导航栏
 FilePath: \vite-music-player\src\components\TheNavigationLeft.vue
 -->
@@ -10,13 +10,23 @@ import iconHome from '@/assets/icon-home.svg'
 import iconDiscovery from '@/assets/icon-discovery.svg'
 import iconLibrary from '@/assets/icon-library.svg'
 import iconSearch from '@/assets/icon-search.svg'
+import { useRouter } from 'vue-router'
+import { ref } from 'vue'
+
+const router = useRouter()
 
 const navConfig = [
   { title: '首页', icon: iconHome, routerName: 'home' },
   { title: '探索', icon: iconDiscovery, routerName: 'discovery' },
-  { title: '媒体库', icon: iconLibrary, routerName: 'home' },
-  { title: '搜索', icon: iconSearch, routerName: 'home' }
+  { title: '媒体库', icon: iconLibrary, routerName: 'library' },
+  { title: '搜索', icon: iconSearch, routerName: 'search' }
 ]
+
+const curRouterName = ref<any>(router.currentRoute.value.name)
+
+router.afterEach((to) => {
+  curRouterName.value = to.name
+})
 </script>
 
 <template>
@@ -27,7 +37,12 @@ const navConfig = [
       </router-link>
 
       <ul class="nav-list">
-        <li class="nav-list-item" v-for="item in navConfig" :key="item.title">
+        <li
+          v-for="item in navConfig"
+          :key="item.title"
+          class="nav-list-item"
+          :class="{ 'nav-checked': item.routerName === curRouterName }"
+        >
           <router-link class="nav-list-link" :to="{ name: item.routerName }">
             <img class="nav-list-item-icon" :src="item.icon" alt="" />
             {{ item.title }}
@@ -65,6 +80,7 @@ const navConfig = [
         font-size: 16px;
         border-radius: 4px;
         cursor: pointer;
+        opacity: 0.5;
         // router-link
         .nav-list-link {
           height: 100%;
@@ -83,6 +99,10 @@ const navConfig = [
         &:hover {
           background: rgba(0, 0, 0, 0.1);
         }
+      }
+
+      .nav-checked {
+        opacity: 1;
       }
     }
   }

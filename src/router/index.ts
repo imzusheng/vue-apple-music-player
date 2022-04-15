@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 20:43:36
- * @LastEditTime: 2022-04-14 00:03:06
+ * @LastEditTime: 2022-04-15 13:18:06
  * @Description: 路由
  * @FilePath: \vite-music-player\src\router\index.ts
  */
@@ -23,7 +23,20 @@ const routes = [
       {
         path: 'discovery',
         name: 'discovery',
+        meta: { description: '探索' },
         component: () => import('@/views/pageDiscovery.vue')
+      },
+      {
+        path: '',
+        name: 'library',
+        meta: { description: '媒体库' },
+        component: () => import('@/views/PageHome.vue')
+      },
+      {
+        path: '',
+        name: 'search',
+        meta: { description: '搜索' },
+        component: () => import('@/views/PageHome.vue')
       },
       {
         path: 'artist',

@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-13 22:41:51
-LastEditTime: 2022-04-15 09:08:57
+LastEditTime: 2022-04-15 11:46:18
 Description: 海报展示组件
 FilePath: \vite-music-player\src\components\SectionBanner.vue
 -->
@@ -149,6 +149,7 @@ watchEffect(() => {
     // 海报
     .banner-picture {
       width: 100%;
+      min-height: 180px;
       display: block;
       border: 3px solid #fff;
     }
