@@ -1,7 +1,14 @@
 <!--
 Author: zusheng
+Date: 2022-04-16 20:52:05
+LastEditTime: 2022-04-16 21:00:48
+Description: 
+FilePath: \vite-music-player\src\components\TheNavigationTop.vue
+-->
+<!--
+Author: zusheng
 Date: 2022-04-12 11:17:48
-LastEditTime: 2022-04-16 21:22:07
+LastEditTime: 2022-04-16 20:46:31
 Description: 左侧导航栏
 FilePath: \vite-music-player\src\components\TheNavigationLeft.vue
 -->
@@ -33,8 +40,7 @@ router.afterEach((to) => {
   <nav id="nav">
     <div class="nav-spacing">
       <router-link class="logo flex-center" :to="{ name: 'home' }">
-        <img class="logo-img-b" src="../assets/logo_b.png" alt="" />
-        <img class="logo-img-m" src="../assets/logo_m.png" alt="" />
+        <img class="logo-img" src="../assets/logo_m.png" alt="" />
       </router-link>
 
       <ul class="nav-list">
@@ -46,7 +52,6 @@ router.afterEach((to) => {
         >
           <router-link class="nav-list-link" :to="{ name: item.routerName }">
             <img class="nav-list-item-icon" :src="item.icon" alt="" />
-            <span class="nav-list-link-span">{{ item.title }}</span>
           </router-link>
         </li>
       </ul>
@@ -58,29 +63,27 @@ router.afterEach((to) => {
 
 <style lang="less">
 #nav {
-  flex-shrink: 0;
-  width: var(--nav-left-width);
-  height: 100vh;
-  background: rgba(246, 246, 246, 1);
   position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(246, 246, 246, 1);
   z-index: 1;
   .nav-spacing {
     padding: 16px;
     height: 100%;
+    display: flex;
+    justify-content: space-between;
 
     .logo {
-      width: 100%;
-      padding: 16px;
-      .logo-img-b {
-        height: 50px;
-      }
-      .logo-img-m {
-        display: none;
+      padding: 0;
+      .logo-img {
+        width: 28px;
       }
     }
 
     .nav-list {
-      margin-top: 16px;
+      display: flex;
       > .nav-list-item {
         font-size: 16px;
         border-radius: 4px;
@@ -91,94 +94,19 @@ router.afterEach((to) => {
           height: 100%;
           width: 100%;
           display: block;
-          padding: 16px;
+          padding: 10px 16px;
           display: flex;
           align-items: center;
           color: #000;
         }
-        .nav-list-link-span {
-          display: block;
-        }
         .nav-list-item-icon {
           height: 24px;
           width: 24px;
-          margin-right: 16px;
-        }
-        &:hover {
-          background: rgba(0, 0, 0, 0.1);
         }
       }
 
       .nav-checked {
         opacity: 1;
-      }
-    }
-  }
-
-  @media screen and (max-width: 728px) {
-    & {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: unset;
-      background: rgba(246, 246, 246, 1);
-      z-index: 1;
-      .nav-spacing {
-        padding: 16px;
-        height: 100%;
-        display: flex;
-        justify-content: space-between;
-
-        .logo {
-          width: unset;
-          padding: 0;
-          .logo-img-b {
-            display: none;
-          }
-          .logo-img-m {
-            display: block;
-            width: 24px;
-          }
-        }
-
-        .nav-list {
-          margin-top: 0;
-          display: flex;
-          > .nav-list-item {
-            font-size: 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            opacity: 0.5;
-            // router-link
-            .nav-list-link {
-              height: 100%;
-              width: 100%;
-              display: block;
-              padding: 10px 16px;
-              display: flex;
-              align-items: center;
-              color: #000;
-              padding: 0 18px;
-            }
-
-            .nav-list-link-span {
-              display: none;
-            }
-            .nav-list-item-icon {
-              height: 24px;
-              width: 24px;
-              margin: 0;
-            }
-            &:hover {
-              background: transparent;
-            }
-          }
-
-          .nav-checked {
-            opacity: 1;
-          }
-        }
       }
     }
   }

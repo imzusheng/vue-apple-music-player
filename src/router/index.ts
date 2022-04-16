@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 20:43:36
- * @LastEditTime: 2022-04-15 13:18:06
+ * @LastEditTime: 2022-04-16 20:49:11
  * @Description: 路由
  * @FilePath: \vite-music-player\src\router\index.ts
  */
@@ -16,6 +16,10 @@ const routes = [
     children: [
       {
         path: '',
+        redirect: '/discovery'
+      },
+      {
+        path: 'recommend',
         name: 'home',
         meta: { description: '主页' },
         component: () => import('@/views/PageHome.vue')

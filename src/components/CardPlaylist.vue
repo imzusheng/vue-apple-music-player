@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-14 23:39:46
-LastEditTime: 2022-04-15 09:29:13
+LastEditTime: 2022-04-16 20:30:23
 Description: 歌单展示卡片
 FilePath: \vite-music-player\src\components\CardPlaylist.vue
 -->
@@ -37,7 +37,9 @@ defineProps<{
       </div>
     </div>
     <!-- 歌单列表插槽 -->
-    <slot> 来点歌曲 </slot>
+    <div class="card-playlist-slot">
+      <slot> 来点歌曲 </slot>
+    </div>
   </div>
 </template>
 
@@ -54,10 +56,12 @@ defineProps<{
     .card-playlist-desc-poster {
       flex-shrink: 0;
       border-radius: 3px;
-      width: 180px;
-      height: 180px;
+      width: 100%;
+      max-width: 180px;
+      max-height: 180px;
     }
     .card-playlist-desc-main {
+      overflow: hidden;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -65,6 +69,9 @@ defineProps<{
       .card-playlist-desc-text {
         > .text-h3 {
           font-size: 36px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
         > .text-p {
           font-size: 14px;

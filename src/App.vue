@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 20:15:36
-LastEditTime: 2022-04-14 18:26:53
+LastEditTime: 2022-04-16 21:24:18
 Description: 入口
 FilePath: \vite-music-player\src\App.vue
 -->
@@ -37,6 +37,10 @@ html {
   overflow-y: scroll;
   scrollbar-color: rgba(0, 0, 0, 0.2) #fff;
   scrollbar-width: auto;
+
+  a {
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0) !important;
+  }
 }
 
 .user-not-select {

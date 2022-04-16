@@ -1,12 +1,13 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 21:10:50
-LastEditTime: 2022-04-14 15:56:06
+LastEditTime: 2022-04-16 21:10:20
 Description: 默认布局
 FilePath: \vite-music-player\src\views\LayoutDefault.vue
 -->
 <script lang="ts" setup>
 import TheNavigationLeft from '@/components/TheNavigationLeft.vue'
+// import TheNavigationTop from '@/components/TheNavigationTop.vue'
 import TheLoading from '@/components/TheLoading.vue'
 import TheHeader from '@/components/TheHeader.vue'
 import PageError from '@/views/PageError.vue'
@@ -28,10 +29,11 @@ const viewKey = computed(() => {
   <div id="default-layout">
     <!-- 左侧导航栏 -->
     <the-navigation-left />
+    <!-- <the-navigation-top /> -->
 
     <main id="main">
       <!-- 头部 -->
-      <the-header />
+      <the-header :class="'m_hide'" />
 
       <the-loading v-if="store.state.loading" />
       <page-error v-if="store.state.error.status" />
@@ -73,9 +75,17 @@ const viewKey = computed(() => {
     }
   }
   @media screen and (max-width: 728px) {
-    #main {
-      width: 100%;
-      margin-left: 0;
+    & {
+      .m_hide {
+        display: none;
+      }
+      .m_show {
+        display: block;
+      }
+      #main {
+        width: 100%;
+        margin-left: 0;
+      }
     }
   }
 }

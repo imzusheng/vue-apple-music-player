@@ -3,7 +3,7 @@ import { watchEffect } from "vue"
 <!--
 Author: zusheng
 Date: 2022-04-15 00:29:14
-LastEditTime: 2022-04-15 09:24:23
+LastEditTime: 2022-04-16 20:05:20
 Description: 人像展示卡片
 FilePath: \vite-music-player\src\components\CardArtist.vue
 -->
@@ -106,11 +106,12 @@ watchEffect(() => {
     background-color: rgba(100, 100, 100, 0.1);
     justify-content: center;
     align-items: center;
+    padding: 32px 0;
     > .card-artist-desc-h3 {
       font-size: 20px;
       font-weight: 400;
       color: rgba(255, 255, 255, 0.95);
-      margin-bottom: 3px;
+      margin-bottom: 6px;
     }
     > .card-artist-desc-p {
       font-size: 14px;

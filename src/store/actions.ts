@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-11 09:15:16
- * @LastEditTime: 2022-04-15 12:01:08
+ * @LastEditTime: 2022-04-16 20:33:11
  * @Description: 所有请求
  * @FilePath: \vite-music-player\src\store\actions.ts
  */
@@ -42,17 +42,29 @@ const notArgs = {
   async getBanner({}): Promise<any> {
     const resJson = await get(API.GET_BANNER, {})
     return resJson.banners.map((v: any) => {
-      let payload: any
+      let id: any
 
       if (v.targetId === 0 && v.url) {
-        payload = v.url.substring(v.url.indexOf('id=') + 3)
+        id = v.url.substring(v.url.indexOf('id=') + 3)
       } else {
-        payload = v.targetId
+        id = v.targetId
       }
 
       return {
-        payload,
+        payload: id,
         picUrl: v.imageUrl,
+        type: v.targetType,
+        title: v.typeTitle
+      }
+    })
+  },
+  //  dj banner图片
+  async getDjBanner({}): Promise<any> {
+    const resJson = await get(API.GET_DJ_BANNER, {})
+    return resJson.data.map((v: any) => {
+      return {
+        payload: v.targetId,
+        picUrl: v.pic,
         type: v.targetType,
         title: v.typeTitle
       }
@@ -81,8 +93,8 @@ const mv = {
         payload: v.id,
         artist: v.artistName,
         area: v.mv.area,
-        desc: v.mv.desc,
-        picUrl: v.cover + '?param=320y180'
+        desc: v.mv.aliaName,
+        picUrl: v.cover + '?param=600y337'
       }
     })
   }

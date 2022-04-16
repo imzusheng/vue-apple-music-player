@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 23:39:53
- * @LastEditTime: 2022-04-15 09:21:41
+ * @LastEditTime: 2022-04-16 18:44:57
  * @Description: api文件
  * @FilePath: \vite-music-player\src\common\api.ts
  */
@@ -16,6 +16,8 @@ export default {
 
   // 获取banner图片
   GET_BANNER: '/banner?type=0',
+  // dj banner
+  GET_DJ_BANNER: '/dj/banner',
 
   // 用户相关
   USER: {

@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-13 22:41:51
-LastEditTime: 2022-04-15 11:46:18
+LastEditTime: 2022-04-16 20:39:55
 Description: 海报展示组件
 FilePath: \vite-music-player\src\components\SectionBanner.vue
 -->
@@ -12,27 +12,43 @@ import { ref, watchEffect } from 'vue'
 
 const router = useRouter()
 
-const { picUrl = '', type } = defineProps<{
+const props = defineProps<{
   payload: string | number
   picUrl: string
   title: string
-  desc: string
+  desc?: string
   type: number
 }>()
 
 // 前往详情页
 const toDetail = (payload: any) => {
   // 1为单曲，10为专辑
-  if (type === 1) {
+  if (props.type === 1) {
     router.push({
       name: 'song',
       query: {
         payload
       }
     })
-  } else {
+  } else if (props.type === 10) {
     router.push({
       name: 'album',
+      query: {
+        payload
+      }
+    })
+  } else if (props.type === 60000) {
+    // dj banner
+    router.push({
+      name: 'dj',
+      query: {
+        payload
+      }
+    })
+  } else if (props.type === 60001) {
+    // djp banner
+    router.push({
+      name: 'djp',
       query: {
         payload
       }
@@ -47,26 +63,40 @@ const bannerOnload = () => {
 }
 
 watchEffect(() => {
-  if (picUrl) {
+  if (props.picUrl) {
     bannerloading.value = true
   }
 })
 </script>
 
 <template>
-  <div v-if="picUrl.length > 0" class="banner-block" @click="toDetail(payload)">
+  <div
+    v-if="props.picUrl.length > 0"
+    class="banner-block"
+    @click="toDetail(payload)"
+  >
+    <!-- 768px分辨率下的独立图片 -->
+    <img
+      @load="bannerOnload"
+      class="banner-block-picture"
+      :src="props.picUrl + '?imageView&quality=90'"
+      alt=""
+    />
+
     <!-- 背景 -->
     <div
       class="banner-blur-bg"
-      :style="{ backgroundImage: `url(${picUrl}?imageView&blur=40x20)` }"
+      :style="{
+        backgroundImage: `url(${props.picUrl}?imageView&blur=40x20&quality=90)`
+      }"
     ></div>
 
     <!-- 海报描述 -->
-    <div class="banner-desc">{{ title }}</div>
+    <div class="banner-desc">{{ props.title }}</div>
     <div class="banner-pictrue-box">
       <!-- 海报标题 -->
-      <div class="banner-title">
-        {{ type === 1 ? '单曲' : '专辑' }}&nbsp;&nbsp;&nbsp;{{ desc }}
+      <div class="banner-title" v-if="props.type && props.type <= 10">
+        {{ type === 1 ? '单曲' : '专辑' }}&nbsp;&nbsp;&nbsp;{{ props.desc }}
       </div>
 
       <!-- 相机框框 -->
@@ -85,7 +115,7 @@ watchEffect(() => {
         v-show="!bannerloading"
         @load="bannerOnload"
         class="banner-picture"
-        :src="picUrl + '?imageView&quality=90'"
+        :src="props.picUrl + '?imageView&quality=90'"
         alt=""
       />
     </div>
@@ -100,6 +130,10 @@ watchEffect(() => {
   position: relative;
   padding: 40px 40px 80px;
   cursor: pointer;
+
+  .banner-block-picture {
+    display: none;
+  }
 
   // 模糊背景
   .banner-blur-bg {
@@ -149,7 +183,7 @@ watchEffect(() => {
     // 海报
     .banner-picture {
       width: 100%;
-      min-height: 180px;
+      // min-height: 180px;
       display: block;
       border: 3px solid #fff;
     }
@@ -203,6 +237,22 @@ watchEffect(() => {
       padding: 10px 10px 40px;
       .banner-pictrue-box {
         padding: 30px 40px 0;
+      }
+    }
+  }
+
+  @media screen and (max-width: 628px) {
+    & {
+      padding: 0;
+
+      .banner-blur-bg,
+      .banner-desc,
+      .banner-pictrue-box {
+        display: none;
+      }
+      .banner-block-picture {
+        display: block;
+        width: 100%;
       }
     }
   }

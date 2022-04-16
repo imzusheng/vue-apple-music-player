@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-13 15:29:38
-LastEditTime: 2022-04-15 12:46:56
+LastEditTime: 2022-04-16 20:31:05
 Description: 探索页面
 FilePath: \vite-music-player\src\views\pageDiscovery.vue
 -->
@@ -14,18 +14,25 @@ import CardArtist from '@/components/CardArtist.vue'
 import CardPlaylist from '@/components/CardPlaylist.vue'
 import SectionBanner from '@/components/SectionBanner.vue'
 import { useStore } from '@/store'
-import { reactive, watchEffect, ref } from 'vue'
+import { reactive, watchEffect, ref, toRaw } from 'vue'
 
-const { getToplistDetail, getToplistArtist, getNewSongs, getBanner, getTopMv } =
-  mapActionsHelpers(null, [
-    'getToplistDetail',
-    'getPlaylistDetail',
-    'getToplistArtist',
-    'getSongsDetail',
-    'getNewSongs',
-    'getBanner',
-    'getTopMv'
-  ])
+const {
+  getToplistDetail,
+  getToplistArtist,
+  getNewSongs,
+  getDjBanner,
+  getBanner,
+  getTopMv
+} = mapActionsHelpers(null, [
+  'getToplistDetail',
+  'getPlaylistDetail',
+  'getToplistArtist',
+  'getSongsDetail',
+  'getNewSongs',
+  'getDjBanner',
+  'getBanner',
+  'getTopMv'
+])
 
 const store = useStore()
 
@@ -34,6 +41,13 @@ const data = reactive<any>({
 
   // 海报
   banner: {
+    payload: '',
+    title: '',
+    picUrl: '',
+    type: 1,
+    desc: ''
+  },
+  djBanner: {
     payload: '',
     title: '',
     picUrl: '',
@@ -71,12 +85,18 @@ const data = reactive<any>({
   },
 
   // mv
-  mvs: []
+  mvs: [],
+
+  // 榜单
+  toplist: {
+    cloud: [],
+    other: []
+  }
 })
 
 // 标记请求是否完成
 const loadings = reactive<any>([])
-loadings.push(new Array(9).fill('target'))
+loadings.push(new Array(10).fill('target'))
 store.commit('setLoading', true)
 
 watchEffect(() => {
@@ -85,12 +105,19 @@ watchEffect(() => {
   }
 })
 
-// 获取banner图片
+// banner图片
 getBanner().then((res: any) => {
   loadings.shift()
   const banners = res
   const curBannerIdx = getRandomIndex(0, res.length - 1)
   Object.assign(data.banner, banners[curBannerIdx])
+})
+// Djbanner图片
+getDjBanner().then((res: any) => {
+  loadings.shift()
+  const banners = res
+  const curBannerIdx = getRandomIndex(0, res.length - 1)
+  Object.assign(data.djBanner, banners[curBannerIdx])
 })
 
 // 新歌排行
@@ -140,7 +167,19 @@ getToplistArtist({ type: 1 }).then((res: any) => {
 // 获取所有榜单详情
 getToplistDetail().then((res: any) => {
   loadings.shift()
-  data.list = res.list
+  data.list = res.list.map((v: any) => {
+    if (
+      v.name.indexOf('云音乐') > -1 ||
+      ['飙升榜', '新歌榜', '热歌榜', '原创榜'].includes(v.name)
+    ) {
+      data.toplist.cloud.push(v.name)
+    } else {
+      data.toplist.other.push(v.name)
+    }
+    return v
+  })
+
+  console.log(data.toplist)
 })
 
 // const playlistId = Toplist.飙升榜
@@ -269,46 +308,15 @@ getToplistDetail().then((res: any) => {
       </div>
     </section>
 
-    <!--
-      新碟上架
-    -->
-    <section class="discovery-newAlbum">
-      <div class="newAlbum-block">
-        <img
-          class="newAlbum-block-poster"
-          src="https://p4.music.126.net/atBpo8-tvdx-bb2dQPk5Aw==/109951167290068170.jpg?param=300y300"
-          alt=""
-        />
-        <div class="newAlbum-block-desc">
-          <h3 class="newAlbum-block-desc-h3">国内热门专辑</h3>
-          <p class="newAlbum-block-desc-p">陈奕迅、林君佳、薛之谦</p>
-        </div>
-      </div>
-
-      <div class="newAlbum-block">
-        <img
-          class="newAlbum-block-poster"
-          src="https://p3.music.126.net/hwp80HtHSowQKkI4BVlEvw==/109951167284428374.jpg?param=300y300"
-          alt=""
-        />
-        <div class="newAlbum-block-desc">
-          <h3 class="newAlbum-block-desc-h3">国内热门专辑</h3>
-          <p class="newAlbum-block-desc-p">陈奕迅、林君佳、薛之谦</p>
-        </div>
-      </div>
-
-      <div class="newAlbum-block">
-        <img
-          class="newAlbum-block-poster"
-          src="https://p4.music.126.net/PqQdNjn2pRlqMOXxJuZuoA==/109951167287881659.jpg?param=300y300"
-          alt=""
-        />
-        <div class="newAlbum-block-desc">
-          <h3 class="newAlbum-block-desc-h3">国内热门专辑</h3>
-          <p class="newAlbum-block-desc-p">陈奕迅、林君佳、薛之谦</p>
-        </div>
-      </div>
-    </section>
+    <!-- 海报 -->
+    <div class="discovery-banner">
+      <section-banner
+        :payload="data.djBanner.payload"
+        :title="data.djBanner.title"
+        :picUrl="data.djBanner.picUrl"
+        :type="data.djBanner.type"
+      />
+    </div>
 
     <!--
       新歌速递 + 最热歌手/粉丝最爱
@@ -349,18 +357,36 @@ getToplistDetail().then((res: any) => {
       </div>
     </section>
 
+    <!--  -->
+    <div style="height: 52px"></div>
+    <!--  -->
+
     <!--
-      分类
+      榜单
     -->
+    <section-title sectionTitle="云音乐特色榜" subTitle="" actionName="" />
     <section class="discovery-category">
-      <section-title sectionTitle="排行榜" subTitle="" actionName="" />
       <div
-        v-for="(item, idx) in data.list"
+        v-for="(item, idx) in data.toplist.cloud"
         :key="`category${idx}`"
         class="discovery-category-item"
         :class="`color-${getRandomIndex(0, 9)}`"
       >
-        {{ item.name }}
+        {{ item }}
+      </div>
+    </section>
+    <!--  -->
+    <div style="height: 52px"></div>
+    <!--  -->
+    <section-title sectionTitle="全球媒体排行榜" subTitle="" actionName="" />
+    <section class="discovery-category">
+      <div
+        v-for="(item, idx) in data.toplist.other"
+        :key="`category${idx}`"
+        class="discovery-category-item"
+        :class="`color-${getRandomIndex(0, 9)}`"
+      >
+        {{ item }}
       </div>
     </section>
   </div>
@@ -369,6 +395,9 @@ getToplistDetail().then((res: any) => {
 <style lang="less">
 #page-discovery {
   --discovery-gap: 24px;
+
+  // 分类-列
+  --discovery-category-columns: 4;
 
   // 海报
   .discovery-banner {
@@ -406,8 +435,7 @@ getToplistDetail().then((res: any) => {
   }
 
   // mv
-  .discovery-mv,
-  .discovery-newAlbum {
+  .discovery-mv {
     display: grid;
     gap: var(--discovery-gap);
     grid-template-columns: repeat(3, 1fr);
@@ -458,16 +486,20 @@ getToplistDetail().then((res: any) => {
     }
   }
 
+  // 分类
   .discovery-category {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(var(--discovery-category-columns), 1fr);
     .discovery-category-item {
-      cursor: pointer;
-      padding: 10px 20px;
       margin: 6px;
+      padding: 10px 20px;
       border-radius: 6px;
       position: relative;
       overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background 0.2s;
       background: rgba(246, 246, 246, 1);
       &::after {
         content: '';
@@ -478,13 +510,45 @@ getToplistDetail().then((res: any) => {
         right: 0;
         bottom: 0;
         z-index: -1;
-        transition: clip-path 0.12s;
         clip-path: inset(0px calc(100% - 6px) 0px 0);
       }
-      &:hover::after {
-        clip-path: inset(0px 0px 0px 0);
+      &:hover {
+        background: rgba(228, 228, 228, 1);
+        &::after {
+          // clip-path: inset(0px 0px 0px 0);
+        }
       }
     }
+  }
+
+  @media screen and (max-width: 1200px) {
+    --discovery-category-columns: 3;
+    .discovery-toplist {
+      .toplist-grid-l,
+      .toplist-grid-r,
+      .toplist-grid-l-2,
+      .toplist-grid-r-2 {
+        grid-column: 1/-1;
+      }
+    }
+  }
+
+  @media screen and (max-width: 968px) {
+    --discovery-category-columns: 2;
+    .discovery-mv {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    --discovery-category-columns: 1;
+    --grid-gap: 10px;
+    --page-spacing: 16px;
+  }
+
+  @media screen and (max-width: 628px) {
+    --discovery-category-columns: 1;
   }
 
   .color-1 {
@@ -514,7 +578,7 @@ getToplistDetail().then((res: any) => {
   .color-9 {
     --color: rgba(123, 62, 219, 0.51);
   }
-  .color-0 {
+  .color-10 {
     --color: rgba(0, 165, 19, 0.51);
   }
 }
