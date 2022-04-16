@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 17:31:44
-LastEditTime: 2022-04-16 21:59:13
+LastEditTime: 2022-04-16 22:34:43
 Description: detail页面的基本框架
 FilePath: \vite-music-player\src\components\TheDetailFrame.vue
 -->
@@ -369,6 +369,17 @@ onUnmounted(() => {
               }
             }
           }
+        }
+
+        // 按钮栏
+        .frame-action {
+          width: 100%;
+          padding: 20px;
+        }
+
+        // 歌手作品
+        .frame-list {
+          padding: 0px;
         }
       }
     }

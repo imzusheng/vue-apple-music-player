@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 18:47:25
-LastEditTime: 2022-04-14 21:04:26
+LastEditTime: 2022-04-16 22:39:42
 Description: 歌曲表格展示 单击切歌，有XL/L/M/S四种尺寸
                 L: 封面，歌名，专辑，发布时间，时长
                 L: 封面，歌名，专辑，时长
@@ -450,6 +450,112 @@ const props = defineProps<{
           .icon-equaliser {
             display: none;
           }
+        }
+      }
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    & {
+      // ul
+      .song-table {
+        padding-top: 6px;
+        // li
+        .table-row {
+          padding: 0 10px;
+
+          // index单元格
+          .table-cell-index {
+            justify-content: center;
+            align-items: center;
+
+            .playlist-table-index {
+              display: block;
+              color: rgba(0, 0, 0, 0.3);
+            }
+
+            .playlist-table-icon {
+              display: none;
+            }
+          }
+
+          // 歌曲信息
+          .table-cell-desc {
+            // 歌曲封面
+            .table-cell-desc-pic {
+              height: 54px;
+              width: 54px;
+              flex-shrink: 0;
+              margin-right: 5px;
+              padding: 5px;
+              box-sizing: border-box;
+            }
+
+            // 歌曲名 和 歌手
+            .table-cell-desc-info {
+              .table-desc-name {
+                grid-area: title;
+                color: #121212;
+                display: flex;
+                align-items: center;
+
+                > span {
+                  font-size: 15px;
+                  color: #121212;
+                  font-weight: 600;
+                }
+
+                .table-cell-desc-vip {
+                  height: 32px;
+                  width: 32px;
+                  margin-left: 4px;
+                }
+              }
+            }
+          }
+
+          // 专辑
+          .table-cell-album,
+          .table-cell-pub,
+          .table-desc-art,
+          .table-cell-dt {
+            color: rgba(0, 0, 0, 0.65);
+            font-size: 14px;
+          }
+
+          // hover样式
+          &:hover {
+            background: rgba(0, 0, 0, 0.1);
+
+            .playlist-table-index {
+              display: none;
+            }
+
+            .playlist-table-icon {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+
+            .table-desc-name {
+              text-decoration: underline;
+            }
+          }
+
+          // 需要省略的格子
+          .table-cell-ellipsis {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+        }
+
+        // 最大尺寸
+        .table-row-size-xl,
+        .table-row-size-l,
+        .table-row-size-m,
+        .table-row-size-s {
+          padding: 0;
         }
       }
     }

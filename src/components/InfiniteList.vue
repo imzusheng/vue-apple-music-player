@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-14 12:00:28
-LastEditTime: 2022-04-14 14:31:10
+LastEditTime: 2022-04-16 22:57:48
 Description: 无限滚动列表
 FilePath: \vite-music-player\src\components\InfiniteList.vue
 -->
@@ -41,7 +41,7 @@ const data = reactive<any>({
 })
 
 const listData = computed(() => {
-  let endIdx = data.startIdx + data.displayCount
+  let endIdx = data.startIdx + data.displayCount + 10
   if (endIdx >= props.listData.length) endIdx = props.listData.length
 
   return props.listData.slice(data.startIdx, endIdx).map((v, k) => {
