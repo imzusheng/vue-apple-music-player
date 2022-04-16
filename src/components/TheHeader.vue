@@ -1,20 +1,29 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 11:22:11
-LastEditTime: 2022-04-13 12:32:57
+LastEditTime: 2022-04-16 22:25:58
 Description: 头部
 FilePath: \vite-music-player\src\components\TheHeader.vue
 -->
 <script lang="ts" setup>
 import { useStore } from '@/store'
+import { useRouter } from 'vue-router'
 import { provide, ref } from 'vue'
 
 const store = useStore()
+const router = useRouter()
 const header = ref<HTMLElement | null>(null)
 
 provide('getHeaderRef', () => {
   return header
 })
+
+const routerPrev = () => {
+  router.go(-1)
+}
+const routerNext = () => {
+  router.go(1)
+}
 </script>
 
 
@@ -22,10 +31,10 @@ provide('getHeaderRef', () => {
   <header id="header" ref="header">
     <!-- 前进后退按钮 -->
     <div class="header-action flex-center">
-      <button class="header-action-prev flex-center">
+      <button class="header-action-prev flex-center" @click="routerPrev">
         <img class="icon" src="@/assets/icon-prev.svg" alt="" />
       </button>
-      <button class="header-action-next flex-center">
+      <button class="header-action-next flex-center" @click="routerNext">
         <img class="icon" src="@/assets/icon-next.svg" alt="" />
       </button>
       <button aria-label="播放全部" class="header-action-play flex-center">

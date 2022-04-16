@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 20:51:30
-LastEditTime: 2022-04-16 22:07:11
+LastEditTime: 2022-04-16 22:28:32
 Description: 专辑详情
 FilePath: \vite-music-player\src\views\DetailPlaylist.vue
 -->
@@ -10,10 +10,12 @@ FilePath: \vite-music-player\src\views\DetailPlaylist.vue
 import { mapActionsHelpers } from '@/common/util'
 import { reactive } from 'vue'
 import { useRoute } from 'vue-router'
+import { useStore } from '@/store'
 import TheDetailFrame from '@/components/TheDetailFrame.vue'
 import TableListSongs from '@/components/TableListSongs.vue'
 
 const route = useRoute()
+const store = useStore()
 const { getPlaylistDetail, getSongsDetail } = mapActionsHelpers(null, [
   'getPlaylistDetail',
   'getSongsDetail'
@@ -42,6 +44,12 @@ getPlaylistDetail(id)
         v.idx = k + 1
         return v
       })
+    })
+  })
+  .catch((err: any) => {
+    store.commit('setError', {
+      status: true,
+      info: err.stack
     })
   })
 </script>

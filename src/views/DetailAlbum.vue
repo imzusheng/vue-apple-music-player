@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 16:04:42
-LastEditTime: 2022-04-14 18:10:01
+LastEditTime: 2022-04-16 22:29:34
 Description: 专辑详情
 FilePath: \vite-music-player\src\views\DetailAlbum.vue
 -->
@@ -9,11 +9,13 @@ FilePath: \vite-music-player\src\views\DetailAlbum.vue
 import { mapActionsHelpers, durationConvert, pickUpName } from '@/common/util'
 import { reactive } from 'vue'
 import { useRoute } from 'vue-router'
+import { useStore } from '@/store'
 import TheDetailFrame from '@/components/TheDetailFrame.vue'
 import TableListSongs from '@/components/TableListSongs.vue'
 import { SongTableRow } from '@/common/types'
 
 const route = useRoute()
+const store = useStore()
 const { getAlbumAll, getAlbumThroughSongs } = mapActionsHelpers(null, [
   'getAlbumAll',
   'getAlbumThroughSongs'
@@ -40,19 +42,26 @@ async function getData() {
     })
   }
 
-  getAlbumAll(id).then((res: any) => {
-    albumInfo.data = res.album
-    albumInfo.songs = res.songs.map((v: any): SongTableRow => {
-      return {
-        artist: pickUpName(v.ar),
-        title: v.name,
-        album: v.al.name,
-        picUrl: v.al.picUrl + '?param=50y50',
-        duration: durationConvert(v.dt / 1000),
-        fee: v.fee.toString()
-      }
+  getAlbumAll(id)
+    .then((res: any) => {
+      albumInfo.data = res.album
+      albumInfo.songs = res.songs.map((v: any): SongTableRow => {
+        return {
+          artist: pickUpName(v.ar),
+          title: v.name,
+          album: v.al.name,
+          picUrl: v.al.picUrl + '?param=50y50',
+          duration: durationConvert(v.dt / 1000),
+          fee: v.fee.toString()
+        }
+      })
     })
-  })
+    .catch((err: any) => {
+      store.commit('setError', {
+        status: true,
+        info: err.stack
+      })
+    })
 }
 </script>
 

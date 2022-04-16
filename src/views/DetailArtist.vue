@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-11 18:15:50
-LastEditTime: 2022-04-13 11:27:27
+LastEditTime: 2022-04-16 22:29:03
 Description: 歌单详情页
 FilePath: \vite-music-player\src\views\DetailArtist.vue
 -->
@@ -36,13 +36,20 @@ const { getArtistDetail, getArtistFans } = mapActionsHelpers(null, [
   'getArtistFans'
 ])
 // 批量请求
-Promise.allSettled([getArtistDetail(id), getArtistFans(id)]).then((resArr) => {
-  resArr.forEach((res: any) => {
-    if (res.status === 'fulfilled') {
-      data[res.value.type] = res.value.data
-    }
+Promise.allSettled([getArtistDetail(id), getArtistFans(id)])
+  .then((resArr) => {
+    resArr.forEach((res: any) => {
+      if (res.status === 'fulfilled') {
+        data[res.value.type] = res.value.data
+      }
+    })
   })
-})
+  .catch((err: any) => {
+    store.commit('setError', {
+      status: true,
+      info: err.stack
+    })
+  })
 </script>
 
 <template>
