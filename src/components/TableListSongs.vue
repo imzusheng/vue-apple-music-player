@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 18:47:25
-LastEditTime: 2022-04-16 22:39:42
+LastEditTime: 2022-04-16 23:21:21
 Description: 歌曲表格展示 单击切歌，有XL/L/M/S四种尺寸
                 L: 封面，歌名，专辑，发布时间，时长
                 L: 封面，歌名，专辑，时长
@@ -525,20 +525,14 @@ const props = defineProps<{
 
           // hover样式
           &:hover {
-            background: rgba(0, 0, 0, 0.1);
+            background: transparent;
 
             .playlist-table-index {
-              display: none;
-            }
-
-            .playlist-table-icon {
-              display: flex;
-              align-items: center;
-              justify-content: center;
+              display: block;
             }
 
             .table-desc-name {
-              text-decoration: underline;
+              text-decoration: none;
             }
           }
 
