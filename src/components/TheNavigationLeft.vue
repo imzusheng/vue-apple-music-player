@@ -122,8 +122,8 @@ router.afterEach((to) => {
       left: 0;
       width: 100%;
       height: unset;
-      background: rgba(246, 246, 246, 1);
-      z-index: 1;
+      background: rgba(246, 246, 246, calc(var(--animation-ratio) * 1));
+      z-index: 999;
       .nav-spacing {
         padding: 16px;
         height: 100%;

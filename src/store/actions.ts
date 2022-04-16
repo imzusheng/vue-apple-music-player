@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-11 09:15:16
- * @LastEditTime: 2022-04-16 20:33:11
+ * @LastEditTime: 2022-04-16 22:23:43
  * @Description: 所有请求
  * @FilePath: \vite-music-player\src\store\actions.ts
  */
@@ -153,33 +153,58 @@ interface Song {
 }
 const song = {
   // 获取单曲详情
-  async getSongsDetail({}, ids: string): Promise<Array<Song>> {
-    const resJson = await get(API.SONG.GET_SONG_DETAIL, { ids })
-    const data: Array<Song> = resJson.songs.map((v: any): Song => {
-      return {
-        // 作者名
-        artist: pickUpName(v.ar),
-
-        // 歌曲封面
-        picUrl: v.al.picUrl + '?param=50y50',
-
-        // 歌曲名
-        title: v.name,
-
-        // 来自专辑
-        album: v.al.name,
-
-        // 发布时间 年
-        publishTime: moment(v.publishTime).year().toString(),
-
-        // 歌曲时长，单位分钟
-        duration: durationConvert(v.dt / 1000),
-
-        // 是否需要会员
-        fee: v.fee.toString()
+  getSongsDetail({}, ids: Array<any>): Promise<Array<Song>> {
+    function sliceArray(newArr: Array<any>, ids: Array<any>): Array<Array<any>> {
+      const newIds = ids
+      if (ids.length > 100) {
+        newArr.push(newIds.splice(0, 100))
+        return sliceArray(newArr, newIds)
+      } else {
+        newArr.push(ids)
+        return newArr
       }
+    }
+    return new Promise<Array<Song>>(resolve => {
+      const idsChunks: Array<Array<any>> = sliceArray([], ids)
+
+      const requestQueue = idsChunks.map(idsArr => get(API.SONG.GET_SONG_DETAIL, { ids: idsArr.toString() }))
+
+      const result: Array<any> = []
+
+      Promise.allSettled(requestQueue).then(resArr => {
+        resArr.forEach((res: any) => {
+          if (res.status === 'fulfilled') {
+            const data: Array<Song> = res.value.songs.map((v: any): Song => {
+              return {
+                // 作者名
+                artist: pickUpName(v.ar),
+
+                // 歌曲封面
+                picUrl: v.al.picUrl + '?param=50y50',
+
+                // 歌曲名
+                title: v.name,
+
+                // 来自专辑
+                album: v.al.name,
+
+                // 发布时间 年
+                publishTime: moment(v.publishTime).year().toString(),
+
+                // 歌曲时长，单位分钟
+                duration: durationConvert(v.dt / 1000),
+
+                // 是否需要会员
+                fee: v.fee.toString()
+              }
+            })
+            result.push(...data)
+          }
+        })
+
+        resolve(result)
+      })
     })
-    return data
   },
   // 新歌速递
   async getNewSongs({}, { type = 0 }): Promise<Array<Song>> {

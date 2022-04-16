@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-13 15:29:38
-LastEditTime: 2022-04-16 20:31:05
+LastEditTime: 2022-04-16 22:05:42
 Description: 探索页面
 FilePath: \vite-music-player\src\views\pageDiscovery.vue
 -->
@@ -178,8 +178,6 @@ getToplistDetail().then((res: any) => {
     }
     return v
   })
-
-  console.log(data.toplist)
 })
 
 // const playlistId = Toplist.飙升榜

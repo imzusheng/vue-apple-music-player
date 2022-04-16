@@ -1,11 +1,11 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 20:43:36
- * @LastEditTime: 2022-04-16 20:49:11
+ * @LastEditTime: 2022-04-16 21:41:34
  * @Description: 路由
  * @FilePath: \vite-music-player\src\router\index.ts
  */
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router'
 import { store } from '@/store'
 
 const routes = [
@@ -89,7 +89,8 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  // history: createWebHistory(),
+  history: createWebHashHistory(),
   routes,
   scrollBehavior() {
     return {

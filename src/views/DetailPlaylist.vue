@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 20:51:30
-LastEditTime: 2022-04-14 18:10:13
+LastEditTime: 2022-04-16 22:07:11
 Description: 专辑详情
 FilePath: \vite-music-player\src\views\DetailPlaylist.vue
 -->
@@ -34,9 +34,9 @@ const id = route.query.payload
 getPlaylistDetail(id)
   .then((res: any) => {
     playlistInfo.data = res
-    return res.trackIds.toString()
+    return res.trackIds
   })
-  .then((ids: string) => {
+  .then((ids: Array<any>) => {
     getSongsDetail(ids).then((res: any) => {
       playlistInfo.songs = res.map((v: any, k: any) => {
         v.idx = k + 1

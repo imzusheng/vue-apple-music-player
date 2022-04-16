@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 17:31:44
-LastEditTime: 2022-04-15 12:22:19
+LastEditTime: 2022-04-16 21:59:13
 Description: detail页面的基本框架
 FilePath: \vite-music-player\src\components\TheDetailFrame.vue
 -->
@@ -326,6 +326,51 @@ onUnmounted(() => {
       // background: #fff;
       padding: 32px;
       min-height: calc(100vh - var(--header-height) + 32px);
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    & {
+      // 封面
+      .frame-banner {
+        .frame-banner-poster {
+          background-repeat: no-repeat;
+          background-position: center center;
+          background-size: auto 100%;
+          &::after {
+            content: '';
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            z-index: 1;
+            background: linear-gradient(
+              rgba(0, 0, 0, 0.05),
+              rgba(0, 0, 0, 0.6) 80%
+            );
+          }
+        }
+      }
+
+      .frame-content {
+        // 歌手信息
+        .section-frame-info {
+          width: 100%;
+          .frame-frame-info-spacing {
+            padding: 16px;
+            .frame-info-main {
+              border-left: 4px solid #fff;
+              .frame-info-name {
+                color: rgba(255, 255, 255, 1);
+                width: 100%;
+                font-size: 26px;
+                line-height: 1.5;
+                font-weight: 900;
+                margin-bottom: 16px;
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

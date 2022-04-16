@@ -9,7 +9,7 @@
     "jsx": "preserve",
     "sourceMap": true,
     "resolveJsonModule": true,
-    "isolatedModules": true,
+    // "isolatedModules": true,
     "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
