@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 18:47:25
-LastEditTime: 2022-04-17 11:00:52
+LastEditTime: 2022-04-17 20:21:14
 Description: 歌曲表格展示 单击切歌，有XL/L/M/S四种尺寸
                 L: 封面，歌名，专辑，发布时间，时长
                 L: 封面，歌名，专辑，时长
@@ -11,10 +11,12 @@ FilePath: \vite-music-player\src\components\TableListSongs.vue
 -->
 
 <script lang="ts" setup>
-import { SongTableRow } from '@/common/types'
 import InfiniteList from './InfiniteList.vue'
+import { useStore } from '@/store'
+import { SongTableRow } from '@/common/types'
 import { mapActionsHelpers, mapMutationsHelpers } from '@/common/util'
 
+const store = useStore()
 const { getSongUrl } = mapActionsHelpers(null, ['getSongUrl'])
 const { setAudioUrl, setAudioInfo } = mapMutationsHelpers(null, [
   'setAudioUrl',
@@ -72,7 +74,9 @@ function play(songInfo: SongTableRow) {
       class="song-table"
       :listData="props.songs"
     >
+      <!-- li -->
       <template #default="{ listItem }">
+        <!-- li > div -->
         <div
           class="table-row"
           :class="`table-title-size-${props.size.toLowerCase()}`"
@@ -149,6 +153,7 @@ function play(songInfo: SongTableRow) {
         v-for="(listItem, listIndex) in props.songs"
         :key="`songs-${listIndex}`"
         :class="`table-row-size-${props.size.toLowerCase()}`"
+        :data-playing="store.state.audioInfo.payload === listItem.payload"
         class="table-row"
       >
         <!-- 序号 -->
@@ -243,7 +248,7 @@ function play(songInfo: SongTableRow) {
       color: rgba(0, 0, 0, 0.45);
       font-size: 16px;
 
-      &:last-child {
+      .table-cell-dt {
         text-align: right;
         margin-right: 32px;
       }
@@ -258,7 +263,7 @@ function play(songInfo: SongTableRow) {
       [first] 6fr
       [var1] 4fr
       [var2] 3fr
-      [last] minmax(120px, 1fr);
+      [last] auto;
   }
 
   // l
@@ -268,7 +273,7 @@ function play(songInfo: SongTableRow) {
       [index] 16px
       [first] 6fr
       [var1] 4fr
-      [last] minmax(120px, 1fr);
+      [last] auto;
   }
 
   // 中等尺寸,去掉专辑
@@ -276,7 +281,7 @@ function play(songInfo: SongTableRow) {
     grid-template-columns:
       [index] 16px
       [name] auto
-      [last] minmax(120px, 1fr);
+      [last] auto;
   }
 
   // 小尺寸,只保留封面、歌名、时长
@@ -284,7 +289,7 @@ function play(songInfo: SongTableRow) {
     padding: 0;
     grid-template-columns:
       [name] auto
-      [last] minmax(120px, 1fr);
+      [last] auto;
   }
 
   // ul
@@ -308,7 +313,7 @@ function play(songInfo: SongTableRow) {
         align-items: center;
         padding: 4px 0;
 
-        &:last-child {
+        .table-cell-dt {
           justify-content: flex-end;
           margin-right: 32px;
         }
@@ -408,7 +413,7 @@ function play(songInfo: SongTableRow) {
         [first] 6fr
         [var1] 4fr
         [var2] 3fr
-        [last] minmax(120px, 1fr);
+        [last] auto;
     }
 
     .table-row-size-l {
@@ -416,7 +421,7 @@ function play(songInfo: SongTableRow) {
         [index] 16px
         [first] 6fr
         [var1] 4fr
-        [last] minmax(120px, 1fr);
+        [last] auto;
     }
 
     // 中等尺寸,去掉专辑
@@ -424,7 +429,7 @@ function play(songInfo: SongTableRow) {
       grid-template-columns:
         [index] 16px
         [name] auto
-        [last] minmax(120px, 1fr);
+        [last] auto;
     }
 
     // 小尺寸,只保留封面、歌名、时长
@@ -432,53 +437,26 @@ function play(songInfo: SongTableRow) {
       padding: 0;
       grid-template-columns:
         [name] auto
-        [last] minmax(120px, 1fr);
-    }
-
-    // 正在播放的歌曲样式
-    .playing {
-      background: rgb(60, 60, 60);
-
-      .playlist-table-index {
-        display: none !important;
-      }
-
-      .playlist-table-icon {
-        display: flex !important;
-        align-items: center;
-        justify-content: center;
-
-        .icon-pause {
-          display: none;
-        }
-
-        .icon-equaliser {
-          display: block;
-        }
-      }
-
-      &:hover {
-        .playlist-table-icon {
-          .icon-pause {
-            display: block;
-          }
-
-          .icon-equaliser {
-            display: none;
-          }
-        }
-      }
+        [last] auto;
     }
   }
 
   @media screen and (max-width: 768px) {
     & {
+      .song-table-title {
+        .table-cell-dt {
+          margin-right: 10px;
+        }
+      }
       // ul
       .song-table {
         padding-top: 6px;
         // li
         .table-row {
           padding: 0 10px;
+          .table-cell-dt {
+            margin-right: 10px;
+          }
 
           // index单元格
           .table-cell-index {
@@ -545,6 +523,17 @@ function play(songInfo: SongTableRow) {
             overflow: hidden;
             text-overflow: ellipsis;
           }
+          &:hover {
+            background: transparent !important;
+
+            .playlist-table-index {
+              display: block;
+            }
+
+            .table-desc-name {
+              text-decoration: none;
+            }
+          }
         }
 
         // 最大尺寸
@@ -553,6 +542,41 @@ function play(songInfo: SongTableRow) {
         .table-row-size-m,
         .table-row-size-s {
           padding: 0;
+        }
+      }
+    }
+  }
+
+  // 正在播放的歌曲样式
+  .table-row[data-playing='true'] {
+    background: rgba(200, 200, 200, 0.65);
+
+    .playlist-table-index {
+      display: none !important;
+    }
+
+    .playlist-table-icon {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+
+      .icon-pause {
+        display: none;
+      }
+
+      .icon-equaliser {
+        display: block;
+      }
+    }
+
+    &:hover {
+      .playlist-table-icon {
+        .icon-pause {
+          display: block;
+        }
+
+        .icon-equaliser {
+          display: none;
         }
       }
     }
@@ -568,19 +592,19 @@ function play(songInfo: SongTableRow) {
       [first] 6fr
       [var1] 4fr
       [var2] 3fr
-      [last] minmax(120px, 1fr) !important;
+      [last] auto !important;
   }
   .table-title-size-l {
     padding: 16px;
     grid-template-columns:
       [first] 6fr
       [var1] 4fr
-      [last] minmax(120px, 1fr) !important;
+      [last] auto !important;
   }
   .table-title-size-m {
     grid-template-columns:
       [name] auto
-      [last] minmax(120px, 1fr) !important;
+      [last] auto !important;
   }
 
   // 行无序号样式
@@ -590,19 +614,19 @@ function play(songInfo: SongTableRow) {
       [first] 6fr
       [var1] 4fr
       [var2] 3fr
-      [last] minmax(120px, 1fr) !important;
+      [last] auto !important;
   }
   .table-row-size-l {
     grid-template-columns:
       [first] 6fr
       [var1] 4fr
-      [last] minmax(120px, 1fr) !important;
+      [last] auto !important;
   }
   // 中等尺寸,去掉专辑
   .table-row-size-m {
     grid-template-columns:
       [name] auto
-      [last] minmax(120px, 1fr) !important;
+      [last] auto !important;
   }
 }
 </style>

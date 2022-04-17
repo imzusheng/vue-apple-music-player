@@ -1,11 +1,12 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 21:10:50
-LastEditTime: 2022-04-17 17:24:28
+LastEditTime: 2022-04-17 19:46:24
 Description: 默认布局
 FilePath: \vite-music-player\src\views\LayoutDefault.vue
 -->
 <script lang="ts" setup>
+import { mapActionsHelpers, mapMutationsHelpers } from '@/common/util'
 import TheNavigationLeft from '@/components/TheNavigationLeft.vue'
 // import TheNavigationTop from '@/components/TheNavigationTop.vue'
 import AudioPlayer from '@/components/AudioPlayer/PlayerAudio.vue'
@@ -16,6 +17,8 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from '@/store'
 
+const { getSongUrl } = mapActionsHelpers(null, ['getSongUrl'])
+const { setAudioUrl } = mapMutationsHelpers(null, ['setAudioUrl'])
 const store = useStore()
 const route = useRoute()
 
@@ -23,6 +26,12 @@ const viewKey = computed(() => {
   const payload = route.query.payload ?? ''
   return Date.now().toString() + payload
 })
+
+function reload() {
+  getSongUrl(store.state.audioInfo.payload).then((url: string) => {
+    setAudioUrl(url)
+  })
+}
 </script>
 
 
@@ -35,6 +44,7 @@ const viewKey = computed(() => {
     :publish-time="store.state.audioInfo.publishTime"
     :artist="store.state.audioInfo.artist"
     :pic-url="store.state.audioInfo.picUrl"
+    @reload="reload"
   />
 
   <div id="default-layout">

@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-16 23:33:22
-LastEditTime: 2022-04-17 19:03:41
+LastEditTime: 2022-04-17 20:29:31
 Description: 音乐播放器
 FilePath: \vite-music-player\src\components\AudioPlayer\PlayerAudio.vue
 -->
@@ -17,6 +17,10 @@ import { onMounted, provide, reactive, watchEffect, nextTick } from 'vue'
 
 const store = useStore()
 const { setAudioDisplay } = mapMutationsHelpers(null, ['setAudioDisplay'])
+
+const emit = defineEmits<{
+  (event: 'reload'): void
+}>()
 
 const props = defineProps<{
   // 音乐url
@@ -69,11 +73,10 @@ const data = reactive<any>({
 
 provide('data', data)
 provide('props', props)
+provide('reload', () => emit('reload'))
 provide('setData', (name: string, value: any) => {
   data[name] = value
 })
-
-let inif = false
 
 onMounted(() => {
   // 创建播放器
@@ -86,8 +89,7 @@ watchEffect(() => {
       document.title = `${props.title} - ${props.artist}`
       setAudioDisplay(true)
       // 加载歌曲
-      playerLoading(props.url, inif)
-      inif = true
+      playerLoading(props.url, true)
     })
   }
 })
@@ -176,6 +178,7 @@ function playerCreate() {
  * @param autoplay 是否自动播放
  */
 function playerLoading(url: string, autoplay: boolean) {
+  data.audioRef.pause
   data.audioRef.src = url
   data.audioRef.autoplay = autoplay
   data.audioRef.load()

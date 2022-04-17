@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-17 11:11:37
-LastEditTime: 2022-04-17 18:51:57
+LastEditTime: 2022-04-17 19:44:12
 Description: 播放器控制中心
 FilePath: \vite-music-player\src\components\AudioPlayer\PlayerAudioControls.vue
 -->
@@ -12,6 +12,7 @@ FilePath: \vite-music-player\src\components\AudioPlayer\PlayerAudioControls.vue
 import { inject } from 'vue'
 
 const parentData = inject<any>('data')
+const reload = inject<any>('reload')
 const setData = inject('setData', (name: string, value: any) => {})
 
 // 开始/暂停音乐
@@ -23,6 +24,8 @@ function playChange() {
       parentData.audioRef.pause()
     }
   } else {
+    reload()
+    setData('loading', true)
   }
 }
 

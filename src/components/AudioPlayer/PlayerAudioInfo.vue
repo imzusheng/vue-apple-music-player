@@ -1,17 +1,17 @@
 <!--
 Author: zusheng
 Date: 2022-04-17 09:39:32
-LastEditTime: 2022-04-17 13:41:53
+LastEditTime: 2022-04-17 19:51:47
 Description: 歌曲信息模块
 FilePath: \vite-music-player\src\components\AudioPlayer\PlayerAudioInfo.vue
 -->
 
 <script lang="ts" setup>
 import TheLoadingCircle from '@/components/TheLoadingCircle.vue'
-import { inject, ref } from 'vue'
+import { inject } from 'vue'
 
 const parentProps = inject<any>('props')
-const loading = inject('loading', ref(false))
+const parentData = inject('data')
 </script>
 
 <template>
@@ -19,7 +19,7 @@ const loading = inject('loading', ref(false))
     <!-- 封面 -->
     <div class="player-song-pic">
       <img
-        v-if="!loading && parentProps.picUrl"
+        v-if="!parentData.loading && parentProps.picUrl"
         :src="parentProps.picUrl"
         alt=""
       />
