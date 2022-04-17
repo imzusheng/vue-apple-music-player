@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-11 22:59:54
- * @LastEditTime: 2022-04-15 08:31:27
+ * @LastEditTime: 2022-04-17 10:37:26
  * @Description: typescript的复用的类型、接口定义
  * @FilePath: \vite-music-player\src\common\types.ts
  */
@@ -40,6 +40,9 @@ interface Args {
 
 // 表格中每首歌曲所需信息
 interface SongTableRow {
+  // id
+  payload: string | number
+
   // 作者名
   artist: string
 
@@ -64,7 +67,24 @@ interface SongTableRow {
   [prop: string]: any
 }
 
-export type { ResRmd, RmdItem, Args, SongTableRow }
+interface PlayerAudioProps {
+  // 音乐url
+  url: string
+
+  // 歌名
+  title: string
+
+  // 专辑
+  album: string
+
+  // 作者
+  artist: string
+
+  // 发布时间
+  publishTime: any
+}
+
+export type { ResRmd, RmdItem, Args, SongTableRow, PlayerAudioProps }
 
 export enum Toplist {
   '飙升榜' = 19723756,

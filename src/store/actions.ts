@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-11 09:15:16
- * @LastEditTime: 2022-04-16 22:23:43
+ * @LastEditTime: 2022-04-17 13:23:13
  * @Description: 所有请求
  * @FilePath: \vite-music-player\src\store\actions.ts
  */
@@ -113,8 +113,6 @@ const album = {
   async getAlbumDetail({}, id: string | number): Promise<any> {
     const data = await get(API.ALBUM.GET_ALBUM_DETAIL, { id })
 
-    console.log(data)
-
     return {
       // 歌曲id集合
       trackIds: data.album.trackIds.map((v: any) => v.id),
@@ -130,6 +128,8 @@ const album = {
  * 单曲
  */
 interface Song {
+  payload: string | number
+
   // 作者名
   artist: string
 
@@ -154,6 +154,7 @@ interface Song {
 const song = {
   // 获取单曲详情
   getSongsDetail({}, ids: Array<any>): Promise<Array<Song>> {
+    // 切割ids
     function sliceArray(newArr: Array<any>, ids: Array<any>): Array<Array<any>> {
       const newIds = ids
       if (ids.length > 100) {
@@ -176,6 +177,9 @@ const song = {
           if (res.status === 'fulfilled') {
             const data: Array<Song> = res.value.songs.map((v: any): Song => {
               return {
+                // id
+                payload: v.id,
+
                 // 作者名
                 artist: pickUpName(v.ar),
 
@@ -189,7 +193,7 @@ const song = {
                 album: v.al.name,
 
                 // 发布时间 年
-                publishTime: moment(v.publishTime).year().toString(),
+                publishTime: v.publishTime ? moment(v.publishTime).year().toString() : '',
 
                 // 歌曲时长，单位分钟
                 duration: durationConvert(v.dt / 1000),
@@ -206,12 +210,19 @@ const song = {
       })
     })
   },
+  // 获取单曲url
+  async getSongUrl({}, id: string | number): Promise<string> {
+    const resJson = await get(API.SONG.GET_SONG_URL, { id })
+    return resJson.data[0].url
+  },
   // 新歌速递
   async getNewSongs({}, { type = 0 }): Promise<Array<Song>> {
     const resJson = await get(API.SONG.GET_NEW_SONGS, { type })
 
     const data: Array<Song> = resJson.data.map((v: any): Song => {
       return {
+        payload: v.id,
+
         // 作者名
         artist: pickUpName(v.artists),
 
@@ -237,7 +248,7 @@ const song = {
     return data
   },
   // 通过单曲获取专辑详情
-  async getAlbumThroughSongs({}, ids: string): Promise<any> {
+  async getAlbumThroughSongs({}, ids: string): Promise<string | number> {
     const resJson = await get(API.SONG.GET_SONG_DETAIL, { ids })
     const song = resJson.songs[0]
     return song.al.id
@@ -427,6 +438,7 @@ const radio = {
     const resJson = await get(API.DJ.GET_DJP, Object.assign(initArgs, args))
     const data: Array<SongTableRow> = resJson.programs.map((row: any): SongTableRow => {
       return {
+        payload: row.id,
         artist: row.dj.nickname,
         title: row.mainSong.name,
         album: row.radio?.name || row.mainSong.album.name,

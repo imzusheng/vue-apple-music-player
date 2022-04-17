@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 18:47:25
-LastEditTime: 2022-04-16 23:21:21
+LastEditTime: 2022-04-17 11:00:52
 Description: 歌曲表格展示 单击切歌，有XL/L/M/S四种尺寸
                 L: 封面，歌名，专辑，发布时间，时长
                 L: 封面，歌名，专辑，时长
@@ -13,6 +13,13 @@ FilePath: \vite-music-player\src\components\TableListSongs.vue
 <script lang="ts" setup>
 import { SongTableRow } from '@/common/types'
 import InfiniteList from './InfiniteList.vue'
+import { mapActionsHelpers, mapMutationsHelpers } from '@/common/util'
+
+const { getSongUrl } = mapActionsHelpers(null, ['getSongUrl'])
+const { setAudioUrl, setAudioInfo } = mapMutationsHelpers(null, [
+  'setAudioUrl',
+  'setAudioInfo'
+])
 
 const props = defineProps<{
   // 数据
@@ -30,6 +37,14 @@ const props = defineProps<{
   // 是否显示序号
   index?: boolean
 }>()
+
+// 获取歌曲url
+function play(songInfo: SongTableRow) {
+  setAudioInfo(songInfo)
+  getSongUrl(songInfo.payload).then((url: string) => {
+    setAudioUrl(url)
+  })
+}
 </script>
 
 <template>
@@ -61,6 +76,7 @@ const props = defineProps<{
         <div
           class="table-row"
           :class="`table-title-size-${props.size.toLowerCase()}`"
+          @click="play(listItem)"
         >
           <!-- 序号 -->
           <div v-if="props.index" class="table-cell-index">
@@ -521,19 +537,6 @@ const props = defineProps<{
           .table-cell-dt {
             color: rgba(0, 0, 0, 0.65);
             font-size: 14px;
-          }
-
-          // hover样式
-          &:hover {
-            background: transparent;
-
-            .playlist-table-index {
-              display: block;
-            }
-
-            .table-desc-name {
-              text-decoration: none;
-            }
           }
 
           // 需要省略的格子

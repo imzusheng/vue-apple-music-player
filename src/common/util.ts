@@ -1,12 +1,12 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 23:39:46
- * @LastEditTime: 2022-04-15 09:13:11
+ * @LastEditTime: 2022-04-17 09:58:52
  * @Description:
  * @FilePath: \vite-music-player\src\common\util.ts
  */
 import moment from 'moment'
-import { mapActions, createNamespacedHelpers } from 'vuex'
+import { mapActions, mapMutations, createNamespacedHelpers } from 'vuex'
 import { store } from '@/store'
 
 /**
@@ -84,9 +84,24 @@ export const blobToBase64 = (blob: Blob): Promise<string> => {
 export const mapActionsHelpers = (namespaced: string | null, actions: Array<string>): any => {
   if (actions.length === 0) return {}
 
-  let namespacedMapActions = namespaced ? createNamespacedHelpers(namespaced).mapActions : mapActions
+  const namespacedMapActions = namespaced ? createNamespacedHelpers(namespaced).mapActions : mapActions
 
   const fnList = namespacedMapActions(actions)
+
+  Object.keys(fnList).forEach(fnKey => {
+    fnList[fnKey] = fnList[fnKey].bind({
+      $store: store
+    })
+  })
+  return fnList
+}
+
+export const mapMutationsHelpers = (namespaced: string | null, mutations: Array<string>): any => {
+  if (mutations.length === 0) return {}
+
+  const namespacedMapMutations = namespaced ? createNamespacedHelpers(namespaced).mapMutations : mapMutations
+
+  const fnList = namespacedMapMutations(mutations)
 
   Object.keys(fnList).forEach(fnKey => {
     fnList[fnKey] = fnList[fnKey].bind({

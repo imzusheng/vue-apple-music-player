@@ -1,19 +1,33 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 23:22:44
- * @LastEditTime: 2022-04-13 13:33:21
+ * @LastEditTime: 2022-04-17 11:00:24
  * @Description: vuex
  * @FilePath: \vite-music-player\src\store\index.ts
  */
 import { InjectionKey } from 'vue'
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
 import actions from './actions'
+import { SongTableRow } from '@/common/types'
 
 // 为 store state 声明类型
 export interface State {
   columnCount: number | string
+
   loading: boolean
+
   headerText: string
+
+  audioUrl: string
+
+  audioInfo: {
+    title: string
+    album: string
+    publishTime: string | number
+    artist: string
+    picUrl: string
+  }
+
   error: {
     status: boolean
     msg?: string
@@ -38,6 +52,18 @@ export const store = createStore<State>({
     // 头部标题显示什么
     headerText: '',
 
+    // 当前音频链接
+    audioUrl: '',
+
+    // 当前音频信息
+    audioInfo: {
+      title: '',
+      album: '',
+      publishTime: '',
+      artist: '',
+      picUrl: ''
+    },
+
     // 错误页面
     error: {
       status: false,
@@ -47,6 +73,12 @@ export const store = createStore<State>({
   },
   getters: {},
   mutations: {
+    setAudioInfo(state, payload) {
+      state.audioInfo = payload
+    },
+    setAudioUrl(state, payload) {
+      state.audioUrl = payload
+    },
     setHeaderText(state, payload) {
       state.headerText = payload
     },

@@ -1,13 +1,14 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 21:10:50
-LastEditTime: 2022-04-16 21:10:20
+LastEditTime: 2022-04-17 10:59:51
 Description: 默认布局
 FilePath: \vite-music-player\src\views\LayoutDefault.vue
 -->
 <script lang="ts" setup>
 import TheNavigationLeft from '@/components/TheNavigationLeft.vue'
 // import TheNavigationTop from '@/components/TheNavigationTop.vue'
+import AudioPlayer from '@/components/AudioPlayer/PlayerAudio.vue'
 import TheLoading from '@/components/TheLoading.vue'
 import TheHeader from '@/components/TheHeader.vue'
 import PageError from '@/views/PageError.vue'
@@ -26,6 +27,16 @@ const viewKey = computed(() => {
 
 
 <template>
+  <!-- 播放器 -->
+  <audio-player
+    :url="store.state.audioUrl"
+    :title="store.state.audioInfo.title"
+    :album="store.state.audioInfo.album"
+    :publish-time="store.state.audioInfo.publishTime"
+    :artist="store.state.audioInfo.artist"
+    :pic-url="store.state.audioInfo.picUrl"
+  />
+
   <div id="default-layout">
     <!-- 左侧导航栏 -->
     <the-navigation-left />
@@ -45,9 +56,6 @@ const viewKey = computed(() => {
       >
         <component :is="Component" />
       </router-view>
-
-      <!-- 播放器 -->
-      <div id="player"></div>
     </main>
   </div>
 </template>
@@ -57,22 +65,13 @@ const viewKey = computed(() => {
   width: 100%;
   min-height: 100vh;
   display: flex;
+  padding: 0 0 72px;
 
   #main {
     min-width: 350px;
     width: calc(100% - var(--nav-left-width));
     margin-left: var(--nav-left-width);
     position: relative;
-
-    #player {
-      display: none;
-      width: 100%;
-      height: 72px;
-      position: fixed;
-      bottom: 0;
-      right: 0;
-      border-top: 1px solid rgba(0, 0, 0, 0.1);
-    }
   }
   @media screen and (max-width: 728px) {
     & {

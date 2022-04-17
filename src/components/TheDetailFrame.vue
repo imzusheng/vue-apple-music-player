@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 17:31:44
-LastEditTime: 2022-04-16 22:34:43
+LastEditTime: 2022-04-17 13:35:18
 Description: detail页面的基本框架
 FilePath: \vite-music-player\src\components\TheDetailFrame.vue
 -->
@@ -42,7 +42,7 @@ watchEffect(() => {
   nextTick(() => {
     // 每次更新页面时，设定css变量--content-mg-top
     const mgTop =
-      actionRef.value.offsetHeight + infoRef.value.offsetHeight + 'px'
+      actionRef.value.offsetHeight + infoRef.value.offsetHeight + 72 + 'px'
     artistContentRef.value.style.setProperty('--content-mg-top', `-${mgTop}`)
   })
 
