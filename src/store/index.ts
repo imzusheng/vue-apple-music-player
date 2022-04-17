@@ -1,14 +1,13 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 23:22:44
- * @LastEditTime: 2022-04-17 11:00:24
+ * @LastEditTime: 2022-04-17 18:49:39
  * @Description: vuex
  * @FilePath: \vite-music-player\src\store\index.ts
  */
 import { InjectionKey } from 'vue'
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
 import actions from './actions'
-import { SongTableRow } from '@/common/types'
 
 // 为 store state 声明类型
 export interface State {
@@ -17,6 +16,8 @@ export interface State {
   loading: boolean
 
   headerText: string
+
+  audioDisplay: boolean
 
   audioUrl: string
 
@@ -37,9 +38,6 @@ export interface State {
 
 export const key: InjectionKey<Store<State>> = Symbol()
 
-// 定义 injection key
-// export const key: InjectionKey<Store<State>> = Symbol()
-
 export const store = createStore<State>({
   strict: process.env.NODE_ENV !== 'production',
   state: {
@@ -51,6 +49,9 @@ export const store = createStore<State>({
 
     // 头部标题显示什么
     headerText: '',
+
+    // 播放器是否显示
+    audioDisplay: false,
 
     // 当前音频链接
     audioUrl: '',
@@ -73,7 +74,11 @@ export const store = createStore<State>({
   },
   getters: {},
   mutations: {
+    setAudioDisplay(state, payload) {
+      state.audioDisplay = payload
+    },
     setAudioInfo(state, payload) {
+      localStorage.setItem('audioInfo', JSON.stringify(payload))
       state.audioInfo = payload
     },
     setAudioUrl(state, payload) {
@@ -92,6 +97,14 @@ export const store = createStore<State>({
       state.error.status = status
       state.error.msg = msg
       state.error.info = info
+    },
+    // 恢复localStorage中的数据
+    restore(state) {
+      const audioInfo = localStorage.getItem('audioInfo')
+      if (audioInfo) {
+        state.audioInfo = JSON.parse(audioInfo)
+        state.audioDisplay = true
+      }
     }
   },
   actions,

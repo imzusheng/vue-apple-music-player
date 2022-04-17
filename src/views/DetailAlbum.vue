@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 16:04:42
-LastEditTime: 2022-04-16 22:29:34
+LastEditTime: 2022-04-17 13:43:00
 Description: 专辑详情
 FilePath: \vite-music-player\src\views\DetailAlbum.vue
 -->
@@ -47,6 +47,7 @@ async function getData() {
       albumInfo.data = res.album
       albumInfo.songs = res.songs.map((v: any): SongTableRow => {
         return {
+          payload: '',
           artist: pickUpName(v.ar),
           title: v.name,
           album: v.al.name,

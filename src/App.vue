@@ -1,13 +1,17 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 20:15:36
-LastEditTime: 2022-04-17 09:22:46
+LastEditTime: 2022-04-17 18:50:16
 Description: 入口
 FilePath: \vite-music-player\src\App.vue
 -->
 
 <script setup lang="ts">
-document.body.addEventListener('touchstart', () => {})
+import { mapMutationsHelpers } from '@/common/util'
+
+const { restore } = mapMutationsHelpers(null, ['restore'])
+
+restore()
 </script>
 
 <template>
@@ -23,6 +27,7 @@ document.body.addEventListener('touchstart', () => {})
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-overflow-scrolling: touch;
+  -webkit-tap-highlight-color: transparent;
 
   padding: 0;
   margin: 0;
@@ -81,22 +86,22 @@ html {
   // 页面两边距
   --page-spacing: 32px;
 
-  @media screen and (min-width: 1200px) {
-  }
+  // @media screen and (min-width: 1200px) {
+  // }
 
-  @media screen and (max-width: 1200px) {
-  }
+  // @media screen and (max-width: 1200px) {
+  // }
 
-  @media screen and (max-width: 1068px) {
-  }
+  // @media screen and (max-width: 1068px) {
+  // }
 
   @media screen and (max-width: 768px) {
     --grid-gap: 10px;
     --page-spacing: 16px;
   }
 
-  @media screen and (max-width: 628px) {
-  }
+  // @media screen and (max-width: 628px) {
+  // }
 }
 
 .flex-center {

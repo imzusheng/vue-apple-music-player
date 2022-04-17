@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-16 23:33:22
-LastEditTime: 2022-04-17 13:36:31
+LastEditTime: 2022-04-17 17:53:37
 Description: 音乐播放器
 FilePath: \vite-music-player\src\components\AudioPlayer\PlayerAudio.vue
 -->
@@ -11,7 +11,12 @@ import PlayerAudioInfo from '@/components/AudioPlayer/PlayerAudioInfo.vue'
 import PlayerAudioControls from '@/components/AudioPlayer/PlayerAudioControls.vue'
 import PlayerAudioVolume from '@/components/AudioPlayer/PlayerAudioVolume.vue'
 import PlayerAudioProgress from '@/components/AudioPlayer/PlayerAudioProgress.vue'
+import { useStore } from '@/store'
+import { mapMutationsHelpers } from '@/common/util'
 import { onMounted, provide, reactive, watchEffect } from 'vue'
+
+const store = useStore()
+const { setAudioDisplay } = mapMutationsHelpers(null, ['setAudioDisplay'])
 
 const props = defineProps<{
   // 音乐url
@@ -75,6 +80,8 @@ onMounted(() => {
 
 watchEffect(() => {
   if (props.url) {
+    document.title = `${props.title} - ${props.artist}`
+    setAudioDisplay(true)
     // 加载歌曲
     playerLoading(props.url, true)
   }
@@ -169,7 +176,10 @@ function playerLoading(url: string, autoplay: boolean) {
 </script>
 
 <template>
-  <div id="audioPlayer" v-if="props.url">
+  <div
+    id="audio-player"
+    :class="{ 'audio-player-show': store.state.audioDisplay }"
+  >
     <div class="player-main">
       <!-- 进度条 -->
       <player-audio-progress />
@@ -191,7 +201,7 @@ function playerLoading(url: string, autoplay: boolean) {
   transform: translate(0, 0) !important;
 }
 
-#audioPlayer {
+#audio-player {
   position: fixed;
   bottom: 0;
   left: 0;
@@ -200,7 +210,7 @@ function playerLoading(url: string, autoplay: boolean) {
   background: rgba(252, 253, 255, 1);
   box-shadow: 0 0 1px rgba(255, 255, 255, 1);
   z-index: 999;
-  // transform: translate(0, 100px);
+  transform: translate(0, 100px);
   transition: transform 0.4s;
 
   * {

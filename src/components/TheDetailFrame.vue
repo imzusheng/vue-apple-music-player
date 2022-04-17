@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 17:31:44
-LastEditTime: 2022-04-17 13:35:18
+LastEditTime: 2022-04-17 17:51:25
 Description: detail页面的基本框架
 FilePath: \vite-music-player\src\components\TheDetailFrame.vue
 -->
@@ -31,20 +31,28 @@ store.commit('setLoading', true)
 // fetch获取封面, 用fetch是因为可以监听封面加载成功没，没有封面的页面太丑了
 ////////////////////////////////
 
+// 设置section页面的marginTop .frame-content
+function setMgt(audioHeight: any) {
+  const mgTop = `${
+    actionRef.value.offsetHeight + infoRef.value.offsetHeight + audioHeight
+  }px`
+  artistContentRef.value.style.setProperty('--content-mg-top', `-${mgTop}`)
+}
+
 watchEffect(() => {
   // 所有数据是同时传入的，有了picUrl说明其他也传入了
-  if (!props.picUrl) return
+  if (props.picUrl) {
+    store.commit('setHeaderText', props.title)
 
-  store.commit('setHeaderText', props.title)
+    store.commit('setLoading', false)
 
-  store.commit('setLoading', false)
-
-  nextTick(() => {
-    // 每次更新页面时，设定css变量--content-mg-top
-    const mgTop =
-      actionRef.value.offsetHeight + infoRef.value.offsetHeight + 72 + 'px'
-    artistContentRef.value.style.setProperty('--content-mg-top', `-${mgTop}`)
-  })
+    if (store.state.audioDisplay) {
+      // 每次更新页面时，设定css变量--content-mg-top
+      nextTick(() => setMgt(72))
+    } else {
+      nextTick(() => setMgt(0))
+    }
+  }
 
   // fetch(props.picUrl).then(async (res) => {
   //   const imgBlob = await res.blob()
@@ -108,17 +116,31 @@ const animationHandler = () => {
     curValue.toFixed(3)
   )
 }
+// 大小变化
+const resizeHandler = () => {
+  const audioHeight = store.state.audioDisplay ? 72 : 0
+  const mgTop =
+    actionRef.value.offsetHeight +
+    infoRef.value.offsetHeight +
+    audioHeight +
+    'px'
+  artistContentRef.value.style.setProperty('--content-mg-top', `-${mgTop}`)
+}
 
 // 套上防抖
 const throttleScrollHandler = throttle(animationHandler, 1000 / 60)
+const throttleResizeHandler = throttle(resizeHandler, 1000 / 60)
 
 onMounted(() => {
   // 监听动画
   document.addEventListener('scroll', throttleScrollHandler)
+  // 监听大小变化
+  window.addEventListener('resize', throttleResizeHandler)
 })
 
 onUnmounted(() => {
   document.removeEventListener('scroll', throttleScrollHandler)
+  window.removeEventListener('resize', throttleResizeHandler)
 })
 </script>
 
@@ -221,6 +243,7 @@ onUnmounted(() => {
     position: relative;
     z-index: 2;
     margin-top: var(--content-mg-top);
+    // transition: margin 0.4s;
     overflow: hidden;
 
     // 歌手信息

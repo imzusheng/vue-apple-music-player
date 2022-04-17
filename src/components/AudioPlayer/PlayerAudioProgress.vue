@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-17 13:04:35
-LastEditTime: 2022-04-17 13:23:53
+LastEditTime: 2022-04-17 18:40:42
 Description: 进度条
 FilePath: \vite-music-player\src\components\AudioPlayer\PlayerAudioProgress.vue
 -->
@@ -36,20 +36,45 @@ onMounted(() => {
 
   // 在进度条按下鼠标时 -------------------------------------开始调整进度条
   playerProgressRef.value.addEventListener('mousedown', () => {
-    const mouseupHandle = (e) => {
+    const mouseupHandle = (e: any) => {
       progressMousedrag(e) // 单击时触发调整进度,因为单击没有触发mousemove
       document.removeEventListener('mousemove', mousemoveHandle)
       document.removeEventListener('mouseup', mouseupHandle)
       // 恢复播放状态
       data.audioSeeking = false
+      parentData.audioRef.muted = false
     }
 
     // 设置播放状态
     data.audioSeeking = true // 调整时标记状态为调整中(seeking)
+    parentData.audioRef.muted = true
 
     document.addEventListener('mousemove', mousemoveHandle) // 监听鼠标移动
     document.addEventListener('mouseup', mouseupHandle) // 监听鼠标松开 ---------------------------结束调整进度条
   })
+
+  // 移动端触摸调整
+  playerProgressRef.value.addEventListener(
+    'touchstart',
+    () => {
+      const mouseupHandle = (e: any) => {
+        progressMousedrag(e) // 单击时触发调整进度,因为单击没有触发mousemove
+        document.removeEventListener('touchmove', mousemoveHandle)
+        document.removeEventListener('touchend', mouseupHandle)
+        // 恢复播放状态
+        data.audioSeeking = false
+        parentData.audioRef.muted = false
+      }
+
+      // 设置播放状态
+      data.audioSeeking = true // 调整时标记状态为调整中(seeking)
+      parentData.audioRef.muted = true
+
+      document.addEventListener('touchmove', mousemoveHandle) // 监听鼠标移动
+      document.addEventListener('touchend', mouseupHandle) // 监听鼠标松开 ---------------------------结束调整进度条
+    },
+    { passive: false }
+  )
 })
 
 /**
@@ -58,8 +83,11 @@ onMounted(() => {
  * @param e event
  */
 function progressMousedMove(e: any) {
+  const clientX =
+    e.clientX || e?.touches[0]?.clientX || e?.changedTouches[0]?.clientX
+
   // 鼠标移动的百分比
-  let x = (e.clientX / playerProgressRef.value.offsetWidth) * 100
+  let x = (clientX / playerProgressRef.value.offsetWidth) * 100
 
   // 处理临界值
   if (x <= 1) {
@@ -72,7 +100,7 @@ function progressMousedMove(e: any) {
   data.currentTimeFormat = durationConvert(parentData.duration * (x / 100))
 
   // 获取提示框显示的位置，X轴坐标
-  let mouseX = e.clientX
+  let mouseX = clientX
   const mouseXMin = 30
   const mouseXmax = playerProgressRef.value.offsetWidth - 30
   if (mouseX < mouseXMin) {
@@ -90,7 +118,9 @@ function progressMousedMove(e: any) {
  */
 function progressMousedrag(e: any) {
   // 鼠标移动的百分比
-  const xRatio = e.clientX / playerProgressRef.value.offsetWidth
+  const clientX =
+    e.clientX || e?.touches[0]?.clientX || e?.changedTouches[0]?.clientX
+  const xRatio = clientX / playerProgressRef.value.offsetWidth
   // 改变歌曲时间
   parentData.audioRef.currentTime = parentData.duration * xRatio
 }
@@ -100,7 +130,7 @@ function progressMousedrag(e: any) {
  * 一起调用,当在进度条上按下鼠标并拖动时
  * @param e
  */
-function mousemoveHandle(e) {
+function mousemoveHandle(e: any) {
   progressMousedMove(e)
   progressMousedrag(e)
 }
