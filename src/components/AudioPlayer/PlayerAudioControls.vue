@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-17 11:11:37
-LastEditTime: 2022-04-17 13:32:03
+LastEditTime: 2022-04-17 18:51:57
 Description: 播放器控制中心
 FilePath: \vite-music-player\src\components\AudioPlayer\PlayerAudioControls.vue
 -->
@@ -16,12 +16,13 @@ const setData = inject('setData', (name: string, value: any) => {})
 
 // 开始/暂停音乐
 function playChange() {
-  if (!parentData.audioRef.src) return
-
-  if (parentData.audioRef.paused) {
-    parentData.audioRef.play()
+  if (parentData.audioRef.src) {
+    if (parentData.audioRef.paused) {
+      parentData.audioRef.play()
+    } else {
+      parentData.audioRef.pause()
+    }
   } else {
-    parentData.audioRef.pause()
   }
 }
 

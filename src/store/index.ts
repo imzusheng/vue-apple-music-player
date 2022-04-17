@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 23:22:44
- * @LastEditTime: 2022-04-17 18:49:39
+ * @LastEditTime: 2022-04-17 18:55:28
  * @Description: vuex
  * @FilePath: \vite-music-player\src\store\index.ts
  */
@@ -27,6 +27,7 @@ export interface State {
     publishTime: string | number
     artist: string
     picUrl: string
+    payload: string | number
   }
 
   error: {
@@ -62,7 +63,8 @@ export const store = createStore<State>({
       album: '',
       publishTime: '',
       artist: '',
-      picUrl: ''
+      picUrl: '',
+      payload: ''
     },
 
     // 错误页面
@@ -97,14 +99,6 @@ export const store = createStore<State>({
       state.error.status = status
       state.error.msg = msg
       state.error.info = info
-    },
-    // 恢复localStorage中的数据
-    restore(state) {
-      const audioInfo = localStorage.getItem('audioInfo')
-      if (audioInfo) {
-        state.audioInfo = JSON.parse(audioInfo)
-        state.audioDisplay = true
-      }
     }
   },
   actions,

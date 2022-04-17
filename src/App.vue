@@ -1,15 +1,32 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 20:15:36
-LastEditTime: 2022-04-17 18:50:16
+LastEditTime: 2022-04-17 18:58:47
 Description: 入口
 FilePath: \vite-music-player\src\App.vue
 -->
 
 <script setup lang="ts">
-import { mapMutationsHelpers } from '@/common/util'
+import { mapMutationsHelpers, mapActionsHelpers } from '@/common/util'
 
-const { restore } = mapMutationsHelpers(null, ['restore'])
+const { setAudioUrl, setAudioDisplay, setAudioInfo } = mapMutationsHelpers(
+  null,
+  ['setAudioUrl', 'setAudioDisplay', 'setAudioInfo']
+)
+const { getSongUrl } = mapActionsHelpers(null, ['getSongUrl'])
+
+// 恢复localStorage中的数据
+function restore() {
+  const audioInfo = localStorage.getItem('audioInfo')
+  if (audioInfo) {
+    const parsedInfo = JSON.parse(audioInfo)
+    setAudioDisplay(true)
+    setAudioInfo(parsedInfo)
+    getSongUrl(parsedInfo.payload).then((url: string) => {
+      setAudioUrl(url)
+    })
+  }
+}
 
 restore()
 </script>

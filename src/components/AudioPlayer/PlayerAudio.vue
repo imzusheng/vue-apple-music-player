@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-16 23:33:22
-LastEditTime: 2022-04-17 17:53:37
+LastEditTime: 2022-04-17 19:03:41
 Description: 音乐播放器
 FilePath: \vite-music-player\src\components\AudioPlayer\PlayerAudio.vue
 -->
@@ -13,7 +13,7 @@ import PlayerAudioVolume from '@/components/AudioPlayer/PlayerAudioVolume.vue'
 import PlayerAudioProgress from '@/components/AudioPlayer/PlayerAudioProgress.vue'
 import { useStore } from '@/store'
 import { mapMutationsHelpers } from '@/common/util'
-import { onMounted, provide, reactive, watchEffect } from 'vue'
+import { onMounted, provide, reactive, watchEffect, nextTick } from 'vue'
 
 const store = useStore()
 const { setAudioDisplay } = mapMutationsHelpers(null, ['setAudioDisplay'])
@@ -73,6 +73,8 @@ provide('setData', (name: string, value: any) => {
   data[name] = value
 })
 
+let inif = false
+
 onMounted(() => {
   // 创建播放器
   playerCreate()
@@ -80,10 +82,13 @@ onMounted(() => {
 
 watchEffect(() => {
   if (props.url) {
-    document.title = `${props.title} - ${props.artist}`
-    setAudioDisplay(true)
-    // 加载歌曲
-    playerLoading(props.url, true)
+    nextTick(() => {
+      document.title = `${props.title} - ${props.artist}`
+      setAudioDisplay(true)
+      // 加载歌曲
+      playerLoading(props.url, inif)
+      inif = true
+    })
   }
 })
 
@@ -167,6 +172,8 @@ function playerCreate() {
 
 /**
  * 加载音乐
+ * @param url 音乐src
+ * @param autoplay 是否自动播放
  */
 function playerLoading(url: string, autoplay: boolean) {
   data.audioRef.src = url
