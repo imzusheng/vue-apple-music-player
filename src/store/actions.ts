@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-11 09:15:16
- * @LastEditTime: 2022-04-17 13:23:13
+ * @LastEditTime: 2022-04-17 20:51:09
  * @Description: 所有请求
  * @FilePath: \vite-music-player\src\store\actions.ts
  */
@@ -27,11 +27,6 @@ const notArgs = {
     return {
       data: resJson.tags
     }
-  },
-  // 获取热门歌单分类
-  async getPlaylistDetail({}): Promise<any> {
-    const resJson = await get(API.PLAYLIST.GET_PLAYLIST_DETAIL, {})
-    return resJson.playlist
   },
   // 所有榜单详情
   async getToplistDetail({}): Promise<any> {
@@ -269,7 +264,12 @@ const playlist = {
       title: data.playlist.name,
       desc: data.playlist.description,
       picUrl: data.playlist.coverImgUrl + '?param=800y800',
-      sub: `共${data.playlist.trackCount}首音乐`
+      sub: `共${data.playlist.trackCount}首音乐`,
+      actionBtn: [
+        {
+          text: `${countConvert(data.playlist.playCount)}人听过`
+        }
+      ]
     }
   }
 }

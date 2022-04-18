@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 17:31:44
-LastEditTime: 2022-04-17 17:51:25
+LastEditTime: 2022-04-17 20:53:59
 Description: detail页面的基本框架
 FilePath: \vite-music-player\src\components\TheDetailFrame.vue
 -->
@@ -20,6 +20,8 @@ const props = defineProps<{
   picUrl: string
   // 副标题
   sub?: string
+  // 订阅按钮
+  actionBtn?: Array<any>
 }>()
 
 const store = useStore()
@@ -178,11 +180,15 @@ onUnmounted(() => {
             <button aria-label="播放全部" class="action-btn-play flex-center">
               <img class="icon" src="@/assets/icon-song-play.svg" alt="" />
             </button>
-            <button aria-label="关注" class="action-btn-subscribe">
-              共12首音乐
-            </button>
-            <button aria-label="关注" class="action-btn-subscribe">
-              订阅 132.1万
+            <!-- <button aria-label="关注" class="action-btn-subscribe">
+              {{ props.sub }}
+            </button> -->
+            <button
+              v-for="(acBtnItem, acBtnIdx) in props.actionBtn"
+              :key="`acBtn-${acBtnIdx}`"
+              class="action-btn-subscribe"
+            >
+              {{ acBtnItem.text }}
             </button>
           </div>
         </div>

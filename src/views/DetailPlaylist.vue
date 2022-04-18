@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 20:51:30
-LastEditTime: 2022-04-16 22:28:32
+LastEditTime: 2022-04-17 20:52:09
 Description: 专辑详情
 FilePath: \vite-music-player\src\views\DetailPlaylist.vue
 -->
@@ -26,7 +26,8 @@ const playlistInfo = reactive<any>({
     title: '',
     desc: '',
     picUrl: '',
-    sub: ''
+    sub: '',
+    actionBtn: []
   },
   // 专辑内歌曲
   songs: []
@@ -62,13 +63,14 @@ getPlaylistDetail(id)
       :desc="playlistInfo.data.desc"
       :picUrl="playlistInfo.data.picUrl"
       :sub="`${playlistInfo.data.sub}`"
+      :actionBtn="playlistInfo.data.actionBtn"
     >
       <template #list>
         <table-list-songs
           :virtualScroll="true"
           :songs="playlistInfo.songs"
-          size="L"
           :title="true"
+          size="L"
         />
       </template>
     </the-detail-frame>

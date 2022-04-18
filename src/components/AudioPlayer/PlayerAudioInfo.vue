@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-17 09:39:32
-LastEditTime: 2022-04-17 19:51:47
+LastEditTime: 2022-04-17 20:58:55
 Description: 歌曲信息模块
 FilePath: \vite-music-player\src\components\AudioPlayer\PlayerAudioInfo.vue
 -->
@@ -10,8 +10,8 @@ FilePath: \vite-music-player\src\components\AudioPlayer\PlayerAudioInfo.vue
 import TheLoadingCircle from '@/components/TheLoadingCircle.vue'
 import { inject } from 'vue'
 
-const parentProps = inject<any>('props')
-const parentData = inject('data')
+const parentProps: any = inject<any>('props')
+const parentData: any = inject('data')
 </script>
 
 <template>
