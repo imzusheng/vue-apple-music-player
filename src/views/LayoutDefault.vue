@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 21:10:50
-LastEditTime: 2022-04-19 13:01:55
+LastEditTime: 2022-04-19 13:48:48
 Description: 默认布局
 FilePath: \vite-music-player\src\views\LayoutDefault.vue
 -->
@@ -67,10 +67,17 @@ function reload() {
     </main>
 
     <!-- 播放器 -->
-    <the-audio-player></the-audio-player>
+    <the-audio-player
+      :url="store.state.audioUrl"
+      :title="store.state.audioInfo.title"
+      :album="store.state.audioInfo.album"
+      :publish-time="store.state.audioInfo.publishTime"
+      :artist="store.state.audioInfo.artist"
+      :pic-url="store.state.audioInfo.picUrl"
+    />
 
     <!-- 底部tabbar -->
-    <the-tabbar></the-tabbar>
+    <!-- <the-tabbar></the-tabbar> -->
   </div>
 </template>
 
