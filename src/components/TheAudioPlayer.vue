@@ -3,7 +3,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-18 13:09:20
-LastEditTime: 2022-04-19 13:00:29
+LastEditTime: 2022-04-19 13:12:33
 Description: 播放器
 FilePath: \vite-music-player\src\components\TheAudioPlayer.vue
 -->
@@ -72,12 +72,6 @@ function resizeHandler() {
 }
 
 onMounted(() => {
-  document.addEventListener('scroll', () => {
-    setDebugInfo(
-      `窗口高度:${document.documentElement.clientHeight}, 2:${document.documentElement.scrollHeight}`
-    )
-  })
-
   resizeHandler()
   window.addEventListener('resize', resizeHandler)
 
@@ -183,11 +177,12 @@ onUnmounted(() => {
       </div> -->
 
       <!-- 海报 -->
-      <img
+      <!-- <img
         class="player-poster user-not-select"
-        src="http://p1.music.126.net/fZXYjrs6ye2IIWYkfWazJg==/109951165849906351.jpg?param=800y800"
+        src=""
         alt=""
-      />
+      /> -->
+      <div class="player-poster user-not-select"></div>
 
       <!-- 迷你控制栏 -->
       <div class="player-mini-controls" v-show="!data.posterDisplay">
@@ -308,6 +303,9 @@ onUnmounted(() => {
       transform-origin: left top;
       transform: translate(10px, 10px) scale(var(--scale-ratio));
       transition: transform 0.3s;
+      background: url('http://p1.music.126.net/fZXYjrs6ye2IIWYkfWazJg==/109951165849906351.jpg?param=800y800')
+        center center no-repeat;
+      background-size: 100%;
     }
 
     // mini控制中心
