@@ -3,7 +3,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-18 13:09:20
-LastEditTime: 2022-04-19 13:48:38
+LastEditTime: 2022-04-19 15:16:31
 Description: 播放器
 FilePath: \vite-music-player\src\components\TheAudioPlayer.vue
 -->
@@ -19,8 +19,9 @@ import {
   onUnmounted
 } from 'vue'
 import { mapMutationsHelpers } from '@/common/util'
-// import { useStore } from '@/store'
+import { useStore } from '@/store'
 
+const store = useStore()
 const player = ref<any>()
 const props = defineProps<{
   // 音乐url
@@ -79,7 +80,10 @@ const data = reactive<any>({
 provide('data', data)
 provide('props', props)
 
-const { setPlayerDisplay } = mapMutationsHelpers(null, ['setPlayerDisplay'])
+const { setPlayerDisplay, setDebugInfo } = mapMutationsHelpers(null, [
+  'setPlayerDisplay',
+  'setDebugInfo'
+])
 
 onMounted(() => {
   // 创建播放器
@@ -146,7 +150,7 @@ function resizeHandler() {
  * @param e
  */
 function touchStartHandler(e: any) {
-  let gH = document.documentElement.clientHeight - 80
+  let gH = document.documentElement.clientHeight
 
   // 设置播放器开启状态
   setPlayerDisplay(true)
@@ -215,8 +219,15 @@ function touchStartHandler(e: any) {
 
       // 稍后设置播放器样式
       setTimeout(() => {
-        gH = document.documentElement.clientHeight - 80
-        const translateY = data.playerDisplay ? 0 : `${gH}px`
+        let cTop: any = data.playerDisplay
+          ? 0
+          : document.documentElement.clientHeight - 80 - 72
+        const translateY = `${cTop.toFixed(0)}px`
+
+        // setDebugInfo(
+        //   `tly:${cTop},窗口高度:${document.documentElement.clientHeight},播放器高度:${player.value.clientHeight}`
+        // )
+
         player.value.style.setProperty('--player-translate', translateY)
         setPlayerDisplay(data.playerDisplay)
       }, 10)
@@ -317,12 +328,12 @@ function playerLoading(url: string, autoplay: boolean) {
 </script>
 
 <template>
-  <div
-    id="player"
-    ref="player"
-    :class="{ 'player-poster-display': data.posterDisplay }"
-  >
-    <div class="player-spacing">
+  <div id="player" :class="{ 'player-poster-display': data.posterDisplay }">
+    <div class="player-spacing" ref="player">
+      <div style="position: absolute; top: 0; right: 0">
+        {{ store.state.debugInfo }}
+      </div>
+
       <!-- 把手 -->
       <div class="player-handle" v-if="data.posterDisplay"></div>
 
@@ -395,35 +406,39 @@ function playerLoading(url: string, autoplay: boolean) {
   --poster-translateX: 0;
   --poster-translateY: 0;
   --scale-ratio: 0;
-  --player-translate: calc(100vh - 80px);
+  --player-translate: calc(100vh - 80px - 72px);
 
   position: fixed;
-  height: 100vh;
-  width: 100%;
+  height: 0;
+  width: 0;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  transform: translate(0, var(--player-translate));
-  overflow: hidden;
-  z-index: 998;
-  transition: transform 0.3s;
 
-  &::after {
-    content: '';
-    position: absolute;
+  .player-spacing {
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(247, 247, 247, 1);
-    z-index: -1;
-    // transition: background 0.3s;
-  }
+    height: 100vh;
+    width: 100vw;
+    z-index: 998;
+    background-color: rgba(247, 247, 247, 1);
+    transform: translate(0, var(--player-translate));
+    transition: transform 0.3s;
 
-  .player-spacing {
-    height: 100%;
-    overflow: hidden;
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6));
+      opacity: 0;
+      z-index: -1;
+      transition: opacity 0.3s;
+    }
 
     // 抓手
     .player-handle {
@@ -505,7 +520,7 @@ function playerLoading(url: string, autoplay: boolean) {
       margin-top: 50vh;
       height: 50vh;
       width: 100%;
-      padding: 48px 24px;
+      padding: 48px 24px 0;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -600,25 +615,22 @@ function playerLoading(url: string, autoplay: boolean) {
       }
 
       .player-tools-bar {
-        height: 32px;
+        height: 140px;
+        flex-shrink: 0;
         width: 100%;
       }
     }
-  }
 
-  &:hover {
-    will-change: auto;
+    &:hover {
+      will-change: auto;
+    }
   }
 }
 
 // 展开后样式
 .player-poster-display {
-  background: rgba(255, 255, 255, 1);
-  &::after {
-    background: linear-gradient(
-      rgba(0, 0, 0, 0.3),
-      rgba(0, 0, 0, 0.6)
-    ) !important;
+  .player-spacing::after {
+    opacity: 1 !important;
   }
   .player-poster {
     transform: translate(var(--poster-translateX), var(--poster-translateY))

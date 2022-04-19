@@ -77,7 +77,7 @@ function reload() {
     />
 
     <!-- 底部tabbar -->
-    <!-- <the-tabbar></the-tabbar> -->
+    <the-tabbar></the-tabbar>
   </div>
 </template>
 
