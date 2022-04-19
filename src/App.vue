@@ -1,16 +1,18 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 20:15:36
-LastEditTime: 2022-04-17 19:29:35
+LastEditTime: 2022-04-19 13:08:32
 Description: 入口
 FilePath: \vite-music-player\src\App.vue
 -->
 
 <script setup lang="ts">
 import { mapMutationsHelpers } from '@/common/util'
+import { watchEffect, onMounted, onUnmounted } from 'vue'
+import { useStore } from '@/store'
 
+const store = useStore()
 const { setAudioDisplay, setAudioInfo } = mapMutationsHelpers(null, [
-  'setAudioUrl',
   'setAudioDisplay',
   'setAudioInfo'
 ])
@@ -26,6 +28,26 @@ function restore() {
 }
 
 restore()
+
+watchEffect(() => {
+  if (store.state.playerDisplay) {
+    document.documentElement.style.setProperty('overflow', 'hidden')
+  } else {
+    document.documentElement.style.setProperty('overflow', 'hidden auto')
+  }
+})
+
+const handler = (e: any) => {
+  if (store.state.playerDisplay) e.preventDefault()
+}
+onMounted(() => {
+  document.addEventListener('touchmove', handler, { passive: false })
+  document.addEventListener('scroll', handler, { passive: false })
+})
+onUnmounted(() => {
+  document.removeEventListener('touchmove', handler)
+  document.removeEventListener('scroll', handler)
+})
 </script>
 
 <template>
@@ -42,6 +64,7 @@ restore()
   -moz-osx-font-smoothing: grayscale;
   -webkit-overflow-scrolling: touch;
   -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
 
   padding: 0;
   margin: 0;
@@ -54,9 +77,18 @@ restore()
 }
 
 html {
-  overflow-y: scroll;
   scrollbar-color: rgba(0, 0, 0, 0.2) #fff;
   scrollbar-width: auto;
+  width: 100vw;
+  position: relative;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  body {
+    width: 100%;
+  }
 
   a {
     -webkit-tap-highlight-color: rgba(255, 255, 255, 0) !important;

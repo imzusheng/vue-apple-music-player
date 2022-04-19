@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 23:22:44
- * @LastEditTime: 2022-04-17 18:55:28
+ * @LastEditTime: 2022-04-19 08:45:34
  * @Description: vuex
  * @FilePath: \vite-music-player\src\store\index.ts
  */
@@ -30,11 +30,15 @@ export interface State {
     payload: string | number
   }
 
+  playerDisplay: boolean
+
   error: {
     status: boolean
     msg?: string
     info?: string
   }
+
+  debugInfo: any
 }
 
 export const key: InjectionKey<Store<State>> = Symbol()
@@ -50,6 +54,8 @@ export const store = createStore<State>({
 
     // 头部标题显示什么
     headerText: '',
+
+    playerDisplay: false,
 
     // 播放器是否显示
     audioDisplay: false,
@@ -72,10 +78,18 @@ export const store = createStore<State>({
       status: false,
       msg: '',
       info: ''
-    }
+    },
+
+    debugInfo: ''
   },
   getters: {},
   mutations: {
+    setDebugInfo(state, payload) {
+      state.debugInfo = payload
+    },
+    setPlayerDisplay(state, payload) {
+      state.playerDisplay = payload
+    },
     setAudioDisplay(state, payload) {
       state.audioDisplay = payload
     },

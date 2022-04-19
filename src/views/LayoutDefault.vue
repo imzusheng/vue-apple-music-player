@@ -1,24 +1,25 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 21:10:50
-LastEditTime: 2022-04-17 19:46:24
+LastEditTime: 2022-04-19 13:01:55
 Description: 默认布局
 FilePath: \vite-music-player\src\views\LayoutDefault.vue
 -->
 <script lang="ts" setup>
 import { mapActionsHelpers, mapMutationsHelpers } from '@/common/util'
-import TheNavigationLeft from '@/components/TheNavigationLeft.vue'
-// import TheNavigationTop from '@/components/TheNavigationTop.vue'
-import AudioPlayer from '@/components/AudioPlayer/PlayerAudio.vue'
+import TheAudioPlayer from '@/components/TheAudioPlayer.vue'
+import TheTabbar from '@/components/TheTabbar.vue'
 import TheLoading from '@/components/TheLoading.vue'
-import TheHeader from '@/components/TheHeader.vue'
 import PageError from '@/views/PageError.vue'
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from '@/store'
 
 const { getSongUrl } = mapActionsHelpers(null, ['getSongUrl'])
-const { setAudioUrl } = mapMutationsHelpers(null, ['setAudioUrl'])
+const { setAudioUrl, setDebugInfo } = mapMutationsHelpers(null, [
+  'setAudioUrl',
+  'setDebugInfo'
+])
 const store = useStore()
 const route = useRoute()
 
@@ -37,7 +38,7 @@ function reload() {
 
 <template>
   <!-- 播放器 -->
-  <audio-player
+  <!-- <audio-player
     :url="store.state.audioUrl"
     :title="store.state.audioInfo.title"
     :album="store.state.audioInfo.album"
@@ -45,16 +46,13 @@ function reload() {
     :artist="store.state.audioInfo.artist"
     :pic-url="store.state.audioInfo.picUrl"
     @reload="reload"
-  />
+  /> -->
 
   <div id="default-layout">
-    <!-- 左侧导航栏 -->
-    <the-navigation-left />
-    <!-- <the-navigation-top /> -->
+    <!-- <div id="default-mask" v-if="store.state.playerDisplay"></div> -->
 
     <main id="main">
       <!-- 头部 -->
-      <the-header :class="'m_hide'" />
 
       <the-loading v-if="store.state.loading" />
       <page-error v-if="store.state.error.status" />
@@ -67,35 +65,36 @@ function reload() {
         <component :is="Component" />
       </router-view>
     </main>
+
+    <!-- 播放器 -->
+    <the-audio-player></the-audio-player>
+
+    <!-- 底部tabbar -->
+    <the-tabbar></the-tabbar>
   </div>
 </template>
 
 <style lang="less">
 #default-layout {
-  width: 100%;
-  min-height: 100vh;
   display: flex;
-  padding: 0 0 72px;
+  padding: 0 0 4.5rem /* 72/16 */;
+
+  // 遮罩
+  // #default-mask {
+  //   position: fixed;
+  //   top: 0;
+  //   left: 0;
+  //   right: 0;
+  //   bottom: 0;
+  //   background: rgba(255, 255, 255, 0.5);
+  //   backdrop-filter: blur(40px);
+  //   -webkit-backdrop-filter: blur(40px);
+  //   z-index: 997;
+  // }
 
   #main {
-    min-width: 350px;
-    width: calc(100% - var(--nav-left-width));
-    margin-left: var(--nav-left-width);
+    width: 100%;
     position: relative;
-  }
-  @media screen and (max-width: 728px) {
-    & {
-      .m_hide {
-        display: none;
-      }
-      .m_show {
-        display: block;
-      }
-      #main {
-        width: 100%;
-        margin-left: 0;
-      }
-    }
   }
 }
 </style>
