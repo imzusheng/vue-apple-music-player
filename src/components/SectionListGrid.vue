@@ -127,9 +127,6 @@ const toDetail = (routeName: string, payload: string | number) => {
       font-weight: 400;
       line-height: calc((28px * 1.6) - 8px);
       color: rgba(0, 0, 0, 0.8);
-      &:hover {
-        text-decoration: underline;
-      }
     }
   }
 

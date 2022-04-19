@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-13 15:29:38
-LastEditTime: 2022-04-16 22:05:42
+LastEditTime: 2022-04-19 22:07:37
 Description: 探索页面
 FilePath: \vite-music-player\src\views\pageDiscovery.vue
 -->
@@ -509,12 +509,6 @@ getToplistDetail().then((res: any) => {
         bottom: 0;
         z-index: -1;
         clip-path: inset(0px calc(100% - 6px) 0px 0);
-      }
-      &:hover {
-        background: rgba(228, 228, 228, 1);
-        &::after {
-          // clip-path: inset(0px 0px 0px 0);
-        }
       }
     }
   }

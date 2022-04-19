@@ -75,11 +75,6 @@ const parentData: any = inject('data')
     overflow: hidden;
     white-space: nowrap;
 
-    p:hover {
-      cursor: pointer;
-      text-decoration: underline;
-    }
-
     p:first-child {
       font-size: 14px;
     }
