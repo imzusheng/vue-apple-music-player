@@ -1,9 +1,9 @@
 <!--
 Author: zusheng
 Date: 2022-04-19 09:19:50
-LastEditTime: 2022-04-19 10:02:05
+LastEditTime: 2022-04-19 20:54:47
 Description: 进度条
-FilePath: \vite-music-player\src\components\TheAudioPlayerProgress.vue
+FilePath: \vite-music-player\src\components\TheAudioPlayer\TheAudioPlayerProgress.vue
 -->
 
 

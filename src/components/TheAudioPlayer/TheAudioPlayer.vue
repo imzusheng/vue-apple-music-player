@@ -3,26 +3,36 @@
 <!--
 Author: zusheng
 Date: 2022-04-18 13:09:20
-LastEditTime: 2022-04-19 15:16:31
+LastEditTime: 2022-04-19 21:23:49
 Description: 播放器
-FilePath: \vite-music-player\src\components\TheAudioPlayer.vue
+FilePath: \vite-music-player\src\components\TheAudioPlayer\TheAudioPlayer.vue
 -->
 
 <script setup lang="ts">
 import {
   ref,
+  toRaw,
   reactive,
   nextTick,
   provide,
+  computed,
   watchEffect,
   onMounted,
   onUnmounted
 } from 'vue'
-import { mapMutationsHelpers } from '@/common/util'
+import { mapMutationsHelpers, durationConvert } from '@/common/util'
 import { useStore } from '@/store'
+import ControlsMini from '@/components/TheAudioPlayer/ControlsMini.vue'
 
 const store = useStore()
 const player = ref<any>()
+const poster = ref<any>()
+const controlsProgress = ref<any>()
+const controlsVolume = ref<any>()
+const { setPlayerDisplay, setDebugInfo } = mapMutationsHelpers(null, [
+  'setPlayerDisplay',
+  'setDebugInfo'
+])
 const props = defineProps<{
   // 音乐url
   url: string
@@ -70,20 +80,30 @@ const data = reactive<any>({
   // 音频时长
   duration: '',
 
+  // 当前播放时间
+  curTime: '',
+
   // 播放进度
   progress: '',
 
   // 音量 0~100
-  volume: ''
+  volume: '',
+
+  // 是否正在调整进度条
+  seeking: false
+})
+
+const getDurationConvert = computed(() => {
+  return function (time: any) {
+    return durationConvert(time)
+  }
 })
 
 provide('data', data)
 provide('props', props)
-
-const { setPlayerDisplay, setDebugInfo } = mapMutationsHelpers(null, [
-  'setPlayerDisplay',
-  'setDebugInfo'
-])
+provide('setData', (name: string, value: any) => {
+  data[name] = value
+})
 
 onMounted(() => {
   // 创建播放器
@@ -99,7 +119,9 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  player.value.removeEventListener('touchstart', touchStartHandler)
+  if (player.value) {
+    player.value.removeEventListener('touchstart', touchStartHandler)
+  }
   window.removeEventListener('resize', resizeHandler)
 })
 
@@ -111,7 +133,12 @@ watchEffect(() => {
       playerLoading(props.url, true)
     })
   }
+  if (props.picUrl && poster.value) {
+    // 设置背景
+    poster.value.style.backgroundImage = `url("${props.picUrl}?param=400y400")`
+  }
 })
+
 /**
  * 计算封面图缩放比例
  */
@@ -150,6 +177,23 @@ function resizeHandler() {
  * @param e
  */
 function touchStartHandler(e: any) {
+  if (e.target.tagName.toLowerCase() === 'button') {
+    // 触发调整按钮
+    if (e.target.dataset.funcVolume === 'on') {
+      // 调整音量
+      volumeChangeHandler()
+    } else if (e.target.dataset.funcProgress === 'on') {
+      progressChangeHandler()
+    }
+  } else {
+    playerChangeHandler(e)
+  }
+}
+
+/**
+ * 播放器全局缩放动画 监听
+ */
+function playerChangeHandler(e: any) {
   let gH = document.documentElement.clientHeight
 
   // 设置播放器开启状态
@@ -212,7 +256,8 @@ function touchStartHandler(e: any) {
       player.value.removeEventListener('touchmove', touchMoveHandler)
 
       // 设置动画
-      player.value.style.transition = 'transform 0.3s'
+      player.value.style.transition =
+        'transform cubic-bezier(0.333, 0.93, 0.667, 1) 0.4s'
 
       // 设置播放器显示状态
       data.posterDisplay = data.playerDisplay
@@ -233,6 +278,89 @@ function touchStartHandler(e: any) {
       }, 10)
     },
     { once: true }
+  )
+}
+
+/**
+ * 调整音量 监听
+ */
+function volumeChangeHandler() {
+  const rect = controlsVolume.value.getBoundingClientRect()
+  const start = rect.left
+  const end = rect.right
+
+  const moveHandler = (e: any) => {
+    const moveX = e.changedTouches[0].clientX
+    // 计算拖动时坐标
+    let ratio = (moveX - start) / (end - start)
+    if (ratio > 1) {
+      ratio = 1
+    } else if (ratio < 0) {
+      ratio = 0
+    }
+    data.audioRef.volume = ratio
+    data.volume = (ratio * 100).toFixed(2)
+    // const context = new AudioContext()
+    // const gainNode = context.createGain()
+    // gainNode.gain.value = ratio
+  }
+
+  player.value.addEventListener('touchmove', moveHandler, {
+    passive: false
+  })
+
+  player.value.addEventListener(
+    'touchend',
+    () => {
+      player.value.removeEventListener('touchmove', moveHandler)
+    },
+    {
+      once: true
+    }
+  )
+}
+
+/**
+ * 调整进度 监听
+ */
+function progressChangeHandler() {
+  // 触发进度调节按钮
+  data.seeking = true
+  data.audioRef.muted = true
+  data.audioRef.pause()
+
+  const rect = controlsProgress.value.getBoundingClientRect()
+  const start = rect.left
+  const end = rect.right
+
+  const moveHandler = (e: any) => {
+    const moveX = e.changedTouches[0].clientX
+    // 计算拖动时坐标
+    let ratio = (moveX - start) / (end - start)
+    if (ratio > 1) {
+      ratio = 1
+    } else if (ratio < 0) {
+      ratio = 0
+    }
+    data.audioRef.currentTime = data.duration * ratio
+    data.progress = (ratio * 100).toFixed(2)
+  }
+
+  player.value.addEventListener('touchmove', moveHandler, {
+    passive: false
+  })
+
+  player.value.addEventListener(
+    'touchend',
+    () => {
+      data.seeking = false
+      data.audioRef.muted = false
+      data.audioRef.play()
+      player.value.removeEventListener('touchmove', moveHandler)
+    },
+    {
+      once: true
+    }
   )
 }
 
@@ -289,6 +417,7 @@ function playerCreate() {
 
   // 计算当前播放进度
   data.audioRef.addEventListener('timeupdate', () => {
+    data.curTime = data.audioRef.currentTime
     data.progress = (data.audioRef.currentTime / data.duration) * 100
     // 保存进度到localStorage
     localStorage.setItem('currentTime', data.audioRef.currentTime)
@@ -325,10 +454,37 @@ function playerLoading(url: string, autoplay: boolean) {
   data.audioRef.autoplay = autoplay
   data.audioRef.load()
 }
+
+/**
+ * 开始/暂停音乐
+ */
+function controlPlay() {
+  // const context = new AudioContext() // 创建Audio上下文
+  // const audio = new Audio(
+  //   'http://m701.music.126.net/20220419201137/dcba2ee07db834acec4260a0b6f45016/jdymusic/obj/wo3DlMOGwrbDjj7DisKw/8731125515/a5c3/ac77/d19e/1d3daf3953ca2d09ea553dcd5b4bfed0.mp3'
+  // )
+  // audio.crossOrigin = 'anonymous'
+  // const media = context.createMediaElementSource(audio) // 从元素创建媒体节点
+  // const gainNode = context.createGain()
+  // gainNode.gain.value = 0.5
+  // //连接：media→gain→destination
+  // media.connect(gainNode)
+  // gainNode.connect(context.destination)
+  // //音量控制
+  // gainNode.gain.value = 0.5
+
+  data.playStatus = !data.playStatus
+  if (data.playStatus) data.audioRef.play()
+  else data.audioRef.pause()
+}
 </script>
 
 <template>
-  <div id="player" :class="{ 'player-poster-display': data.posterDisplay }">
+  <div
+    id="player"
+    v-show="props.url"
+    :class="{ 'player-poster-display': data.posterDisplay }"
+  >
     <div class="player-spacing" ref="player">
       <div style="position: absolute; top: 0; right: 0">
         {{ store.state.debugInfo }}
@@ -338,56 +494,79 @@ function playerLoading(url: string, autoplay: boolean) {
       <div class="player-handle" v-if="data.posterDisplay"></div>
 
       <!-- 海报 -->
-      <div class="player-poster user-not-select"></div>
+      <div ref="poster" class="player-poster user-not-select"></div>
 
       <!-- 迷你控制栏 -->
-      <div class="player-mini-controls" v-show="!data.posterDisplay">
-        <div class="player-mini-controls-spacing">
-          <div class="player-mini-desc">Time (feat. Mapei)</div>
-          <div class="player-mini-controls-btn">
-            <button class="btn-play">
-              <img src="@/assets/icon-apple-center.png" alt="" />
-            </button>
-            <button class="btn-next">
-              <img src="@/assets/icon-apple-next.png" alt="" />
-            </button>
-          </div>
-        </div>
-      </div>
+      <controls-mini :title="props.title" />
 
+      <!-- 标准控制中心 -->
       <div class="player-controls">
         <!-- 歌曲信息 -->
         <div class="player-controls-info">
-          <h2 class="player-controls-info-h2">Time (feat. Mapei)</h2>
-          <p class="player-controls-info-p">Swedish Hourse Mafia</p>
+          <h2 class="player-controls-info-h2">{{ props.title }}</h2>
+          <p class="player-controls-info-p">{{ props.artist }}</p>
         </div>
 
         <!-- 进度条 -->
-        <div class="player-controls-progress">
+        <div class="player-controls-progress" ref="controlsProgress">
+          <!-- 进度条本体 -->
+          <div
+            class="player-controls-progress-rail"
+            :style="{
+              'clip-path': `inset(0 ${100 - data.progress}% 0 0)`
+            }"
+          ></div>
+          <!-- 调整按钮 -->
+          <div
+            class="player-progress-handler-btn"
+            :class="{ 'player-progress-handler-btn-seeking': data.seeking }"
+            :style="{ transform: ` translateX(${data.progress}%)` }"
+          ></div>
+          <button
+            class="player-progress-handler"
+            data-func-progress="on"
+          ></button>
           <div class="player-controls-progress-info">
-            <div>0:05</div>
-            <div>3:15</div>
+            <div>{{ getDurationConvert(data.curTime) }}</div>
+            <div>{{ getDurationConvert(data.duration) }}</div>
           </div>
         </div>
 
+        <!-- 中控 -->
         <div class="player-controls-btn">
-          <button>
-            <img src="@/assets/icon-apple-white-prev.png" alt="" />
-          </button>
-          <button class="btn-play">
-            <img src="@/assets/icon-apple-white-center.png" alt="" />
-          </button>
-          <button>
-            <img src="@/assets/icon-apple-white-next.png" alt="" />
-          </button>
+          <button class="player-controls-btn-prev"></button>
+          <button
+            v-show="data.playStatus"
+            class="player-controls-btn-play"
+            @click="controlPlay"
+          ></button>
+          <button
+            v-show="!data.playStatus"
+            class="player-controls-btn-pause"
+            @click="controlPlay"
+          ></button>
+          <button class="player-controls-btn-next"></button>
         </div>
 
+        <!-- 音量调整 -->
         <div class="player-controls-volume">
           <div>
             <img src="@/assets/player-controls-volume-low.svg" alt="" />
           </div>
-          <div class="player-controls-volume-progress">
-            <div class="volume-progress-handler"></div>
+          <div class="player-controls-volume-progress" ref="controlsVolume">
+            <!-- 音量条底色 -->
+            <div
+              :style="{
+                'clip-path': `inset(0 ${100 - data.volume}% 0 0)`
+              }"
+              class="player-controls-volume-bg"
+            ></div>
+            <!-- 圆形按钮 -->
+            <button
+              :style="{ transform: ` translateX(${data.volume}%)` }"
+              class="volume-progress-handler"
+              data-func-volume="on"
+            ></button>
           </div>
           <div>
             <img src="@/assets/player-controls-volume-high.svg" alt="" />
@@ -402,10 +581,16 @@ function playerLoading(url: string, autoplay: boolean) {
 
 <style lang="less">
 #player {
+  // 封面尺寸 大
   --poster-size: 0;
+  // 封面X偏移
   --poster-translateX: 0;
+  // 封面Y偏移
   --poster-translateY: 0;
+  // 封面放大比例
   --scale-ratio: 0;
+
+  // 播放器Y偏移
   --player-translate: calc(100vh - 80px - 72px);
 
   position: fixed;
@@ -423,9 +608,11 @@ function playerLoading(url: string, autoplay: boolean) {
     height: 100vh;
     width: 100vw;
     z-index: 998;
-    background-color: rgba(247, 247, 247, 1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background-color: rgba(247, 247, 247, 0.6);
     transform: translate(0, var(--player-translate));
-    transition: transform 0.3s;
+    transition: transform cubic-bezier(0.333, 0.93, 0.667, 1) 0.4s;
 
     &::after {
       content: '';
@@ -434,10 +621,16 @@ function playerLoading(url: string, autoplay: boolean) {
       left: 0;
       right: 0;
       bottom: 0;
-      background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6));
       opacity: 0;
       z-index: -1;
-      transition: opacity 0.3s;
+      // background-image: linear-gradient(
+      //   rgba(0, 0, 0, 0),
+      //   rgba(0, 0, 0, 0.1),
+      //   rgba(0, 0, 0, 0.3),
+      //   rgba(0, 0, 0, 0.1),
+      //   rgba(0, 0, 0, 0)
+      // );
+      transition: opacity cubic-bezier(0.333, 0.93, 0.667, 1) 0.4s;
     }
 
     // 抓手
@@ -462,57 +655,10 @@ function playerLoading(url: string, autoplay: boolean) {
       height: var(--poster-size);
       transform-origin: left top;
       transform: translate(16px, 10px) scale(var(--scale-ratio));
-      transition: transform 0.3s;
-      background: url('http://p1.music.126.net/fZXYjrs6ye2IIWYkfWazJg==/109951165849906351.jpg?param=800y800')
-        center center no-repeat;
+      transition: transform cubic-bezier(0.333, 0.93, 0.667, 1) 0.4s;
+      background-position: center center;
+      background-repeat: no-repeat;
       background-size: 100%;
-    }
-
-    // mini控制中心
-    .player-mini-controls {
-      position: absolute;
-      top: 0;
-      right: 0;
-      left: 78px;
-      height: 78px;
-      .player-mini-controls-spacing {
-        width: 100%;
-        height: 100%;
-        padding: 10px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        .player-mini-desc {
-          font-size: 20px;
-          padding-right: 10px;
-          overflow: hidden;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-        }
-
-        .player-mini-controls-btn {
-          display: flex;
-          align-items: center;
-          .btn-play,
-          .btn-next {
-            border: none;
-            padding: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            > img {
-              display: block;
-            }
-          }
-          .btn-play > img {
-            height: 22px;
-          }
-          .btn-next > img {
-            height: 28px;
-          }
-        }
-      }
     }
 
     // 控制中心
@@ -520,11 +666,10 @@ function playerLoading(url: string, autoplay: boolean) {
       margin-top: 50vh;
       height: 50vh;
       width: 100%;
-      padding: 48px 24px 0;
+      padding: 24px 24px 0;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      // background-color: #ccc;
 
       // 进度条
       .player-controls-progress {
@@ -532,7 +677,52 @@ function playerLoading(url: string, autoplay: boolean) {
         width: 100%;
         margin: 16px 0;
         border-radius: 3px;
-        background: #ccc;
+        background-color: rgba(0, 0, 0, 0.15);
+        position: relative;
+        .player-controls-progress-rail {
+          position: absolute;
+          height: 100%;
+          width: 100%;
+          overflow: hidden;
+          border-radius: 3px;
+          clip-path: inset(0 100% 0 0);
+          background-color: rgba(0, 0, 0, 0.45);
+        }
+        // 小圆点
+        .player-progress-handler-btn {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          transform: translateX(0);
+          &::after {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.45);
+          }
+        }
+        .player-progress-handler-btn-seeking {
+          &::after {
+            transform: scale(3) !important;
+          }
+        }
+        // 调整触发区域
+        .player-progress-handler {
+          z-index: 1;
+          position: absolute;
+          top: -10px;
+          left: 0;
+          width: 100%;
+          height: 22px;
+          border: none;
+          background: transparent;
+        }
         .player-controls-progress-info {
           width: 100%;
           position: relative;
@@ -540,7 +730,7 @@ function playerLoading(url: string, autoplay: boolean) {
           justify-content: space-between;
           > div {
             margin-top: 6px;
-            color: #ccc;
+            color: rgba(0, 0, 0, 0.45);
             font-size: 13px;
           }
         }
@@ -550,11 +740,14 @@ function playerLoading(url: string, autoplay: boolean) {
       .player-controls-info {
         .player-controls-info-h2 {
           font-size: 22px;
-          color: #fff;
+          color: rgba(0, 0, 0, 0.8);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
         .player-controls-info-p {
           font-size: 21px;
-          color: rgba(255, 255, 255, 0.5);
+          color: rgba(0, 0, 0, 0.45);
           line-height: 1;
         }
       }
@@ -564,20 +757,31 @@ function playerLoading(url: string, autoplay: boolean) {
         display: flex;
         justify-content: space-between;
         padding: 32px 24px;
-        .btn-play {
-          > img {
-            width: 46px;
-            height: 46px;
-          }
-        }
-        > button {
+        .player-controls-btn-next,
+        .player-controls-btn-play,
+        .player-controls-btn-pause,
+        .player-controls-btn-prev {
           border: none;
           display: flex;
           justify-content: center;
           align-items: center;
-          > img {
-            height: 50px;
-          }
+          width: 46px;
+          height: 46px;
+          background-position: center center;
+          background-repeat: no-repeat;
+          background-size: 100%;
+        }
+        .player-controls-btn-prev {
+          background-image: url('@/assets/icon-apple-prev.png');
+        }
+        .player-controls-btn-play {
+          background-image: url('@/assets/player-controls-play.svg');
+        }
+        .player-controls-btn-pause {
+          background-image: url('@/assets/icon-apple-center.png');
+        }
+        .player-controls-btn-next {
+          background-image: url('@/assets/icon-apple-next.png');
         }
       }
 
@@ -587,6 +791,7 @@ function playerLoading(url: string, autoplay: boolean) {
         align-items: center;
         justify-content: space-between;
         padding: 24px 0;
+
         > div {
           display: flex;
           align-items: center;
@@ -595,27 +800,51 @@ function playerLoading(url: string, autoplay: boolean) {
             height: 14px;
           }
         }
+
         .player-controls-volume-progress {
           height: 3px;
           width: 100%;
           margin: 0 16px;
           border-radius: 3px;
-          background: #ccc;
+          background-color: rgba(0, 0, 0, 0.15);
           position: relative;
-          .volume-progress-handler {
-            height: 20px;
-            width: 20px;
-            border-radius: 50%;
-            background-color: #999;
+          .player-controls-volume-bg {
             position: absolute;
-            top: clac(12px /2 * -1);
-            left: clac(12px /2 * -1);
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 3px;
+            overflow: hidden;
+            clip-path: inset(0 100% 0 0);
+            background-color: rgba(0, 0, 0, 0.45);
+          }
+          .volume-progress-handler {
+            position: absolute;
+            top: -10px;
+            left: -5px;
+            width: 100%;
+            height: 22px;
+            border: none;
+            background: transparent;
+            transform: translateX(0);
+            &::after {
+              content: '';
+              height: 22px;
+              width: 22px;
+              border-radius: 50%;
+              background-color: rgba(140, 140, 140, 1);
+              position: absolute;
+              top: 0;
+              left: -6px;
+              border: none;
+            }
           }
         }
       }
 
       .player-tools-bar {
-        height: 140px;
+        height: 175px;
         flex-shrink: 0;
         width: 100%;
       }
@@ -629,6 +858,11 @@ function playerLoading(url: string, autoplay: boolean) {
 
 // 展开后样式
 .player-poster-display {
+  // .player-spacing {
+  //   backdrop-filter: none !important;
+  //   -webkit-backdrop-filter: none !important;
+  //   background-color: rgba(247, 247, 247, 1) !important;
+  // }
   .player-spacing::after {
     opacity: 1 !important;
   }

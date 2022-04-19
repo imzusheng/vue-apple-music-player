@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 15:36:11
-LastEditTime: 2022-04-12 15:52:51
+LastEditTime: 2022-04-19 21:48:37
 Description: css3全局加载动画
 FilePath: \vite-music-player\src\components\TheLoading.vue
 -->
@@ -13,7 +13,7 @@ FilePath: \vite-music-player\src\components\TheLoading.vue
 
 <style lang="less">
 .g-loading {
-  position: absolute;
+  position: fixed;
   z-index: 999;
   top: 50%;
   left: 50%;

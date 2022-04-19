@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 18:47:25
-LastEditTime: 2022-04-17 20:21:14
+LastEditTime: 2022-04-19 21:52:01
 Description: 歌曲表格展示 单击切歌，有XL/L/M/S四种尺寸
                 L: 封面，歌名，专辑，发布时间，时长
                 L: 封面，歌名，专辑，时长
@@ -11,8 +11,9 @@ FilePath: \vite-music-player\src\components\TableListSongs.vue
 -->
 
 <script lang="ts" setup>
-import InfiniteList from './InfiniteList.vue'
+import { computed } from 'vue'
 import { useStore } from '@/store'
+import InfiniteList from './InfiniteList.vue'
 import { SongTableRow } from '@/common/types'
 import { mapActionsHelpers, mapMutationsHelpers } from '@/common/util'
 
@@ -42,11 +43,20 @@ const props = defineProps<{
 
 // 获取歌曲url
 function play(songInfo: SongTableRow) {
-  setAudioInfo(songInfo)
-  getSongUrl(songInfo.payload).then((url: string) => {
-    setAudioUrl(url)
-  })
+  if (songInfo.payload) {
+    setAudioInfo(songInfo)
+
+    getSongUrl(songInfo.payload).then((url: string) => {
+      setAudioUrl(url)
+    })
+  }
 }
+
+const vLazyLoad = computed(() => {
+  return function (url: string) {
+    return `${url}?param=50y50`
+  }
+})
 </script>
 
 <template>
@@ -92,7 +102,11 @@ function play(songInfo: SongTableRow) {
 
           <!-- 歌曲名字和作者 -->
           <div class="table-cell-desc table-cell-ellipsis">
-            <img class="table-cell-desc-pic" :src="listItem.picUrl" alt="" />
+            <img
+              class="table-cell-desc-pic"
+              :src="`${listItem.picUrl}?param=50y50`"
+              alt=""
+            />
             <div class="table-cell-desc-info table-cell-ellipsis">
               <!-- 歌名 -->
               <div class="table-desc-name">
@@ -167,7 +181,7 @@ function play(songInfo: SongTableRow) {
         <!-- 歌曲名字和作者 -->
         <div class="table-cell-desc table-cell-ellipsis">
           <img
-            v-lazy:[listItem.picUrl]
+            v-lazy="vLazyLoad(listItem.picUrl)"
             class="table-cell-desc-pic"
             src="../assets/empty_white.png"
             alt=""

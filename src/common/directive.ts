@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-11 15:06:54
- * @LastEditTime: 2022-04-14 11:56:33
+ * @LastEditTime: 2022-04-19 16:28:58
  * @Description: 自定义指令，利用插件安装
  * @FilePath: \vite-music-player\src\common\directive.ts
  */
@@ -52,7 +52,7 @@ export const lazyloadDirective = {
     app.directive('lazy', {
       // 节点挂载
       mounted(imgEl: HTMLImageElement, binding: any) {
-        const src = binding.arg
+        const src = binding.value
 
         if (!src) return
         // IntersectionObserver

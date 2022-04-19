@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-18 12:37:17
-LastEditTime: 2022-04-19 15:16:13
+LastEditTime: 2022-04-19 20:28:13
 Description: 底部tabbar
 FilePath: \vite-music-player\src\components\TheTabbar.vue
 -->
@@ -107,24 +107,23 @@ const navConfig = [
   height: 72px;
   overflow: hidden;
   transition: transform 0.1s;
+  background: rgba(247, 247, 247, 1);
   border-top: 1px solid rgba(143, 146, 147, 0.1);
   .tabbar-list {
     height: 100%;
     display: flex;
     align-items: center;
     position: relative;
-    &::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(247, 247, 247, 0.8);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      z-index: -1;
-    }
+    // &::after {
+    //   content: '';
+    //   position: absolute;
+    //   top: 0;
+    //   left: 0;
+    //   right: 0;
+    //   bottom: 0;
+    //   // background: rgba(247, 247, 247, 0.8);
+    //   z-index: -1;
+    // }
     .tabbar-list-item {
       width: 20%;
       padding: 12px 10px;

@@ -1,13 +1,13 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 21:10:50
-LastEditTime: 2022-04-19 13:48:48
+LastEditTime: 2022-04-19 21:51:18
 Description: 默认布局
 FilePath: \vite-music-player\src\views\LayoutDefault.vue
 -->
 <script lang="ts" setup>
 import { mapActionsHelpers, mapMutationsHelpers } from '@/common/util'
-import TheAudioPlayer from '@/components/TheAudioPlayer.vue'
+import TheAudioPlayer from '@/components/TheAudioPlayer/TheAudioPlayer.vue'
 import TheTabbar from '@/components/TheTabbar.vue'
 import TheLoading from '@/components/TheLoading.vue'
 import PageError from '@/views/PageError.vue'
@@ -33,6 +33,8 @@ function reload() {
     setAudioUrl(url)
   })
 }
+
+reload()
 </script>
 
 
@@ -55,6 +57,7 @@ function reload() {
       <!-- 头部 -->
 
       <the-loading v-if="store.state.loading" />
+
       <page-error v-if="store.state.error.status" />
 
       <router-view
@@ -84,7 +87,7 @@ function reload() {
 <style lang="less">
 #default-layout {
   display: flex;
-  padding: 0 0 4.5rem /* 72/16 */;
+  padding: 0 0 calc(72px + 80px + 10px);
 
   // 遮罩
   // #default-mask {

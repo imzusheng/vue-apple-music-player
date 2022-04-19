@@ -179,7 +179,7 @@ const song = {
                 artist: pickUpName(v.ar),
 
                 // 歌曲封面
-                picUrl: v.al.picUrl + '?param=50y50',
+                picUrl: v.al.picUrl,
 
                 // 歌曲名
                 title: v.name,
