@@ -3,7 +3,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-18 13:09:20
-LastEditTime: 2022-04-20 22:18:15
+LastEditTime: 2022-04-20 22:43:18
 Description: 播放器
 FilePath: \vite-music-player\src\components\TheAudioPlayer\TheAudioPlayer.vue
 -->
@@ -273,14 +273,6 @@ function playerChangeHandler(e: any) {
         const openTranslate = `${(
           document.documentElement.clientHeight - 144
         ).toFixed(0)}px`
-
-        // setDebugInfo(
-        //   `当前屏幕高度: ${document.documentElement.clientHeight}
-        //   <br>根据屏幕高度计算: ${document.documentElement.clientHeight - 144}
-        //   <br>根据tabbar计算的高度: ${
-        //     tabbarRef.value.getBoundingClientRect().top - 72
-        //   }`
-        // )
 
         // 如果data.playerDisplay为true则为打开状态
         const translateValue = data.playerDisplay ? '0px' : openTranslate

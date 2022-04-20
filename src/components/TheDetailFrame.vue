@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 17:31:44
-LastEditTime: 2022-04-20 22:13:01
+LastEditTime: 2022-04-20 23:07:27
 Description: detail页面的基本框架
 FilePath: \vite-music-player\src\components\TheDetailFrame.vue
 -->
@@ -99,8 +99,22 @@ function toPlaySong(songInfo: any) {
       </div>
       <!-- 播放按钮 -->
       <div class="detail-frame-poster-action">
-        <button>播放</button>
-        <button>随机播放</button>
+        <button class="detail-frame-action-btn">
+          <img
+            class="action-icon-play"
+            src="@/assets/icon-detail-play.png"
+            alt=""
+          />
+          播放
+        </button>
+        <button class="detail-frame-action-btn">
+          <img
+            class="action-icon-random"
+            src="@/assets/icon-detail-random.png"
+            alt=""
+          />
+          随机播放
+        </button>
       </div>
     </div>
 
@@ -215,7 +229,7 @@ function toPlaySong(songInfo: any) {
       display: flex;
       justify-content: space-between;
 
-      > button {
+      .detail-frame-action-btn {
         font-size: 15px;
         height: 48px;
         color: var(--theme-color);
@@ -224,6 +238,19 @@ function toPlaySong(songInfo: any) {
         border-radius: 8px;
         width: calc(50% - 8px);
         background: rgba(0, 0, 0, 0.06);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .action-icon-play {
+          height: 11px;
+          width: 11px;
+          margin-right: 4px;
+        }
+        .action-icon-random {
+          height: 16px;
+          width: 16px;
+          margin-right: 4px;
+        }
       }
     }
 

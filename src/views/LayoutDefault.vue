@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 21:10:50
-LastEditTime: 2022-04-20 21:11:44
+LastEditTime: 2022-04-20 22:49:57
 Description: 默认布局
 FilePath: \vite-music-player\src\views\LayoutDefault.vue
 -->
@@ -11,45 +11,26 @@ import TheAudioPlayer from '@/components/TheAudioPlayer/TheAudioPlayer.vue'
 import TheTabbar from '@/components/TheTabbar.vue'
 import TheLoading from '@/components/TheLoading.vue'
 import PageError from '@/views/PageError.vue'
-import {
-  computed,
-  onMounted,
-  onUnmounted,
-  provide,
-  ref,
-  watchEffect
-} from 'vue'
+import { computed, onMounted, onUnmounted, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from '@/store'
 
 const { getSongUrl } = mapActionsHelpers(null, ['getSongUrl'])
-const {
-  setAudioUrl,
-  setDebugInfo,
-  setAudioInfo,
-  setAudioDisplay,
-  setPlayerFade
-} = mapMutationsHelpers(null, [
-  'setAudioUrl',
-  'setDebugInfo',
-  'setAudioInfo',
-  'setAudioDisplay',
-  'setPlayerFade'
-])
+const { setAudioUrl, setDebugInfo, setAudioInfo, setAudioDisplay } =
+  mapMutationsHelpers(null, [
+    'setAudioUrl',
+    'setDebugInfo',
+    'setAudioInfo',
+    'setAudioDisplay'
+  ])
 const store = useStore()
 const route = useRoute()
-const tabbarRef = ref<any>(null)
-
+// 播放器在滚动时隐藏
+const playerFade = ref<boolean>(true)
 const viewKey = computed(() => {
   const payload = route.query.payload ?? ''
   return Date.now().toString() + payload
 })
-
-provide('tabbarRef', tabbarRef)
-
-function getRef(ref: any) {
-  tabbarRef.value = ref
-}
 
 // =============================================================================> 恢复上次播放歌曲
 restore()
@@ -75,32 +56,33 @@ watchEffect(() => {
 })
 
 function setPlayerTranslate() {
-  const rectTop = tabbarRef.value.getBoundingClientRect().top
+  // const rectTop = tabbarRef.value.getBoundingClientRect().top
   const clientHeight = document.documentElement.clientHeight
   const trl =
     clientHeight > window.innerHeight
       ? `${clientHeight - 144}px`
       : `${window.innerHeight - 144}px`
   document.body.style.setProperty('--player-translate', trl)
-  setPlayerFade(true)
+  playerFade.value = true
   ////////////////////////////////////////////////////////////////
-  setDebugInfo(
-    `window.outerHeight:${window.outerHeight}
-    <br>window.innerHeight:${window.innerHeight}
-    <br>当前屏幕高度: ${clientHeight}
-    <br>tabbar距离顶部高度:${rectTop.toFixed(0)}
-    <br>根据屏幕高度计算:${clientHeight}-144=${clientHeight - 144}
-    <br>根据屏幕tabbar高度计算:${rectTop}-72=${(rectTop - 72).toFixed(0)}`
-  )
+  // setDebugInfo(
+  //   `window.outerHeight:${window.outerHeight}
+  //   <br>window.innerHeight:${window.innerHeight}
+  //   <br>当前屏幕高度: ${clientHeight}
+  //   <br>tabbar距离顶部高度:${rectTop.toFixed(0)}
+  //   <br>根据屏幕高度计算:${clientHeight}-144=${clientHeight - 144}
+  //   <br>根据屏幕tabbar高度计算:${rectTop}-72=${(rectTop - 72).toFixed(0)}`
+  // )
 }
 
+// 定时器
 let playerFadeTimer: any
 const handler = (e: any) => {
   if (store.state.playerDisplay) {
     e.preventDefault()
   } else {
     // 一滚动就把播放器隐藏
-    setPlayerFade(false)
+    playerFade.value = false
 
     if (playerFadeTimer) clearTimeout(playerFadeTimer)
     playerFadeTimer = setTimeout(() => {
@@ -155,7 +137,7 @@ onUnmounted(() => {
     <transition name="fade">
       <!-- 播放器 -->
       <the-audio-player
-        v-show="store.state.playerFade"
+        v-show="playerFade"
         :url="store.state.audioUrl"
         :title="store.state.audioInfo.title"
         :album="store.state.audioInfo.album"
@@ -166,7 +148,7 @@ onUnmounted(() => {
     </transition>
 
     <!-- 底部tabbar -->
-    <the-tabbar @getRef="getRef"></the-tabbar>
+    <the-tabbar></the-tabbar>
   </div>
 </template>
 
