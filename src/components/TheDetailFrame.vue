@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 17:31:44
-LastEditTime: 2022-04-20 13:26:04
+LastEditTime: 2022-04-20 18:37:13
 Description: detail页面的基本框架
 FilePath: \vite-music-player\src\components\TheDetailFrame.vue
 -->
@@ -9,8 +9,10 @@ FilePath: \vite-music-player\src\components\TheDetailFrame.vue
 <script lang="ts" setup>
 import { mapActionsHelpers, mapMutationsHelpers } from '@/common/util'
 import { reactive, watchEffect } from 'vue'
+import { useStore } from '@/store'
 import moment from 'moment'
 
+const store = useStore()
 const props = defineProps<{
   //创建时间
   createTime: string
@@ -34,10 +36,13 @@ const data = reactive({
 })
 
 const { getSongUrl } = mapActionsHelpers(null, ['getSongUrl'])
-const { setAudioUrl, setAudioInfo } = mapMutationsHelpers(null, [
+const { setAudioUrl, setAudioInfo, setLoading } = mapMutationsHelpers(null, [
   'setAudioUrl',
-  'setAudioInfo'
+  'setAudioInfo',
+  'setLoading'
 ])
+
+setLoading(true)
 
 watchEffect(() => {
   if (props.songs.length > 0) {
@@ -48,6 +53,7 @@ watchEffect(() => {
     })
     // 分钟数
     data.duration = durationTotal
+    setLoading(false)
   }
 })
 
@@ -102,10 +108,16 @@ function toPlaySong(songInfo: any) {
           v-for="(songItem, songIdx) in props.songs"
           :data-song-id="songItem.payload"
           :key="`song-${songIdx}`"
-          class="detail-frame-list-li"
           @click="toPlaySong(songItem)"
+          class="detail-frame-list-li"
+          :class="{
+            listening: songItem.payload === store.state.audioInfo.payload
+          }"
         >
-          <div class="list-index">{{ songIdx + 1 }}</div>
+          <div class="list-index">
+            <span class="list-index-text">{{ songIdx + 1 }}</span>
+            <img class="list-index-icon" src="@/assets/equaliser.svg" alt="" />
+          </div>
           <div class="list-desc">
             <div class="list-desc-title">{{ songItem.title }}</div>
             <div class="list-desc-sub">{{ songItem.artist }}</div>
@@ -237,6 +249,10 @@ function toPlaySong(songInfo: any) {
           align-items: center;
         }
 
+        .list-index-icon {
+          display: none;
+        }
+
         .list-index,
         .list-select {
           font-weight: 600;
@@ -249,7 +265,7 @@ function toPlaySong(songInfo: any) {
           display: flex;
           flex-direction: column;
           align-items: flex-start;
-          padding: 2px 32px 2px 10px;
+          padding: 4px 32px 2px 10px;
           border-bottom: 1px solid rgba(0, 0, 0, 0.1);
           overflow: hidden;
           white-space: nowrap;
@@ -277,6 +293,22 @@ function toPlaySong(songInfo: any) {
 
         .list-select {
           border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+      }
+
+      .listening {
+        .list-desc {
+          .list-desc-title {
+            color: var(--theme-color);
+          }
+        }
+        .list-index {
+          .list-index-text {
+            display: none;
+          }
+          .list-index-icon {
+            display: block;
+          }
         }
       }
     }
