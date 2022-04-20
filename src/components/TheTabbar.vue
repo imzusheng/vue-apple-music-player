@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-18 12:37:17
-LastEditTime: 2022-04-20 14:20:13
+LastEditTime: 2022-04-20 18:20:53
 Description: 底部tabbar
 FilePath: \vite-music-player\src\components\TheTabbar.vue
 -->
@@ -117,7 +117,7 @@ onMounted(() => {
   width: 100%;
   height: 72px;
   overflow: hidden;
-  transition: transform cubic-bezier(0.333, 0.93, 0.667, 1) 0.35s;
+  transition: opacity cubic-bezier(0.333, 0.93, 0.667, 1) 0.35s;
   background: rgba(247, 247, 247, 1);
   border-top: 1px solid rgba(143, 146, 147, 0.1);
   .tabbar-list {
@@ -163,6 +163,7 @@ onMounted(() => {
 }
 
 .tabbar-display {
-  transform: translate(0, 100%);
+  // transform: translate(0, 100%);
+  opacity: 0;
 }
 </style>

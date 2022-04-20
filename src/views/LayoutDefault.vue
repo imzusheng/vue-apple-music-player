@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 21:10:50
-LastEditTime: 2022-04-20 14:52:23
+LastEditTime: 2022-04-20 18:00:57
 Description: 默认布局
 FilePath: \vite-music-player\src\views\LayoutDefault.vue
 -->
@@ -11,7 +11,14 @@ import TheAudioPlayer from '@/components/TheAudioPlayer/TheAudioPlayer.vue'
 import TheTabbar from '@/components/TheTabbar.vue'
 import TheLoading from '@/components/TheLoading.vue'
 import PageError from '@/views/PageError.vue'
-import { computed, onMounted, onUnmounted, ref, watchEffect } from 'vue'
+import {
+  computed,
+  onMounted,
+  onUnmounted,
+  provide,
+  ref,
+  watchEffect
+} from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from '@/store'
 
@@ -37,6 +44,8 @@ const viewKey = computed(() => {
   const payload = route.query.payload ?? ''
   return Date.now().toString() + payload
 })
+
+provide('tabbarRef', tabbarRef)
 
 function getRef(ref: any) {
   tabbarRef.value = ref
@@ -97,6 +106,17 @@ onUnmounted(() => {
 
 <template>
   <div id="default-layout">
+    <div
+      style="
+        position: fixed;
+        top: 0;
+        right: 0;
+        z-index: 9999;
+        background: #ccc;
+        padding: 10px;
+      "
+      v-html="store.state.debugInfo"
+    ></div>
     <!-- <div id="default-mask" v-if="store.state.playerDisplay"></div> -->
 
     <main id="main">

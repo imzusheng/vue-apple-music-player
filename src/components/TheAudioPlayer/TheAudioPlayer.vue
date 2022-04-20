@@ -3,7 +3,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-18 13:09:20
-LastEditTime: 2022-04-20 14:50:46
+LastEditTime: 2022-04-20 18:22:39
 Description: 播放器
 FilePath: \vite-music-player\src\components\TheAudioPlayer\TheAudioPlayer.vue
 -->
@@ -17,7 +17,8 @@ import {
   computed,
   watchEffect,
   onMounted,
-  onUnmounted
+  onUnmounted,
+  inject
 } from 'vue'
 import { mapMutationsHelpers, durationConvert } from '@/common/util'
 import { useStore } from '@/store'
@@ -105,6 +106,8 @@ provide('setData', (name: string, value: any) => {
   data[name] = value
 })
 
+const tabbarRef: any = inject('tabbarRef')
+
 onMounted(() => {
   // 创建播放器
   playerCreate()
@@ -191,7 +194,7 @@ function touchStartHandler(e: any) {
 }
 
 /**
- * 播放器全局缩放动画 监听
+ * 播放器全局缩放动画 监听 touchstart
  */
 function playerChangeHandler(e: any) {
   let gH = document.documentElement.clientHeight
@@ -214,12 +217,13 @@ function playerChangeHandler(e: any) {
 
   // 拖动时触发
   function touchMoveHandler(e: any) {
+    // 阻止默认行为
     e.stopPropagation()
     e.preventDefault()
 
     // 计算拖动时播放器坐标
     let curY = targetStartY + (e.changedTouches[0].clientY - startY)
-    // 边界
+    // 拖放边界，不能小于0，不能大于屏幕高度
     if (curY < 0) {
       curY = 0
     } else if (curY > gH) {
@@ -228,22 +232,25 @@ function playerChangeHandler(e: any) {
 
     // 过了临界值自动收缩/展开
     if (befY > e.changedTouches[0].clientY) {
-      // 向上滑动
-
+      // 向上滑动时
       if (curY / gH < 0.7) {
+        // 展开封面和播放器
         data.posterDisplay = true
         data.playerDisplay = true
       }
     } else {
       // 向下滑动
       if (curY / gH > 0.2) {
+        // 收缩播放器，封面暂时不动
         data.playerDisplay = false
       }
     }
 
+    // 更新为上次位置
     befY = e.changedTouches[0].clientY
 
-    // 设置当前坐标
+    // 在body上设置当前坐标，因为稍后default页面也要设置，
+    // 而外部无法获取播放器元素的引用(HTMLElement)
     document.body.style.setProperty('--player-translate', `${curY}px`)
   }
 
@@ -255,26 +262,39 @@ function playerChangeHandler(e: any) {
   player.value.addEventListener(
     'touchend',
     () => {
+      // 移除监听
       player.value.removeEventListener('touchmove', touchMoveHandler)
 
-      // 设置动画
-      player.value.style.transition =
-        'transform cubic-bezier(0.333, 0.93, 0.667, 1) 0.35s'
+      // 重新设置回动画
+      const transition = 'transform cubic-bezier(0.333, 0.93, 0.667, 1) 0.35s'
+      player.value.style.transition = transition
 
       // 稍后设置播放器样式
       setTimeout(() => {
-        let cTop: any = data.playerDisplay
-          ? 0
-          : document.documentElement.clientHeight - 72 - 72
-        const translateY = `${cTop.toFixed(0)}px`
+        // 展开时的位置
+        const openTranslate = `${(
+          document.documentElement.clientHeight - 144
+        ).toFixed(0)}px`
 
         // setDebugInfo(
-        //   `tly:${cTop},窗口高度:${document.documentElement.clientHeight},播放器高度:${player.value.clientHeight}`
+        //   `当前屏幕高度: ${document.documentElement.clientHeight}
+        //   <br>根据屏幕高度计算: ${document.documentElement.clientHeight - 144}
+        //   <br>根据tabbar计算的高度: ${
+        //     tabbarRef.value.getBoundingClientRect().top - 72
+        //   }`
         // )
 
-        document.body.style.setProperty('--player-translate', translateY)
-        setPlayerDisplay(data.playerDisplay)
-        // 设置播放器显示状态
+        // 如果data.playerDisplay为true则为打开状态
+        const translateValue = data.playerDisplay ? '0px' : openTranslate
+        document.body.style.setProperty('--player-translate', translateValue)
+
+        // 设置全局打开状态，tabbar就会隐藏
+        setTimeout(() => {
+          player.value.style.transition = 'none'
+          setPlayerDisplay(data.playerDisplay)
+        }, 350)
+
+        // 设置封面展开放大
         data.posterDisplay = data.playerDisplay
       }, 10)
     },
@@ -492,10 +512,6 @@ function controlPlay() {
     }"
   >
     <div class="player-spacing" ref="player">
-      <div style="position: absolute; top: 0; right: 0">
-        {{ store.state.debugInfo }}
-      </div>
-
       <!-- 把手 -->
       <div class="player-handle" v-if="data.posterDisplay"></div>
 
@@ -733,12 +749,15 @@ function controlPlay() {
 
       // 歌曲信息
       .player-controls-info {
-        .player-controls-info-h2 {
-          font-size: 22px;
-          color: rgba(0, 0, 0, 0.8);
+        .player-controls-info-h2,
+        .player-controls-info-p {
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
+        }
+        .player-controls-info-h2 {
+          font-size: 22px;
+          color: rgba(0, 0, 0, 0.8);
         }
         .player-controls-info-p {
           font-size: 21px;

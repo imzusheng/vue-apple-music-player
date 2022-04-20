@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 23:22:44
- * @LastEditTime: 2022-04-20 14:32:02
+ * @LastEditTime: 2022-04-20 17:36:32
  * @Description: vuex
  * @FilePath: \vite-music-player\src\store\index.ts
  */
@@ -57,9 +57,10 @@ export const store = createStore<State>({
     // 头部标题显示什么
     headerText: '',
 
+    // 播放器是否显示
     playerDisplay: false,
 
-    // 播放器是否显示
+    // 旧版播放器 是否显示
     audioDisplay: false,
 
     // 播放器在滚动时隐藏
@@ -96,9 +97,12 @@ export const store = createStore<State>({
       state.playerFade = payload
     },
     setPlayerDisplay(state, payload) {
-      state.playerDisplay = payload
+      if (state.playerDisplay !== payload) {
+        state.playerDisplay = payload
+      }
     },
     setAudioDisplay(state, payload) {
+      // 旧版播放器
       state.audioDisplay = payload
     },
     setAudioInfo(state, payload) {
