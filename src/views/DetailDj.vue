@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-13 12:49:50
-LastEditTime: 2022-04-14 18:10:06
+LastEditTime: 2022-04-21 00:01:41
 Description: 电台详情
 FilePath: \vite-music-player\src\views\DetailDj.vue
 -->
@@ -12,7 +12,6 @@ import { useRoute } from 'vue-router'
 import { reactive } from 'vue'
 import { mapActionsHelpers } from '@/common/util'
 import TheDetailFrame from '@/components/TheDetailFrame.vue'
-import TableListSongs from '@/components/TableListSongs.vue'
 import { SongTableRow } from '@/common/types'
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -30,7 +29,9 @@ const data = reactive<{
     title: '',
     desc: '',
     picUrl: '',
-    sub: ''
+    sub: '',
+    artist: '',
+    createTime: ''
   },
   songs: []
 })
@@ -60,21 +61,15 @@ getDjDetail({ rid })
 
 <template>
   <div id="detail-radio">
-<!--    <the-detail-frame
+    <the-detail-frame
       :title="data.info.title"
       :desc="data.info.desc"
       :sub="data.info.sub"
       :picUrl="data.info.picUrl"
-    >
-      <template #list>
-        <table-list-songs
-          :virtualScroll="true"
-          :songs="data.songs"
-          size="L"
-          :title="true"
-        />
-      </template>
-    </the-detail-frame>-->
+      :artist="data.info.artist"
+      :createTime="data.info.createTime"
+      :songs="data.songs"
+    />
   </div>
 </template>
 

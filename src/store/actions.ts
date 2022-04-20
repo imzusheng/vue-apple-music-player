@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-11 09:15:16
- * @LastEditTime: 2022-04-20 13:25:20
+ * @LastEditTime: 2022-04-21 00:09:03
  * @Description: 所有请求
  * @FilePath: \vite-music-player\src\store\actions.ts
  */
@@ -257,8 +257,6 @@ const playlist = {
   async getPlaylistDetail({}, id: string | number): Promise<any> {
     const data = await get(API.PLAYLIST.GET_PLAYLIST_DETAIL, { id })
 
-    console.log(data.playlist)
-
     return {
       // 歌曲id集合
       createTime: moment(data.playlist.createTime).format('YYYY年M月D日'),
@@ -424,9 +422,11 @@ const radio = {
     // 单曲详情没啥用，需要节目ID然后再获取整个节目列表
 
     return {
+      artist: resJson.data.dj.nickname,
+      createTime: moment(resJson.data.createTime).format('YYYY-M-D'),
       title: resJson.data.name,
       desc: resJson.data.desc,
-      picUrl: resJson.data.picUrl + '?param=800y800',
+      picUrl: resJson.data.picUrl + '?param=400y400',
       sub: resJson.data.category,
       radioId: resJson.data.id
     }
@@ -436,11 +436,11 @@ const radio = {
     const resJson = await get(API.DJ.GET_DJP, Object.assign(initArgs, args))
     const data: Array<SongTableRow> = resJson.programs.map((row: any): SongTableRow => {
       return {
-        payload: row.id,
+        payload: row.mainSong.id,
         artist: row.dj.nickname,
         title: row.mainSong.name,
         album: row.radio?.name || row.mainSong.album.name,
-        picUrl: row.coverUrl + '?param=50y50',
+        picUrl: row.coverUrl,
         duration: durationConvert(row.duration / 1000),
         fee: row.fee
       }

@@ -66,8 +66,7 @@ getPlaylistDetail(id)
       :sub="playlistInfo.data.sub"
       :createTime="playlistInfo.data.createTime"
       :songs="playlistInfo.songs"
-    >
-    </the-detail-frame>
+    />
   </div>
 </template>
 
