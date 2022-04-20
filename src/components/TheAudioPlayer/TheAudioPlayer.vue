@@ -3,7 +3,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-18 13:09:20
-LastEditTime: 2022-04-19 23:41:52
+LastEditTime: 2022-04-20 13:12:20
 Description: 播放器
 FilePath: \vite-music-player\src\components\TheAudioPlayer\TheAudioPlayer.vue
 -->
@@ -267,7 +267,7 @@ function playerChangeHandler(e: any) {
       setTimeout(() => {
         let cTop: any = data.playerDisplay
           ? 0
-          : document.documentElement.clientHeight - 80 - 72
+          : document.documentElement.clientHeight - 72 - 72
         const translateY = `${cTop.toFixed(0)}px`
 
         // setDebugInfo(
@@ -489,12 +489,6 @@ function controlPlay() {
     v-show="props.url"
     :class="{ 'player-poster-display': data.posterDisplay }"
   >
-    <!-- <div
-      ref="poster"
-      class="player-poster user-not-select"
-      :class="{ 'player-poster-show': data.posterDisplay }"
-    ></div> -->
-
     <div class="player-spacing" ref="player">
       <div style="position: absolute; top: 0; right: 0">
         {{ store.state.debugInfo }}
@@ -605,30 +599,12 @@ function controlPlay() {
   --scale-ratio: 0;
 
   // 播放器Y偏移
-  --player-translate: calc(100vh - 80px - 72px);
+  --player-translate: calc(100vh - 72px - 72px);
 
   position: fixed;
   height: 0;
   width: 0;
   top: 0;
-
-  // 封面
-  .player-poster {
-    position: absolute;
-    border-radius: 4px;
-    top: 0;
-    left: 0;
-    width: var(--poster-size);
-    height: var(--poster-size);
-    transform-origin: left top;
-    transform: translate(16px, calc(100vh - 80px - 72px + 10px))
-      scale(var(--scale-ratio));
-    transition: all cubic-bezier(0.333, 0.93, 0.667, 1) 0.35s;
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: 100%;
-    z-index: 1000;
-  }
 
   // 展开后样式
   .player-poster-show {
@@ -668,14 +644,13 @@ function controlPlay() {
     // 封面
     .player-poster {
       position: absolute;
-      border-radius: 4px;
       top: 0;
       left: 0;
       width: var(--poster-size);
       height: var(--poster-size);
       transform-origin: left top;
-      transform: translate(16px, 10px) scale(var(--scale-ratio));
-      transition: all cubic-bezier(0.333, 0.93, 0.667, 1) 0.35s;
+      transform: translate(16px, 6px) scale(var(--scale-ratio));
+      transition: transform cubic-bezier(0.333, 0.93, 0.667, 1) 0.35s;
       background-position: center center;
       background-repeat: no-repeat;
       background-size: 100%;
