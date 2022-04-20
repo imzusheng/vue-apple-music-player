@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 21:10:50
-LastEditTime: 2022-04-19 21:51:18
+LastEditTime: 2022-04-20 14:34:58
 Description: 默认布局
 FilePath: \vite-music-player\src\views\LayoutDefault.vue
 -->
@@ -11,45 +11,88 @@ import TheAudioPlayer from '@/components/TheAudioPlayer/TheAudioPlayer.vue'
 import TheTabbar from '@/components/TheTabbar.vue'
 import TheLoading from '@/components/TheLoading.vue'
 import PageError from '@/views/PageError.vue'
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from '@/store'
 
 const { getSongUrl } = mapActionsHelpers(null, ['getSongUrl'])
-const { setAudioUrl, setDebugInfo } = mapMutationsHelpers(null, [
+const {
+  setAudioUrl,
+  setDebugInfo,
+  setAudioInfo,
+  setAudioDisplay,
+  setPlayerFade
+} = mapMutationsHelpers(null, [
   'setAudioUrl',
-  'setDebugInfo'
+  'setDebugInfo',
+  'setAudioInfo',
+  'setAudioDisplay',
+  'setPlayerFade'
 ])
 const store = useStore()
 const route = useRoute()
+const tabbarRef = ref<any>(null)
 
 const viewKey = computed(() => {
   const payload = route.query.payload ?? ''
   return Date.now().toString() + payload
 })
 
-function reload() {
-  getSongUrl(store.state.audioInfo.payload).then((url: string) => {
-    setAudioUrl(url)
-  })
+function getRef(ref: any) {
+  tabbarRef.value = ref
 }
 
-reload()
+// =============================================================================> 恢复上次播放歌曲
+restore()
+function restore() {
+  const audioInfo = localStorage.getItem('audioInfo')
+  if (audioInfo) {
+    const parsedInfo = JSON.parse(audioInfo)
+    setAudioInfo(parsedInfo)
+    setAudioDisplay(true)
+
+    getSongUrl(parsedInfo.payload).then((url: string) => {
+      setAudioUrl(url)
+    })
+  }
+}
+
+watchEffect(() => {
+  if (store.state.playerDisplay) {
+    document.documentElement.style.setProperty('overflow', 'hidden')
+  } else {
+    document.documentElement.style.setProperty('overflow', 'hidden auto')
+  }
+})
+
+let playerFadeTimer: any
+const handler = (e: any) => {
+  // 一滚动就把播放器隐藏
+  setPlayerFade(false)
+
+  if (playerFadeTimer) clearTimeout(playerFadeTimer)
+  playerFadeTimer = setTimeout(() => {
+    setPlayerFade(true)
+    const trl = `${tabbarRef.value.getBoundingClientRect().top - 72}px`
+    document.body.style.setProperty('--player-translate', trl)
+    setDebugInfo(trl)
+  }, 300)
+  if (store.state.playerDisplay) e.preventDefault()
+}
+
+onMounted(() => {
+  document.addEventListener('touchmove', handler, { passive: false })
+  document.addEventListener('scroll', handler, { passive: false })
+})
+
+onUnmounted(() => {
+  document.removeEventListener('touchmove', handler)
+  document.removeEventListener('scroll', handler)
+})
 </script>
 
 
 <template>
-  <!-- 播放器 -->
-  <!-- <audio-player
-    :url="store.state.audioUrl"
-    :title="store.state.audioInfo.title"
-    :album="store.state.audioInfo.album"
-    :publish-time="store.state.audioInfo.publishTime"
-    :artist="store.state.audioInfo.artist"
-    :pic-url="store.state.audioInfo.picUrl"
-    @reload="reload"
-  /> -->
-
   <div id="default-layout">
     <!-- <div id="default-mask" v-if="store.state.playerDisplay"></div> -->
 
@@ -80,7 +123,7 @@ reload()
     />
 
     <!-- 底部tabbar -->
-    <the-tabbar></the-tabbar>
+    <the-tabbar @getRef="getRef"></the-tabbar>
   </div>
 </template>
 

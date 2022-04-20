@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 23:22:44
- * @LastEditTime: 2022-04-19 08:45:34
+ * @LastEditTime: 2022-04-20 14:32:02
  * @Description: vuex
  * @FilePath: \vite-music-player\src\store\index.ts
  */
@@ -32,6 +32,8 @@ export interface State {
 
   playerDisplay: boolean
 
+  playerFade: boolean
+
   error: {
     status: boolean
     msg?: string
@@ -60,6 +62,9 @@ export const store = createStore<State>({
     // 播放器是否显示
     audioDisplay: false,
 
+    // 播放器在滚动时隐藏
+    playerFade: true,
+
     // 当前音频链接
     audioUrl: '',
 
@@ -86,6 +91,9 @@ export const store = createStore<State>({
   mutations: {
     setDebugInfo(state, payload) {
       state.debugInfo = payload
+    },
+    setPlayerFade(state, payload) {
+      state.playerFade = payload
     },
     setPlayerDisplay(state, payload) {
       state.playerDisplay = payload

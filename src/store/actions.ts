@@ -1,15 +1,15 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-11 09:15:16
- * @LastEditTime: 2022-04-17 20:51:09
+ * @LastEditTime: 2022-04-20 13:25:20
  * @Description: 所有请求
  * @FilePath: \vite-music-player\src\store\actions.ts
  */
 import API from '@/common/api'
-import {countConvert, durationConvert, pickUpName, timeStampConvert} from '@/common/util'
+import { countConvert, durationConvert, pickUpName, timeStampConvert } from '@/common/util'
 import moment from 'moment'
-import {get} from '@/common/apiService'
-import {Args, ResRmd, RmdItem, SongTableRow} from '@/common/types'
+import { get } from '@/common/apiService'
+import { Args, ResRmd, RmdItem, SongTableRow } from '@/common/types'
 
 // 定义参数默认值
 const initArgs: Args = {
@@ -261,6 +261,7 @@ const playlist = {
 
     return {
       // 歌曲id集合
+      createTime: moment(data.playlist.createTime).format('YYYY年M月D日'),
       artist: data.playlist.creator.nickname,
       trackIds: data.playlist.trackIds.map((v: any) => v.id),
       title: data.playlist.name,

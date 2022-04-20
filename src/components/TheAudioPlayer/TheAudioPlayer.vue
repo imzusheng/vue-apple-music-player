@@ -3,7 +3,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-18 13:09:20
-LastEditTime: 2022-04-20 13:12:20
+LastEditTime: 2022-04-20 14:31:02
 Description: 播放器
 FilePath: \vite-music-player\src\components\TheAudioPlayer\TheAudioPlayer.vue
 -->
@@ -147,7 +147,7 @@ function resizeHandler() {
   const h = document.documentElement.clientHeight
 
   // 目标缩放比率
-  let targetScale
+  let targetScale: any
 
   if (w > h / 2) {
     // 宽屏
@@ -169,7 +169,6 @@ function resizeHandler() {
   }
 
   // 设置缩小后的比例
-  player.value.style.setProperty('--scale-ratio', targetScale)
   playerRef.value.style.setProperty('--scale-ratio', targetScale)
 }
 
@@ -245,8 +244,7 @@ function playerChangeHandler(e: any) {
     befY = e.changedTouches[0].clientY
 
     // 设置当前坐标
-    player.value.style.setProperty('--player-translate', `${curY}px`)
-    playerRef.value.style.setProperty('--player-translate', `${curY}px`)
+    document.body.style.setProperty('--player-translate', `${curY}px`)
   }
 
   player.value.addEventListener('touchmove', touchMoveHandler, {
@@ -274,7 +272,7 @@ function playerChangeHandler(e: any) {
         //   `tly:${cTop},窗口高度:${document.documentElement.clientHeight},播放器高度:${player.value.clientHeight}`
         // )
 
-        player.value.style.setProperty('--player-translate', translateY)
+        document.body.style.setProperty('--player-translate', translateY)
         setPlayerDisplay(data.playerDisplay)
         // 设置播放器显示状态
         data.posterDisplay = data.playerDisplay
@@ -487,7 +485,11 @@ function controlPlay() {
     ref="playerRef"
     id="player"
     v-show="props.url"
-    :class="{ 'player-poster-display': data.posterDisplay }"
+    :class="{
+      'player-poster-display': data.posterDisplay,
+      'player-fade': store.state.playerFade,
+      'player-hide': !store.state.playerFade
+    }"
   >
     <div class="player-spacing" ref="player">
       <div style="position: absolute; top: 0; right: 0">
@@ -598,9 +600,6 @@ function controlPlay() {
   // 封面放大比例
   --scale-ratio: 0;
 
-  // 播放器Y偏移
-  --player-translate: calc(100vh - 72px - 72px);
-
   position: fixed;
   height: 0;
   width: 0;
@@ -623,11 +622,12 @@ function controlPlay() {
     height: 100vh;
     width: 100vw;
     z-index: 998;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    background-color: rgba(247, 247, 247, 0.6);
+    // backdrop-filter: blur(20px);
+    // -webkit-backdrop-filter: blur(20px);
+    // background-color: rgba(247, 247, 247, 0.6);
+    background-color: rgba(247, 247, 247, 1);
     transform: translate(0, var(--player-translate));
-    transition: transform cubic-bezier(0.333, 0.93, 0.667, 1) 0.35s;
+    // transition: transform cubic-bezier(0.333, 0.93, 0.667, 1) 0.35s;
 
     // 抓手
     .player-handle {
@@ -848,6 +848,44 @@ function controlPlay() {
     &:hover {
       will-change: auto;
     }
+  }
+}
+
+.player-fade {
+  animation: player-fade 0.2s forwards;
+}
+
+.player-hide {
+  animation: player-hide 0.2s forwards;
+}
+
+@keyframes player-fade {
+  0% {
+    opacity: 0;
+    display: none;
+  }
+  1% {
+    opacity: 0;
+    display: block;
+  }
+  100% {
+    opacity: 1;
+    display: block;
+  }
+}
+
+@keyframes player-hide {
+  0% {
+    opacity: 1;
+    display: block;
+  }
+  99% {
+    opacity: 0;
+    display: block;
+  }
+  100% {
+    opacity: 0;
+    display: none;
   }
 }
 

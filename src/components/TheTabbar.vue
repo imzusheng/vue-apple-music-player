@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-18 12:37:17
-LastEditTime: 2022-04-19 23:06:58
+LastEditTime: 2022-04-20 14:20:13
 Description: 底部tabbar
 FilePath: \vite-music-player\src\components\TheTabbar.vue
 -->
@@ -23,9 +23,12 @@ import iconSearch from '@/assets/icon-uni-search.png'
 import iconPlayCheck from '@/assets/icon-uni-play-checked.png'
 import iconvViewCheck from '@/assets/icon-uni-view-checked.png'
 
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from '@/store'
 
+const emit = defineEmits(['getRef'])
+const tabbar = ref<any>()
 const store = useStore()
 const router = useRouter()
 const navConfig = [
@@ -60,10 +63,18 @@ const navConfig = [
     routerName: 'search'
   }
 ]
+
+onMounted(() => {
+  emit('getRef', tabbar.value)
+})
 </script>
 
 <template>
-  <nav id="tabbar" :class="{ 'tabbar-display': store.state.playerDisplay }">
+  <nav
+    id="tabbar"
+    ref="tabbar"
+    :class="{ 'tabbar-display': store.state.playerDisplay }"
+  >
     <ul class="tabbar-list">
       <li
         class="tabbar-list-item"

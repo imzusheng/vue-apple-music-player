@@ -1,17 +1,19 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 17:31:44
-LastEditTime: 2022-04-17 20:53:59
+LastEditTime: 2022-04-20 13:26:04
 Description: detail页面的基本框架
 FilePath: \vite-music-player\src\components\TheDetailFrame.vue
 -->
 
 <script lang="ts" setup>
-import {mapActionsHelpers, mapMutationsHelpers} from "@/common/util";
-import {reactive, watchEffect} from "vue";
-import moment from "moment";
+import { mapActionsHelpers, mapMutationsHelpers } from '@/common/util'
+import { reactive, watchEffect } from 'vue'
+import moment from 'moment'
 
 const props = defineProps<{
+  //创建时间
+  createTime: string
   // 作者
   artist: string
   // 标题
@@ -31,14 +33,17 @@ const data = reactive({
   duration: 0
 })
 
-const {getSongUrl} = mapActionsHelpers(null, ['getSongUrl'])
-const {setAudioUrl, setAudioInfo} = mapMutationsHelpers(null, ['setAudioUrl', 'setAudioInfo'])
+const { getSongUrl } = mapActionsHelpers(null, ['getSongUrl'])
+const { setAudioUrl, setAudioInfo } = mapMutationsHelpers(null, [
+  'setAudioUrl',
+  'setAudioInfo'
+])
 
 watchEffect(() => {
   if (props.songs.length > 0) {
     // 歌单总时长
     let durationTotal: number = 0
-    props.songs.forEach(song => {
+    props.songs.forEach((song) => {
       durationTotal += moment.duration(song.duration, 'millisecond').minutes()
     })
     // 分钟数
@@ -68,14 +73,11 @@ function toPlaySong(songInfo: any) {
 
 <template>
   <div id="detail-frame">
-
     <!--  歌单上半部 封面信息+按钮  -->
     <div class="detail-frame-poster">
-
       <div class="detail-frame-poster-img">
-        <img :src="props.picUrl" alt="">
+        <img :src="props.picUrl" alt="" />
       </div>
-
 
       <div class="detail-frame-poster-main">
         <!-- 歌单描述 -->
@@ -91,18 +93,17 @@ function toPlaySong(songInfo: any) {
           <button>随机播放</button>
         </div>
       </div>
-
     </div>
 
     <!--  歌单下半部 歌曲列表  -->
     <div class="detail-frame-list">
       <ul class="detail-frame-list-ul">
         <li
-            v-for="(songItem, songIdx) in props.songs"
-            :data-song-id="songItem.payload"
-            :key="`song-${songIdx}`"
-            class="detail-frame-list-li"
-            @click="toPlaySong(songItem)"
+          v-for="(songItem, songIdx) in props.songs"
+          :data-song-id="songItem.payload"
+          :key="`song-${songIdx}`"
+          class="detail-frame-list-li"
+          @click="toPlaySong(songItem)"
         >
           <div class="list-index">{{ songIdx + 1 }}</div>
           <div class="list-desc">
@@ -116,7 +117,12 @@ function toPlaySong(songInfo: any) {
 
     <!-- 歌单歌曲总数，时长信息 -->
     <div class="detail-frame-info">
-      <div>{{ props.songs.length }}&nbsp;首歌曲，{{ data.duration }}&nbsp;分钟</div>
+      <div>
+        {{ props.createTime }}
+      </div>
+      <div>
+        {{ props.songs.length }}&nbsp;首歌曲，{{ data.duration }}&nbsp;分钟
+      </div>
     </div>
   </div>
 </template>
@@ -136,7 +142,6 @@ function toPlaySong(songInfo: any) {
     justify-content: center;
     grid-template-rows: minmax(180px, auto) auto;
     grid-auto-columns: 1fr;
-
 
     .detail-frame-poster-img {
       height: 100%;
@@ -183,14 +188,13 @@ function toPlaySong(songInfo: any) {
         font-weight: 600;
         display: block;
         text-align: center;
-        color: rgba(0, 0, 0, .45);
+        color: rgba(0, 0, 0, 0.45);
         padding: 0 32px;
         display: -webkit-box;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2;
         overflow: hidden;
       }
-
     }
 
     .detail-frame-poster-action {
@@ -206,7 +210,7 @@ function toPlaySong(songInfo: any) {
         padding: 10px 0;
         border-radius: 8px;
         width: calc(50% - 8px);
-        background: rgba(0, 0, 0, .06);
+        background: rgba(0, 0, 0, 0.06);
       }
     }
   }
@@ -219,7 +223,7 @@ function toPlaySong(songInfo: any) {
       width: 100%;
       position: relative;
       margin-top: 16px;
-      border-top: 1px solid rgba(0, 0, 0, .1);
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
 
       .detail-frame-list-li {
         width: 100%;
@@ -237,7 +241,7 @@ function toPlaySong(songInfo: any) {
         .list-select {
           font-weight: 600;
           font-size: 16px;
-          color: rgba(0, 0, 0, .45);
+          color: rgba(0, 0, 0, 0.45);
           justify-content: center;
         }
 
@@ -246,7 +250,7 @@ function toPlaySong(songInfo: any) {
           flex-direction: column;
           align-items: flex-start;
           padding: 2px 32px 2px 10px;
-          border-bottom: 1px solid rgba(0, 0, 0, .1);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.1);
           overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;
@@ -258,7 +262,7 @@ function toPlaySong(songInfo: any) {
           .list-desc-sub {
             font-size: 12px;
             font-weight: 200;
-            color: rgba(0, 0, 0, .45);
+            color: rgba(0, 0, 0, 0.45);
           }
 
           .list-desc-title,
@@ -272,19 +276,21 @@ function toPlaySong(songInfo: any) {
         }
 
         .list-select {
-          border-bottom: 1px solid rgba(0, 0, 0, .1);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.1);
         }
       }
-
     }
   }
 
   // 歌单信息
   .detail-frame-info {
-    margin: 10px 0;
+    margin: 16px 0;
     font-weight: 600;
     font-size: 12px;
-    color: rgba(0, 0, 0, .45);
+    color: rgba(0, 0, 0, 0.45);
+    > div {
+      margin-top: 2px;
+    }
   }
 }
 </style>

@@ -1,54 +1,10 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 20:15:36
-LastEditTime: 2022-04-19 22:16:45
+LastEditTime: 2022-04-20 13:59:20
 Description: 入口
 FilePath: \vite-music-player\src\App.vue
 -->
-
-<script setup lang="ts">
-import { mapMutationsHelpers } from '@/common/util'
-import { watchEffect, onMounted, onUnmounted } from 'vue'
-import { useStore } from '@/store'
-
-const store = useStore()
-const { setAudioDisplay, setAudioInfo } = mapMutationsHelpers(null, [
-  'setAudioDisplay',
-  'setAudioInfo'
-])
-
-// 恢复localStorage中的数据
-function restore() {
-  const audioInfo = localStorage.getItem('audioInfo')
-  if (audioInfo) {
-    const parsedInfo = JSON.parse(audioInfo)
-    setAudioInfo(parsedInfo)
-    setAudioDisplay(true)
-  }
-}
-
-restore()
-
-watchEffect(() => {
-  if (store.state.playerDisplay) {
-    document.documentElement.style.setProperty('overflow', 'hidden')
-  } else {
-    document.documentElement.style.setProperty('overflow', 'hidden auto')
-  }
-})
-
-const handler = (e: any) => {
-  if (store.state.playerDisplay) e.preventDefault()
-}
-onMounted(() => {
-  document.addEventListener('touchmove', handler, { passive: false })
-  document.addEventListener('scroll', handler, { passive: false })
-})
-onUnmounted(() => {
-  document.removeEventListener('touchmove', handler)
-  document.removeEventListener('scroll', handler)
-})
-</script>
 
 <template>
   <!-- v-columnMatch指令 js响应式布局，计算gird列数 -->
@@ -88,6 +44,8 @@ html {
 
   body {
     width: 100%;
+    // 播放器Y偏移
+    --player-translate: calc(100vh - 72px - 72px);
   }
 
   a {
