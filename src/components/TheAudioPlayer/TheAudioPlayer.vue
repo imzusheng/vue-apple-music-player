@@ -3,7 +3,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-18 13:09:20
-LastEditTime: 2022-04-20 22:43:18
+LastEditTime: 2022-04-21 00:25:58
 Description: 播放器
 FilePath: \vite-music-player\src\components\TheAudioPlayer\TheAudioPlayer.vue
 -->
@@ -117,11 +117,15 @@ onMounted(() => {
   player.value.addEventListener('touchstart', touchStartHandler, {
     passive: false
   })
+  player.value.addEventListener('mousedown', touchStartHandler, {
+    passive: false
+  })
 })
 
 onUnmounted(() => {
   if (player.value) {
     player.value.removeEventListener('touchstart', touchStartHandler)
+    player.value.removeEventListener('mousedown', touchStartHandler)
   }
   window.removeEventListener('resize', resizeHandler)
 })
@@ -205,7 +209,7 @@ function playerChangeHandler(e: any) {
   player.value.style.transition = 'none'
 
   // 开始拖动时手按下的坐标
-  const startY = e.changedTouches[0].clientY
+  const startY = e.clientY || e?.changedTouches[0]?.clientY
 
   // 此时播放器距离网页顶部的距离
   const targetStartY = player.value.getBoundingClientRect().top
@@ -219,8 +223,10 @@ function playerChangeHandler(e: any) {
     e.stopPropagation()
     e.preventDefault()
 
+    const clientY = e.clientY || e?.changedTouches[0]?.clientY || 0
+
     // 计算拖动时播放器坐标
-    let curY = targetStartY + (e.changedTouches[0].clientY - startY)
+    let curY = targetStartY + (clientY - startY)
     // 拖放边界，不能小于0，不能大于屏幕高度
     if (curY < 0) {
       curY = 0
@@ -229,7 +235,7 @@ function playerChangeHandler(e: any) {
     }
 
     // 过了临界值自动收缩/展开
-    if (befY > e.changedTouches[0].clientY) {
+    if (befY > clientY) {
       // 向上滑动时
       if (curY / gH < 0.7) {
         // 展开封面和播放器
@@ -245,7 +251,7 @@ function playerChangeHandler(e: any) {
     }
 
     // 更新为上次位置
-    befY = e.changedTouches[0].clientY
+    befY = clientY
 
     // 在body上设置当前坐标，因为稍后default页面也要设置，
     // 而外部无法获取播放器元素的引用(HTMLElement)
@@ -255,6 +261,9 @@ function playerChangeHandler(e: any) {
   player.value.addEventListener('touchmove', touchMoveHandler, {
     passive: false
   })
+  document.addEventListener('mousemove', touchMoveHandler, {
+    passive: false
+  })
 
   // 只监听一次
   player.value.addEventListener(
@@ -262,34 +271,46 @@ function playerChangeHandler(e: any) {
     () => {
       // 移除监听
       player.value.removeEventListener('touchmove', touchMoveHandler)
-
-      // 重新设置回动画
-      const transition = 'transform cubic-bezier(0.333, 0.93, 0.667, 1) 0.35s'
-      player.value.style.transition = transition
-
-      // 稍后设置播放器样式
-      setTimeout(() => {
-        // 展开时的位置
-        const openTranslate = `${(
-          document.documentElement.clientHeight - 144
-        ).toFixed(0)}px`
-
-        // 如果data.playerDisplay为true则为打开状态
-        const translateValue = data.playerDisplay ? '0px' : openTranslate
-        document.body.style.setProperty('--player-translate', translateValue)
-
-        // 设置全局打开状态，tabbar就会隐藏
-        setTimeout(() => {
-          player.value.style.transition = 'none'
-          setPlayerDisplay(data.playerDisplay)
-        }, 350)
-
-        // 设置封面展开放大
-        data.posterDisplay = data.playerDisplay
-      }, 10)
+      end()
     },
     { once: true }
   )
+  document.addEventListener(
+    'mouseup',
+    () => {
+      // 移除监听
+      document.removeEventListener('mousemove', touchMoveHandler)
+      end()
+    },
+    { once: true }
+  )
+  // 结束后要做的事
+  function end() {
+    // 重新设置回动画
+    const transition = 'transform cubic-bezier(0.333, 0.93, 0.667, 1) 0.35s'
+    player.value.style.transition = transition
+
+    // 稍后设置播放器样式
+    setTimeout(() => {
+      // 展开时的位置
+      const openTranslate = `${(
+        document.documentElement.clientHeight - 144
+      ).toFixed(0)}px`
+
+      // 如果data.playerDisplay为true则为打开状态
+      const translateValue = data.playerDisplay ? '0px' : openTranslate
+      document.body.style.setProperty('--player-translate', translateValue)
+
+      // 设置全局打开状态，tabbar就会隐藏
+      setTimeout(() => {
+        player.value.style.transition = 'none'
+        setPlayerDisplay(data.playerDisplay)
+      }, 350)
+
+      // 设置封面展开放大
+      data.posterDisplay = data.playerDisplay
+    }, 10)
+  }
 }
 
 /**
