@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 21:10:50
-LastEditTime: 2022-04-20 14:34:58
+LastEditTime: 2022-04-20 14:52:23
 Description: 默认布局
 FilePath: \vite-music-player\src\views\LayoutDefault.vue
 -->
@@ -67,17 +67,20 @@ watchEffect(() => {
 
 let playerFadeTimer: any
 const handler = (e: any) => {
-  // 一滚动就把播放器隐藏
-  setPlayerFade(false)
+  if (store.state.playerDisplay) {
+    e.preventDefault()
+  } else {
+    // 一滚动就把播放器隐藏
+    setPlayerFade(false)
 
-  if (playerFadeTimer) clearTimeout(playerFadeTimer)
-  playerFadeTimer = setTimeout(() => {
-    setPlayerFade(true)
-    const trl = `${tabbarRef.value.getBoundingClientRect().top - 72}px`
-    document.body.style.setProperty('--player-translate', trl)
-    setDebugInfo(trl)
-  }, 300)
-  if (store.state.playerDisplay) e.preventDefault()
+    if (playerFadeTimer) clearTimeout(playerFadeTimer)
+    playerFadeTimer = setTimeout(() => {
+      const trl = `${tabbarRef.value.getBoundingClientRect().top - 72}px`
+      document.body.style.setProperty('--player-translate', trl)
+      setPlayerFade(true)
+      // setDebugInfo(trl)
+    }, 300)
+  }
 }
 
 onMounted(() => {

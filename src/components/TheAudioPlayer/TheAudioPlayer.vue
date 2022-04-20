@@ -3,7 +3,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-18 13:09:20
-LastEditTime: 2022-04-20 14:31:02
+LastEditTime: 2022-04-20 14:50:46
 Description: 播放器
 FilePath: \vite-music-player\src\components\TheAudioPlayer\TheAudioPlayer.vue
 -->
@@ -624,8 +624,8 @@ function controlPlay() {
     z-index: 998;
     // backdrop-filter: blur(20px);
     // -webkit-backdrop-filter: blur(20px);
-    // background-color: rgba(247, 247, 247, 0.6);
     background-color: rgba(247, 247, 247, 1);
+    // background-color: rgba(255, 255, 255, 1);
     transform: translate(0, var(--player-translate));
     // transition: transform cubic-bezier(0.333, 0.93, 0.667, 1) 0.35s;
 
