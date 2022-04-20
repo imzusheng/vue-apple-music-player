@@ -3,7 +3,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-18 13:09:20
-LastEditTime: 2022-04-20 21:53:18
+LastEditTime: 2022-04-20 22:18:15
 Description: 播放器
 FilePath: \vite-music-player\src\components\TheAudioPlayer\TheAudioPlayer.vue
 -->
@@ -105,8 +105,6 @@ provide('props', props)
 provide('setData', (name: string, value: any) => {
   data[name] = value
 })
-
-const tabbarRef: any = inject('tabbarRef')
 
 onMounted(() => {
   // 创建播放器
@@ -321,6 +319,8 @@ function volumeChangeHandler() {
     }
     data.audioRef.volume = ratio
     data.volume = (ratio * 100).toFixed(2)
+    localStorage.setItem('volume', data.volume)
+
     // const context = new AudioContext()
     // const gainNode = context.createGain()
     // gainNode.gain.value = ratio
