@@ -26,14 +26,17 @@ const vLazyLoad = computed(() => {
 
 <template>
   <li class="list-item user-not-select">
-    <!-- 遮罩 -->
+
     <div class="list-item-poster">
+
+      <!-- 遮罩 -->
       <div class="list-item-overlay">
         <!-- 播放按钮 -->
         <button class="overlay-btn-play flex-center" v-if="props.playBtn">
           <img src="@/assets/player-controls-pause.svg" alt="" />
         </button>
       </div>
+
       <!-- 封面 -->
       <img
         v-lazy="vLazyLoad(props.data.picUrl)"

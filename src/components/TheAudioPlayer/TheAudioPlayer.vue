@@ -3,7 +3,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-18 13:09:20
-LastEditTime: 2022-04-19 21:23:49
+LastEditTime: 2022-04-19 23:41:52
 Description: 播放器
 FilePath: \vite-music-player\src\components\TheAudioPlayer\TheAudioPlayer.vue
 -->
@@ -11,7 +11,6 @@ FilePath: \vite-music-player\src\components\TheAudioPlayer\TheAudioPlayer.vue
 <script setup lang="ts">
 import {
   ref,
-  toRaw,
   reactive,
   nextTick,
   provide,
@@ -27,6 +26,7 @@ import ControlsMini from '@/components/TheAudioPlayer/ControlsMini.vue'
 const store = useStore()
 const player = ref<any>()
 const poster = ref<any>()
+const playerRef = ref<any>()
 const controlsProgress = ref<any>()
 const controlsVolume = ref<any>()
 const { setPlayerDisplay, setDebugInfo } = mapMutationsHelpers(null, [
@@ -147,29 +147,30 @@ function resizeHandler() {
   const h = document.documentElement.clientHeight
 
   // 目标缩放比率
-  let targetScale = ''
+  let targetScale
 
   if (w > h / 2) {
     // 宽屏
     const curSize = h / 2 - 32
     const curW = (w - curSize) / 2
     const curY = h / 2 - curSize
-    player.value.style.setProperty('--poster-translateX', `${curW}px`)
-    player.value.style.setProperty('--poster-translateY', `${curY}px`)
-    player.value.style.setProperty('--poster-size', `${curSize}px`)
+    playerRef.value.style.setProperty('--poster-size', `${curSize}px`)
+    playerRef.value.style.setProperty('--poster-translateX', `${curW}px`)
+    playerRef.value.style.setProperty('--poster-translateY', `${curY}px`)
     targetScale = (60 / (h / 2)).toFixed(2)
   } else {
     // 竖排
     const curW = w - 32
     const curY = h / 2 - curW
-    player.value.style.setProperty('--poster-translateX', `16px`)
-    player.value.style.setProperty('--poster-translateY', `${curY}px`)
-    player.value.style.setProperty('--poster-size', `${curW}px`)
+    playerRef.value.style.setProperty('--poster-translateX', `16px`)
+    playerRef.value.style.setProperty('--poster-translateY', `${curY}px`)
+    playerRef.value.style.setProperty('--poster-size', `${curW}px`)
     targetScale = (60 / curW).toFixed(2)
   }
 
   // 设置缩小后的比例
   player.value.style.setProperty('--scale-ratio', targetScale)
+  playerRef.value.style.setProperty('--scale-ratio', targetScale)
 }
 
 /**
@@ -198,7 +199,6 @@ function playerChangeHandler(e: any) {
 
   // 设置播放器开启状态
   setPlayerDisplay(true)
-  data.posterDisplay = true
   data.playerDisplay = true
 
   // 拖动时关闭动画
@@ -230,8 +230,11 @@ function playerChangeHandler(e: any) {
     // 过了临界值自动收缩/展开
     if (befY > e.changedTouches[0].clientY) {
       // 向上滑动
-      data.posterDisplay = true
-      data.playerDisplay = true
+
+      if (curY / gH < 0.7) {
+        data.posterDisplay = true
+        data.playerDisplay = true
+      }
     } else {
       // 向下滑动
       if (curY / gH > 0.2) {
@@ -243,6 +246,7 @@ function playerChangeHandler(e: any) {
 
     // 设置当前坐标
     player.value.style.setProperty('--player-translate', `${curY}px`)
+    playerRef.value.style.setProperty('--player-translate', `${curY}px`)
   }
 
   player.value.addEventListener('touchmove', touchMoveHandler, {
@@ -257,10 +261,7 @@ function playerChangeHandler(e: any) {
 
       // 设置动画
       player.value.style.transition =
-        'transform cubic-bezier(0.333, 0.93, 0.667, 1) 0.4s'
-
-      // 设置播放器显示状态
-      data.posterDisplay = data.playerDisplay
+        'transform cubic-bezier(0.333, 0.93, 0.667, 1) 0.35s'
 
       // 稍后设置播放器样式
       setTimeout(() => {
@@ -275,6 +276,8 @@ function playerChangeHandler(e: any) {
 
         player.value.style.setProperty('--player-translate', translateY)
         setPlayerDisplay(data.playerDisplay)
+        // 设置播放器显示状态
+        data.posterDisplay = data.playerDisplay
       }, 10)
     },
     { once: true }
@@ -481,10 +484,17 @@ function controlPlay() {
 
 <template>
   <div
+    ref="playerRef"
     id="player"
     v-show="props.url"
     :class="{ 'player-poster-display': data.posterDisplay }"
   >
+    <!-- <div
+      ref="poster"
+      class="player-poster user-not-select"
+      :class="{ 'player-poster-show': data.posterDisplay }"
+    ></div> -->
+
     <div class="player-spacing" ref="player">
       <div style="position: absolute; top: 0; right: 0">
         {{ store.state.debugInfo }}
@@ -494,7 +504,11 @@ function controlPlay() {
       <div class="player-handle" v-if="data.posterDisplay"></div>
 
       <!-- 海报 -->
-      <div ref="poster" class="player-poster user-not-select"></div>
+      <div
+        ref="poster"
+        class="player-poster user-not-select"
+        :class="{ 'player-poster-show': data.posterDisplay }"
+      ></div>
 
       <!-- 迷你控制栏 -->
       <controls-mini :title="props.title" />
@@ -597,7 +611,32 @@ function controlPlay() {
   height: 0;
   width: 0;
   top: 0;
-  left: 0;
+
+  // 封面
+  .player-poster {
+    position: absolute;
+    border-radius: 4px;
+    top: 0;
+    left: 0;
+    width: var(--poster-size);
+    height: var(--poster-size);
+    transform-origin: left top;
+    transform: translate(16px, calc(100vh - 80px - 72px + 10px))
+      scale(var(--scale-ratio));
+    transition: all cubic-bezier(0.333, 0.93, 0.667, 1) 0.35s;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    z-index: 1000;
+  }
+
+  // 展开后样式
+  .player-poster-show {
+    transform: translate(var(--poster-translateX), var(--poster-translateY))
+      scale(1) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 16px 20px rgba(94, 84, 77, 0.6) !important;
+  }
 
   .player-spacing {
     position: fixed;
@@ -612,26 +651,7 @@ function controlPlay() {
     -webkit-backdrop-filter: blur(20px);
     background-color: rgba(247, 247, 247, 0.6);
     transform: translate(0, var(--player-translate));
-    transition: transform cubic-bezier(0.333, 0.93, 0.667, 1) 0.4s;
-
-    &::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      opacity: 0;
-      z-index: -1;
-      // background-image: linear-gradient(
-      //   rgba(0, 0, 0, 0),
-      //   rgba(0, 0, 0, 0.1),
-      //   rgba(0, 0, 0, 0.3),
-      //   rgba(0, 0, 0, 0.1),
-      //   rgba(0, 0, 0, 0)
-      // );
-      transition: opacity cubic-bezier(0.333, 0.93, 0.667, 1) 0.4s;
-    }
+    transition: transform cubic-bezier(0.333, 0.93, 0.667, 1) 0.35s;
 
     // 抓手
     .player-handle {
@@ -655,7 +675,7 @@ function controlPlay() {
       height: var(--poster-size);
       transform-origin: left top;
       transform: translate(16px, 10px) scale(var(--scale-ratio));
-      transition: transform cubic-bezier(0.333, 0.93, 0.667, 1) 0.4s;
+      transition: all cubic-bezier(0.333, 0.93, 0.667, 1) 0.35s;
       background-position: center center;
       background-repeat: no-repeat;
       background-size: 100%;
@@ -857,20 +877,10 @@ function controlPlay() {
 }
 
 // 展开后样式
-.player-poster-display {
-  // .player-spacing {
-  //   backdrop-filter: none !important;
-  //   -webkit-backdrop-filter: none !important;
-  //   background-color: rgba(247, 247, 247, 1) !important;
-  // }
-  .player-spacing::after {
-    opacity: 1 !important;
-  }
-  .player-poster {
-    transform: translate(var(--poster-translateX), var(--poster-translateY))
-      scale(1) !important;
-    border-radius: 12px !important;
-    box-shadow: 0px 16px 20px rgba(94, 84, 77, 0.6) !important;
-  }
+.player-poster-show {
+  transform: translate(var(--poster-translateX), var(--poster-translateY))
+    scale(1) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 16px 20px rgba(94, 84, 77, 0.6) !important;
 }
 </style>

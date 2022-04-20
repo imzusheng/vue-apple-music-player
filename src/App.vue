@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 20:15:36
-LastEditTime: 2022-04-19 13:08:32
+LastEditTime: 2022-04-19 22:16:45
 Description: 入口
 FilePath: \vite-music-player\src\App.vue
 -->
@@ -124,7 +124,7 @@ html {
   --animation-target: 0;
 
   // 主题色
-  --theme-color: rgba(212, 42, 42, 0.8);
+  --theme-color: rgba(250, 35, 59, 1);
 
   // gap间隙
   --grid-gap: 24px;
@@ -163,8 +163,7 @@ html {
 }
 
 .spacing {
-  padding: calc(var(--header-height) + 16px) var(--page-spacing)
-    var(--page-spacing);
+  padding: 32px var(--page-spacing) 0;
 }
 
 ::-webkit-scrollbar {

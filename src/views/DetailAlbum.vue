@@ -69,7 +69,7 @@ async function getData() {
 
 <template>
   <div id="detail-album">
-    <the-detail-frame
+<!--    <the-detail-frame
       :title="albumInfo.data.name"
       :desc="albumInfo.data.description"
       :picUrl="albumInfo.data.picUrl"
@@ -83,7 +83,7 @@ async function getData() {
           :title="true"
         />
       </template>
-    </the-detail-frame>
+    </the-detail-frame>-->
   </div>
 </template>
 

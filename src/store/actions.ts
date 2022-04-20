@@ -6,10 +6,10 @@
  * @FilePath: \vite-music-player\src\store\actions.ts
  */
 import API from '@/common/api'
-import { countConvert, timeStampConvert, pickUpName, durationConvert } from '@/common/util'
+import {countConvert, durationConvert, pickUpName, timeStampConvert} from '@/common/util'
 import moment from 'moment'
-import { get } from '@/common/apiService'
-import { Args, RmdItem, ResRmd, SongTableRow } from '@/common/types'
+import {get} from '@/common/apiService'
+import {Args, ResRmd, RmdItem, SongTableRow} from '@/common/types'
 
 // 定义参数默认值
 const initArgs: Args = {
@@ -30,8 +30,7 @@ const notArgs = {
   },
   // 所有榜单详情
   async getToplistDetail({}): Promise<any> {
-    const resJson = await get(API.GET_TOPLIST_DETAIL, {})
-    return resJson
+    return await get(API.GET_TOPLIST_DETAIL, {})
   },
   // 获取banner图片
   async getBanner({}): Promise<any> {
@@ -191,7 +190,7 @@ const song = {
                 publishTime: v.publishTime ? moment(v.publishTime).year().toString() : '',
 
                 // 歌曲时长，单位分钟
-                duration: durationConvert(v.dt / 1000),
+                duration: v.dt,
 
                 // 是否需要会员
                 fee: v.fee.toString()
@@ -258,18 +257,16 @@ const playlist = {
   async getPlaylistDetail({}, id: string | number): Promise<any> {
     const data = await get(API.PLAYLIST.GET_PLAYLIST_DETAIL, { id })
 
+    console.log(data.playlist)
+
     return {
       // 歌曲id集合
+      artist: data.playlist.creator.nickname,
       trackIds: data.playlist.trackIds.map((v: any) => v.id),
       title: data.playlist.name,
       desc: data.playlist.description,
       picUrl: data.playlist.coverImgUrl + '?param=800y800',
-      sub: `共${data.playlist.trackCount}首音乐`,
-      actionBtn: [
-        {
-          text: `${countConvert(data.playlist.playCount)}人听过`
-        }
-      ]
+      sub: `共${data.playlist.trackCount}首音乐`
     }
   }
 }

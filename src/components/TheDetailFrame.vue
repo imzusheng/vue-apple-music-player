@@ -7,11 +7,13 @@ FilePath: \vite-music-player\src\components\TheDetailFrame.vue
 -->
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref, nextTick, watchEffect } from 'vue'
-import { useStore } from '@/store'
-import { blobToBase64, throttle } from '@/common/util'
+import {mapActionsHelpers, mapMutationsHelpers} from "@/common/util";
+import {reactive, watchEffect} from "vue";
+import moment from "moment";
 
 const props = defineProps<{
+  // 作者
+  artist: string
   // 标题
   title: string
   // 副标题
@@ -20,398 +22,269 @@ const props = defineProps<{
   picUrl: string
   // 副标题
   sub?: string
-  // 订阅按钮
-  actionBtn?: Array<any>
+  // 歌曲列表
+  songs: Array<any>
 }>()
 
-const store = useStore()
-const posterRef = ref<any>()
+const data = reactive({
+  // 所有歌曲总时长，分钟
+  duration: 0
+})
 
-store.commit('setLoading', true)
-////////////////////////////////////////////////////////////////////////////////////////////////
-// 以下加载封面图
-// fetch获取封面, 用fetch是因为可以监听封面加载成功没，没有封面的页面太丑了
-////////////////////////////////
-
-// 设置section页面的marginTop .frame-content
-function setMgt(audioHeight: any) {
-  const mgTop = `${
-    actionRef.value.offsetHeight + infoRef.value.offsetHeight + audioHeight
-  }px`
-  artistContentRef.value.style.setProperty('--content-mg-top', `-${mgTop}`)
-}
+const {getSongUrl} = mapActionsHelpers(null, ['getSongUrl'])
+const {setAudioUrl, setAudioInfo} = mapMutationsHelpers(null, ['setAudioUrl', 'setAudioInfo'])
 
 watchEffect(() => {
-  // 所有数据是同时传入的，有了picUrl说明其他也传入了
-  if (props.picUrl) {
-    store.commit('setHeaderText', props.title)
-
-    store.commit('setLoading', false)
-
-    if (store.state.audioDisplay) {
-      // 每次更新页面时，设定css变量--content-mg-top
-      nextTick(() => setMgt(72))
-    } else {
-      nextTick(() => setMgt(0))
-    }
+  if (props.songs.length > 0) {
+    // 歌单总时长
+    let durationTotal: number = 0
+    props.songs.forEach(song => {
+      durationTotal += moment.duration(song.duration, 'millisecond').minutes()
+    })
+    // 分钟数
+    data.duration = durationTotal
   }
-
-  // fetch(props.picUrl).then(async (res) => {
-  //   const imgBlob = await res.blob()
-  //   const base64 = await blobToBase64(imgBlob)
-  //   // base64过长
-  //   posterRef.value.style.backgroundImage = `url(${base64})`
-  //   store.commit('setLoading', false)
-  //   nextTick(() => {
-  //     // 每次更新页面时，设定css变量--content-mg-top
-  //     const mgTop =
-  //       actionRef.value.offsetHeight + infoRef.value.offsetHeight + 'px'
-  //     artistContentRef.value.style.setProperty('--content-mg-top', `-${mgTop}`)
-  //   })
-  // })
 })
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-// 以下动画
-////////////////////////////////////////////////////////////////
+/**
+ * 单击li元素，播放音乐
+ * @param songInfo
+ */
+function toPlaySong(songInfo: any) {
+  setAudioInfo(songInfo)
+  // // DOM路径
+  // const bubblingPath: Array<HTMLElement> = e.path
+  // // LI元素排在第几位
+  // const liElementIdx: number = bubblingPath.map(el => el.toString()).indexOf('[object HTMLLIElement]')
+  // // 找到歌曲id
+  // const payload: string = e.path[liElementIdx].dataset['songId']
 
-const artistContentRef = ref<any>()
-const infoRef = ref<any>()
-const actionRef = ref<any>()
-
-// 处理动画
-const animationHandler = () => {
-  // 首屏高度
-  const documentHeight = document.documentElement.clientHeight
-  // 当前滚动条高度
-  const curScrollTop = document.documentElement.scrollTop
-
-  // 动画完成节点
-  const targetHeight = documentHeight * 0.7
-  // 头部标题显示触发点
-  const headerTarget = documentHeight - 120 - 36
-
-  // 动画产生值
-  let curValue: any, showValue: any
-
-  // 头部按钮显示动画
-  if (headerTarget > curScrollTop) {
-    showValue = 1 - (headerTarget - curScrollTop) / headerTarget
-  } else {
-    showValue = 1
-  }
-
-  // 其他动画
-  if (targetHeight > curScrollTop) {
-    curValue = 1 - (targetHeight - curScrollTop) / targetHeight
-  } else {
-    curValue = 1
-  }
-
-  document.documentElement.style.setProperty(
-    '--animation-target',
-    showValue === 1 ? showValue : '0'
-  )
-
-  document.documentElement.style.setProperty(
-    '--animation-ratio',
-    curValue.toFixed(3)
-  )
+  // 获取歌曲url
+  getSongUrl(songInfo.payload).then((url: string) => {
+    setAudioUrl(url)
+  })
 }
-// 大小变化
-const resizeHandler = () => {
-  const audioHeight = store.state.audioDisplay ? 72 : 0
-  const mgTop =
-    actionRef.value.offsetHeight +
-    infoRef.value.offsetHeight +
-    audioHeight +
-    'px'
-  artistContentRef.value.style.setProperty('--content-mg-top', `-${mgTop}`)
-}
-
-// 套上防抖
-const throttleScrollHandler = throttle(animationHandler, 1000 / 60)
-const throttleResizeHandler = throttle(resizeHandler, 1000 / 60)
-
-onMounted(() => {
-  // 监听动画
-  document.addEventListener('scroll', throttleScrollHandler)
-  // 监听大小变化
-  window.addEventListener('resize', throttleResizeHandler)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('scroll', throttleScrollHandler)
-  window.removeEventListener('resize', throttleResizeHandler)
-})
 </script>
 
 <template>
   <div id="detail-frame">
-    <!-- 海报 -->
-    <div class="frame-banner">
-      <div
-        :style="{ backgroundImage: `url(${props.picUrl})` }"
-        v-show="props.picUrl"
-        class="frame-banner-poster"
-        ref="posterRef"
-      ></div>
-      <div class="frame-banner-mask" ref="maskRef"></div>
+
+    <!--  歌单上半部 封面信息+按钮  -->
+    <div class="detail-frame-poster">
+
+      <div class="detail-frame-poster-img">
+        <img :src="props.picUrl" alt="">
+      </div>
+
+
+      <div class="detail-frame-poster-main">
+        <!-- 歌单描述 -->
+        <div class="detail-frame-poster-desc">
+          <h1 class="detail-frame-poster-desc-h">{{ props.title }}</h1>
+          <p class="detail-frame-poster-desc-p">{{ props.artist }}</p>
+          <span class="detail-frame-poster-desc-s">{{ props.desc }}</span>
+        </div>
+
+        <!-- 按钮栏  -->
+        <div class="detail-frame-poster-action">
+          <button>播放</button>
+          <button>随机播放</button>
+        </div>
+      </div>
+
     </div>
 
-    <section class="frame-content" ref="artistContentRef">
-      <!-- 歌手信息 -->
-      <div class="section-frame-info" ref="infoRef">
-        <div class="frame-frame-info-spacing">
-          <div class="frame-info-main">
-            <span v-if="props.sub" class="frame-info-sub">{{ props.sub }}</span>
-            <span class="frame-info-name">{{ props.title }}</span>
-            <span class="frame-info-desc">{{ props.desc }}</span>
+    <!--  歌单下半部 歌曲列表  -->
+    <div class="detail-frame-list">
+      <ul class="detail-frame-list-ul">
+        <li
+            v-for="(songItem, songIdx) in props.songs"
+            :data-song-id="songItem.payload"
+            :key="`song-${songIdx}`"
+            class="detail-frame-list-li"
+            @click="toPlaySong(songItem)"
+        >
+          <div class="list-index">{{ songIdx + 1 }}</div>
+          <div class="list-desc">
+            <div class="list-desc-title">{{ songItem.title }}</div>
+            <div class="list-desc-sub">{{ songItem.artist }}</div>
           </div>
-        </div>
-      </div>
+          <div class="list-select">...</div>
+        </li>
+      </ul>
+    </div>
 
-      <div class="section-frame-content">
-        <div class="section-frame-bg"></div>
-
-        <!-- 按钮栏 -->
-        <div class="frame-action" ref="actionRef">
-          <div class="frame-action-content">
-            <button aria-label="播放全部" class="action-btn-play flex-center">
-              <img class="icon" src="@/assets/icon-song-play.svg" alt="" />
-            </button>
-            <!-- <button aria-label="关注" class="action-btn-subscribe">
-              {{ props.sub }}
-            </button> -->
-            <button
-              v-for="(acBtnItem, acBtnIdx) in props.actionBtn"
-              :key="`acBtn-${acBtnIdx}`"
-              class="action-btn-subscribe"
-            >
-              {{ acBtnItem.text }}
-            </button>
-          </div>
-        </div>
-
-        <!-- 歌手作品列表 -->
-        <div class="frame-list">
-          <!-- 列表插槽 -->
-          <slot name="list"></slot>
-        </div>
-      </div>
-    </section>
+    <!-- 歌单歌曲总数，时长信息 -->
+    <div class="detail-frame-info">
+      <div>{{ props.songs.length }}&nbsp;首歌曲，{{ data.duration }}&nbsp;分钟</div>
+    </div>
   </div>
 </template>
 
 <style lang="less">
 #detail-frame {
-  --content-mg-top: 0;
   height: 100%;
   width: 100%;
   position: relative;
+  padding: 16px;
 
-  // 封面
-  .frame-banner {
-    position: sticky;
-    top: 0;
-    height: 100vh;
+  // 上
+  .detail-frame-poster {
+    height: 50vh;
     width: 100%;
-    overflow: hidden;
-    .frame-banner-poster {
-      position: absolute;
-      top: 0;
-      height: 100vh;
-      width: 100%;
-      transform: scale(calc(1.05 - 0.05 * var(--animation-ratio)));
-      background-repeat: no-repeat;
-      background-position: center center;
-      background-size: 100% auto;
-      &::after {
-        content: '';
-        position: absolute;
+    display: grid;
+    justify-content: center;
+    grid-template-rows: minmax(180px, auto) auto;
+    grid-auto-columns: 1fr;
+
+
+    .detail-frame-poster-img {
+      height: 100%;
+      width: auto;
+      padding: 12px;
+      display: flex;
+      justify-content: center;
+      font-size: 0;
+
+      > img {
+        display: block;
         height: 100%;
-        width: 100%;
-        z-index: 1;
-        background: linear-gradient(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.6));
+        width: auto;
+        border-radius: 6px;
+        box-shadow: 6px 6px 32px rgba(94, 84, 77, 0.6);
+        object-fit: cover;
       }
     }
-    .frame-banner-mask {
-      position: absolute;
+
+    .detail-frame-poster-main {
       width: 100%;
-      height: 100%;
-      z-index: 1;
-      opacity: var(--animation-ratio);
-      background: #fff;
+    }
+
+    .detail-frame-poster-desc {
+      .detail-frame-poster-desc-h {
+        font-size: 19px;
+        font-weight: 600;
+        text-align: center;
+        padding: 0 16px;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+      }
+
+      .detail-frame-poster-desc-p {
+        font-size: 18px;
+        text-align: center;
+        color: var(--theme-color);
+      }
+
+      .detail-frame-poster-desc-s {
+        font-size: 11px;
+        font-weight: 600;
+        display: block;
+        text-align: center;
+        color: rgba(0, 0, 0, .45);
+        padding: 0 32px;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+      }
+
+    }
+
+    .detail-frame-poster-action {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+
+      > button {
+        font-size: 15px;
+        color: var(--theme-color);
+        font-weight: 600;
+        border: none;
+        padding: 10px 0;
+        border-radius: 8px;
+        width: calc(50% - 8px);
+        background: rgba(0, 0, 0, .06);
+      }
     }
   }
 
-  .frame-content {
-    position: relative;
-    z-index: 2;
-    margin-top: var(--content-mg-top);
-    // transition: margin 0.4s;
-    overflow: hidden;
+  //  下
+  .detail-frame-list {
+    width: 100%;
 
-    // 歌手信息
-    .section-frame-info {
+    .detail-frame-list-ul {
       width: 100%;
-      .frame-frame-info-spacing {
-        padding: 32px;
-        display: flex;
+      position: relative;
+      margin-top: 16px;
+      border-top: 1px solid rgba(0, 0, 0, .1);
+
+      .detail-frame-list-li {
         width: 100%;
-        height: 100%;
-        align-items: flex-end;
-        justify-content: flex-start;
-        .frame-info-main {
+        display: grid;
+        grid-template-columns: [index] 32px [songInfo] 1fr [select] 32px;
+
+        .list-index,
+        .list-desc,
+        .list-select {
+          display: flex;
+          align-items: center;
+        }
+
+        .list-index,
+        .list-select {
+          font-weight: 600;
+          font-size: 16px;
+          color: rgba(0, 0, 0, .45);
+          justify-content: center;
+        }
+
+        .list-desc {
           display: flex;
           flex-direction: column;
           align-items: flex-start;
-          justify-content: flex-end;
-          border-left: 6px solid #fff;
-          padding-left: 24px;
-          box-sizing: border-box;
-          .frame-info-name {
-            color: rgba(255, 255, 255, 1);
+          padding: 2px 32px 2px 10px;
+          border-bottom: 1px solid rgba(0, 0, 0, .1);
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+
+          .list-desc-title {
+            font-size: 16px;
+          }
+
+          .list-desc-sub {
+            font-size: 12px;
+            font-weight: 200;
+            color: rgba(0, 0, 0, .45);
+          }
+
+          .list-desc-title,
+          .list-desc-sub {
             width: 100%;
-            font-size: 56px;
-            line-height: 56px;
-            font-weight: 900;
-            margin-bottom: 16px;
-          }
-          .frame-info-sub {
-            color: rgba(255, 255, 255, 1);
-            font-weight: 600;
-            margin-bottom: 20px;
-          }
-          .frame-info-desc {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 14px;
-            line-height: 2;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            display: -webkit-box;
+            display: block;
             overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
           }
         }
-      }
-    }
 
-    .section-frame-content {
-      // height: calc(100% + var(--content-mg-top));
-      .section-frame-bg {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        background-image: linear-gradient(
-          rgba(255, 255, 255, 0.6) 0,
-          rgba(255, 255, 255, 1) 220px
-        );
-      }
-    }
-
-    // 按钮栏
-    .frame-action {
-      width: 100%;
-      padding: 32px;
-      // background-image: linear-gradient(
-      //   rgba(255, 255, 255, 0.6),
-      //   rgba(255, 255, 255, 1)
-      // );
-      .frame-action-content {
-        display: flex;
-        align-items: center;
-        .action-btn-play {
-          margin-right: 16px;
-          border: none;
-          outline: none;
-          cursor: pointer;
-          width: 56px;
-          height: 56px;
-          border-radius: 50%;
-          background-color: rgba(0, 0, 0, 0.6);
-          .icon {
-            height: 24px;
-            width: 24px;
-          }
-        }
-        .action-btn-subscribe {
-          padding: 6px 16px;
-          margin-left: 16px;
-          // background: transparent;
-          // border: 1px solid rgba(0, 0, 0, 0.6);
-          border: none;
-          background-color: rgba(0, 0, 0, 0.05);
-          border-radius: 16px;
-          cursor: pointer;
+        .list-select {
+          border-bottom: 1px solid rgba(0, 0, 0, .1);
         }
       }
-    }
 
-    // 歌手作品
-    .frame-list {
-      width: 100%;
-      height: 100%;
-      // background: #fff;
-      padding: 32px;
-      min-height: calc(100vh - var(--header-height) + 32px);
     }
   }
 
-  @media screen and (max-width: 768px) {
-    & {
-      // 封面
-      .frame-banner {
-        .frame-banner-poster {
-          background-repeat: no-repeat;
-          background-position: center center;
-          background-size: auto 100%;
-          &::after {
-            content: '';
-            position: absolute;
-            height: 100%;
-            width: 100%;
-            z-index: 1;
-            background: linear-gradient(
-              rgba(0, 0, 0, 0.05),
-              rgba(0, 0, 0, 0.6) 80%
-            );
-          }
-        }
-      }
-
-      .frame-content {
-        // 歌手信息
-        .section-frame-info {
-          width: 100%;
-          .frame-frame-info-spacing {
-            padding: 16px;
-            .frame-info-main {
-              border-left: 4px solid #fff;
-              .frame-info-name {
-                color: rgba(255, 255, 255, 1);
-                width: 100%;
-                font-size: 26px;
-                line-height: 1.5;
-                font-weight: 900;
-                margin-bottom: 16px;
-              }
-            }
-          }
-        }
-
-        // 按钮栏
-        .frame-action {
-          width: 100%;
-          padding: 20px;
-        }
-
-        // 歌手作品
-        .frame-list {
-          padding: 0px;
-        }
-      }
-    }
+  // 歌单信息
+  .detail-frame-info {
+    margin: 10px 0;
+    font-weight: 600;
+    font-size: 12px;
+    color: rgba(0, 0, 0, .45);
   }
 }
 </style>

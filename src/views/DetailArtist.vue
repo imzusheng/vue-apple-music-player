@@ -54,12 +54,12 @@ Promise.allSettled([getArtistDetail(id), getArtistFans(id)])
 
 <template>
   <div id="detail-artist">
-    <the-detail-frame
+<!--    <the-detail-frame
       :title="data.ArtistDetail.title"
       :desc="data.ArtistDetail.desc"
       :picUrl="data.ArtistDetail.picUrl"
     >
-      <!-- 作品列表 -->
+      &lt;!&ndash; 作品列表 &ndash;&gt;
       <template #list>
         <section-list-grid
           action="ArtistAlbum"
@@ -87,7 +87,7 @@ Promise.allSettled([getArtistDetail(id), getArtistFans(id)])
           :round="true"
         />
       </template>
-    </the-detail-frame>
+    </the-detail-frame>-->
   </div>
 </template>
 

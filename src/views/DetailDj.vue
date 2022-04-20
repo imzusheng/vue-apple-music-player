@@ -60,7 +60,7 @@ getDjDetail({ rid })
 
 <template>
   <div id="detail-radio">
-    <the-detail-frame
+<!--    <the-detail-frame
       :title="data.info.title"
       :desc="data.info.desc"
       :sub="data.info.sub"
@@ -74,7 +74,7 @@ getDjDetail({ rid })
           :title="true"
         />
       </template>
-    </the-detail-frame>
+    </the-detail-frame>-->
   </div>
 </template>
 

@@ -53,7 +53,7 @@ getDjpDetail({ id }).then((res: any) => {
 
 <template>
   <div id="detail-radio">
-    <the-detail-frame
+<!--    <the-detail-frame
       :title="data.info.title"
       :desc="data.info.desc"
       :sub="data.info.sub"
@@ -67,7 +67,7 @@ getDjpDetail({ id }).then((res: any) => {
           :title="true"
         />
       </template>
-    </the-detail-frame>
+    </the-detail-frame>-->
   </div>
 </template>
 
