@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 17:31:44
-LastEditTime: 2022-04-20 18:37:13
+LastEditTime: 2022-04-20 22:13:01
 Description: detail页面的基本框架
 FilePath: \vite-music-player\src\components\TheDetailFrame.vue
 -->
@@ -81,23 +81,26 @@ function toPlaySong(songInfo: any) {
   <div id="detail-frame">
     <!--  歌单上半部 封面信息+按钮  -->
     <div class="detail-frame-poster">
+      <!-- 封面 -->
       <div class="detail-frame-poster-img">
         <img :src="props.picUrl" alt="" />
       </div>
-
-      <div class="detail-frame-poster-main">
-        <!-- 歌单描述 -->
-        <div class="detail-frame-poster-desc">
-          <h1 class="detail-frame-poster-desc-h">{{ props.title }}</h1>
-          <p class="detail-frame-poster-desc-p">{{ props.artist }}</p>
-          <span class="detail-frame-poster-desc-s">{{ props.desc }}</span>
-        </div>
-
-        <!-- 按钮栏  -->
-        <div class="detail-frame-poster-action">
-          <button>播放</button>
-          <button>随机播放</button>
-        </div>
+      <!-- 标题 -->
+      <div>
+        <h1 class="detail-frame-poster-desc-h">{{ props.title }}</h1>
+      </div>
+      <!-- 作者 -->
+      <div>
+        <p class="detail-frame-poster-desc-p">{{ props.artist }}</p>
+      </div>
+      <!-- 描述 -->
+      <div>
+        <span class="detail-frame-poster-desc-s">{{ props.desc }}</span>
+      </div>
+      <!-- 播放按钮 -->
+      <div class="detail-frame-poster-action">
+        <button>播放</button>
+        <button>随机播放</button>
       </div>
     </div>
 
@@ -142,18 +145,23 @@ function toPlaySong(songInfo: any) {
 <style lang="less">
 #detail-frame {
   height: 100%;
-  width: 100%;
-  position: relative;
   padding: 16px;
+  position: relative;
+  width: 100vw;
+  overflow: hidden;
 
   // 上
   .detail-frame-poster {
     height: 50vh;
-    width: 100%;
     display: grid;
     justify-content: center;
-    grid-template-rows: minmax(180px, auto) auto;
-    grid-auto-columns: 1fr;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-template-rows:
+      [poster] minmax(180px, 2fr)
+      [title] minmax(0, auto)
+      [artist] minmax(0, auto)
+      [desc] minmax(0, auto)
+      [action] minmax(0, auto);
 
     .detail-frame-poster-img {
       height: 100%;
@@ -173,40 +181,33 @@ function toPlaySong(songInfo: any) {
       }
     }
 
-    .detail-frame-poster-main {
-      width: 100%;
+    .detail-frame-poster-desc-h {
+      font-size: 19px;
+      font-weight: 600;
+      text-align: center;
+      padding: 0 16px;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1;
+      overflow: hidden;
     }
 
-    .detail-frame-poster-desc {
-      .detail-frame-poster-desc-h {
-        font-size: 19px;
-        font-weight: 600;
-        text-align: center;
-        padding: 0 16px;
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-        overflow: hidden;
-      }
+    .detail-frame-poster-desc-p {
+      font-size: 18px;
+      text-align: center;
+      color: var(--theme-color);
+    }
 
-      .detail-frame-poster-desc-p {
-        font-size: 18px;
-        text-align: center;
-        color: var(--theme-color);
-      }
-
-      .detail-frame-poster-desc-s {
-        font-size: 11px;
-        font-weight: 600;
-        display: block;
-        text-align: center;
-        color: rgba(0, 0, 0, 0.45);
-        padding: 0 32px;
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-        overflow: hidden;
-      }
+    .detail-frame-poster-desc-s {
+      font-size: 11px;
+      font-weight: 600;
+      display: block;
+      text-align: center;
+      color: rgba(0, 0, 0, 0.45);
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
     }
 
     .detail-frame-poster-action {
@@ -216,15 +217,20 @@ function toPlaySong(songInfo: any) {
 
       > button {
         font-size: 15px;
+        height: 48px;
         color: var(--theme-color);
         font-weight: 600;
         border: none;
-        padding: 10px 0;
         border-radius: 8px;
         width: calc(50% - 8px);
         background: rgba(0, 0, 0, 0.06);
       }
     }
+
+    // .detail-frame-poster-main {
+    //   .detail-frame-poster-desc {
+    //   }
+    // }
   }
 
   //  下

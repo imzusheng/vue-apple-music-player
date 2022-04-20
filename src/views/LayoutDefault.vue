@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 21:10:50
-LastEditTime: 2022-04-20 18:00:57
+LastEditTime: 2022-04-20 21:11:44
 Description: 默认布局
 FilePath: \vite-music-player\src\views\LayoutDefault.vue
 -->
@@ -74,6 +74,26 @@ watchEffect(() => {
   }
 })
 
+function setPlayerTranslate() {
+  const rectTop = tabbarRef.value.getBoundingClientRect().top
+  const clientHeight = document.documentElement.clientHeight
+  const trl =
+    clientHeight > window.innerHeight
+      ? `${clientHeight - 144}px`
+      : `${window.innerHeight - 144}px`
+  document.body.style.setProperty('--player-translate', trl)
+  setPlayerFade(true)
+  ////////////////////////////////////////////////////////////////
+  setDebugInfo(
+    `window.outerHeight:${window.outerHeight}
+    <br>window.innerHeight:${window.innerHeight}
+    <br>当前屏幕高度: ${clientHeight}
+    <br>tabbar距离顶部高度:${rectTop.toFixed(0)}
+    <br>根据屏幕高度计算:${clientHeight}-144=${clientHeight - 144}
+    <br>根据屏幕tabbar高度计算:${rectTop}-72=${(rectTop - 72).toFixed(0)}`
+  )
+}
+
 let playerFadeTimer: any
 const handler = (e: any) => {
   if (store.state.playerDisplay) {
@@ -84,10 +104,7 @@ const handler = (e: any) => {
 
     if (playerFadeTimer) clearTimeout(playerFadeTimer)
     playerFadeTimer = setTimeout(() => {
-      const trl = `${tabbarRef.value.getBoundingClientRect().top - 72}px`
-      document.body.style.setProperty('--player-translate', trl)
-      setPlayerFade(true)
-      // setDebugInfo(trl)
+      setPlayerTranslate()
     }, 300)
   }
 }
@@ -106,7 +123,7 @@ onUnmounted(() => {
 
 <template>
   <div id="default-layout">
-    <div
+    <!-- <div
       style="
         position: fixed;
         top: 0;
@@ -116,7 +133,7 @@ onUnmounted(() => {
         padding: 10px;
       "
       v-html="store.state.debugInfo"
-    ></div>
+    ></div> -->
     <!-- <div id="default-mask" v-if="store.state.playerDisplay"></div> -->
 
     <main id="main">
@@ -135,15 +152,18 @@ onUnmounted(() => {
       </router-view>
     </main>
 
-    <!-- 播放器 -->
-    <the-audio-player
-      :url="store.state.audioUrl"
-      :title="store.state.audioInfo.title"
-      :album="store.state.audioInfo.album"
-      :publish-time="store.state.audioInfo.publishTime"
-      :artist="store.state.audioInfo.artist"
-      :pic-url="store.state.audioInfo.picUrl"
-    />
+    <transition name="fade">
+      <!-- 播放器 -->
+      <the-audio-player
+        v-show="store.state.playerFade"
+        :url="store.state.audioUrl"
+        :title="store.state.audioInfo.title"
+        :album="store.state.audioInfo.album"
+        :publish-time="store.state.audioInfo.publishTime"
+        :artist="store.state.audioInfo.artist"
+        :pic-url="store.state.audioInfo.picUrl"
+      />
+    </transition>
 
     <!-- 底部tabbar -->
     <the-tabbar @getRef="getRef"></the-tabbar>
@@ -172,5 +192,15 @@ onUnmounted(() => {
     width: 100%;
     position: relative;
   }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity cubic-bezier(0.333, 0.93, 0.667, 1) 0.2s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

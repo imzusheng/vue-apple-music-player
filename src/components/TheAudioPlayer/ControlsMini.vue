@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-19 20:58:30
-LastEditTime: 2022-04-19 21:08:19
+LastEditTime: 2022-04-20 21:19:01
 Description: mini控制中心
 FilePath: \vite-music-player\src\components\TheAudioPlayer\ControlsMini.vue
 -->
@@ -48,8 +48,8 @@ function playStatusChange(status: boolean) {
   position: absolute;
   top: 0;
   right: 0;
-  left: 78px;
-  height: 78px;
+  left: 72px;
+  height: 72px;
   .player-mini-controls-spacing {
     width: 100%;
     height: 100%;

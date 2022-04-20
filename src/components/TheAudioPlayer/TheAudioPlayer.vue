@@ -3,7 +3,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-18 13:09:20
-LastEditTime: 2022-04-20 18:22:39
+LastEditTime: 2022-04-20 21:53:18
 Description: 播放器
 FilePath: \vite-music-player\src\components\TheAudioPlayer\TheAudioPlayer.vue
 -->
@@ -501,26 +501,17 @@ function controlPlay() {
 </script>
 
 <template>
-  <div
-    ref="playerRef"
-    id="player"
-    v-show="props.url"
-    :class="{
-      'player-poster-display': data.posterDisplay,
-      'player-fade': store.state.playerFade,
-      'player-hide': !store.state.playerFade
-    }"
-  >
-    <div class="player-spacing" ref="player">
+  <div ref="playerRef" id="player" v-show="props.url">
+    <div
+      ref="player"
+      class="player-spacing"
+      :class="{ 'player-poster-show': data.posterDisplay }"
+    >
       <!-- 把手 -->
       <div class="player-handle" v-if="data.posterDisplay"></div>
 
       <!-- 海报 -->
-      <div
-        ref="poster"
-        class="player-poster user-not-select"
-        :class="{ 'player-poster-show': data.posterDisplay }"
-      ></div>
+      <div ref="poster" class="player-poster user-not-select"></div>
 
       <!-- 迷你控制栏 -->
       <controls-mini :title="props.title" />
@@ -621,14 +612,6 @@ function controlPlay() {
   width: 0;
   top: 0;
 
-  // 展开后样式
-  .player-poster-show {
-    transform: translate(var(--poster-translateX), var(--poster-translateY))
-      scale(1) !important;
-    border-radius: 12px !important;
-    box-shadow: 0 16px 20px rgba(94, 84, 77, 0.6) !important;
-  }
-
   .player-spacing {
     position: fixed;
     top: 0;
@@ -677,7 +660,7 @@ function controlPlay() {
       margin-top: 50vh;
       height: 50vh;
       width: 100%;
-      padding: 24px 24px 0;
+      padding: 24px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -762,7 +745,7 @@ function controlPlay() {
         .player-controls-info-p {
           font-size: 21px;
           color: rgba(0, 0, 0, 0.45);
-          line-height: 1;
+          line-height: 1.5;
         }
       }
 
@@ -870,49 +853,14 @@ function controlPlay() {
   }
 }
 
-.player-fade {
-  animation: player-fade 0.2s forwards;
-}
-
-.player-hide {
-  animation: player-hide 0.2s forwards;
-}
-
-@keyframes player-fade {
-  0% {
-    opacity: 0;
-    display: none;
-  }
-  1% {
-    opacity: 0;
-    display: block;
-  }
-  100% {
-    opacity: 1;
-    display: block;
-  }
-}
-
-@keyframes player-hide {
-  0% {
-    opacity: 1;
-    display: block;
-  }
-  99% {
-    opacity: 0;
-    display: block;
-  }
-  100% {
-    opacity: 0;
-    display: none;
-  }
-}
-
 // 展开后样式
 .player-poster-show {
-  transform: translate(var(--poster-translateX), var(--poster-translateY))
-    scale(1) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 16px 20px rgba(94, 84, 77, 0.6) !important;
+  background-color: rgba(255, 255, 255, 1) !important;
+  .player-poster {
+    transform: translate(var(--poster-translateX), var(--poster-translateY))
+      scale(1) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 16px 20px rgba(94, 84, 77, 0.6) !important;
+  }
 }
 </style>
