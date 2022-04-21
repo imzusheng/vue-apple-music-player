@@ -1,62 +1,139 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 21:10:50
-LastEditTime: 2022-04-17 19:46:24
+LastEditTime: 2022-04-21 17:24:52
 Description: 默认布局
 FilePath: \vite-music-player\src\views\LayoutDefault.vue
 -->
 <script lang="ts" setup>
 import { mapActionsHelpers, mapMutationsHelpers } from '@/common/util'
-import TheNavigationLeft from '@/components/TheNavigationLeft.vue'
-// import TheNavigationTop from '@/components/TheNavigationTop.vue'
-import AudioPlayer from '@/components/AudioPlayer/PlayerAudio.vue'
-import TheLoading from '@/components/TheLoading.vue'
+import TheAudioPlayer from '@/components/TheAudioPlayer/TheAudioPlayer.vue'
 import TheHeader from '@/components/TheHeader.vue'
+import TheLoading from '@/components/TheLoading.vue'
+import TheTabbar from '@/components/TheTabbar.vue'
+import TheTips from '@/components/TheTips.vue'
 import PageError from '@/views/PageError.vue'
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from '@/store'
 
 const { getSongUrl } = mapActionsHelpers(null, ['getSongUrl'])
-const { setAudioUrl } = mapMutationsHelpers(null, ['setAudioUrl'])
+const { setAudioUrl, setDebugInfo, setAudioInfo, setAudioDisplay } =
+  mapMutationsHelpers(null, [
+    'setAudioUrl',
+    'setDebugInfo',
+    'setAudioInfo',
+    'setAudioDisplay'
+  ])
 const store = useStore()
 const route = useRoute()
 
+// 播放器在滚动时隐藏
+const playerFade = ref<boolean>(true)
+
+// 解决路由name相同但参数改变时不刷新的问题
 const viewKey = computed(() => {
   const payload = route.query.payload ?? ''
   return Date.now().toString() + payload
 })
 
-function reload() {
-  getSongUrl(store.state.audioInfo.payload).then((url: string) => {
-    setAudioUrl(url)
-  })
+// =============================================================================> 恢复上次播放歌曲
+restore()
+function restore() {
+  const audioInfo = localStorage.getItem('audioInfo')
+  if (audioInfo) {
+    const parsedInfo = JSON.parse(audioInfo)
+    setAudioInfo(parsedInfo)
+    setAudioDisplay(true)
+
+    getSongUrl(parsedInfo.payload).then((url: string) => {
+      if (url) setAudioUrl(url)
+    })
+  }
 }
+
+watchEffect(() => {
+  if (store.state.playerDisplay) {
+    document.documentElement.style.setProperty('overflow', 'hidden')
+  } else {
+    document.documentElement.style.setProperty('overflow', 'hidden auto')
+  }
+})
+
+function setPlayerTranslate() {
+  // const rectTop = tabbarRef.value.getBoundingClientRect().top
+  const clientHeight = document.documentElement.clientHeight
+  const trl =
+    clientHeight > window.innerHeight
+      ? `${clientHeight - 144}px`
+      : `${window.innerHeight - 144}px`
+  document.body.style.setProperty('--player-translate', trl)
+  playerFade.value = true
+  ////////////////////////////////////////////////////////////////
+  // setDebugInfo(
+  //   `window.outerHeight:${window.outerHeight}
+  //   <br>window.innerHeight:${window.innerHeight}
+  //   <br>当前屏幕高度: ${clientHeight}
+  //   <br>tabbar距离顶部高度:${rectTop.toFixed(0)}
+  //   <br>根据屏幕高度计算:${clientHeight}-144=${clientHeight - 144}
+  //   <br>根据屏幕tabbar高度计算:${rectTop}-72=${(rectTop - 72).toFixed(0)}`
+  // )
+}
+
+// 定时器
+let playerFadeTimer: any
+const handler = (e: any) => {
+  if (store.state.playerDisplay) {
+    e.preventDefault()
+  } else {
+    // 一滚动就把播放器隐藏
+    playerFade.value = false
+
+    if (playerFadeTimer) clearTimeout(playerFadeTimer)
+    playerFadeTimer = setTimeout(() => {
+      setPlayerTranslate()
+    }, 300)
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('touchmove', handler, { passive: false })
+  document.addEventListener('scroll', handler, { passive: false })
+})
+
+onUnmounted(() => {
+  document.removeEventListener('touchmove', handler)
+  document.removeEventListener('scroll', handler)
+})
 </script>
 
 
 <template>
-  <!-- 播放器 -->
-  <audio-player
-    :url="store.state.audioUrl"
-    :title="store.state.audioInfo.title"
-    :album="store.state.audioInfo.album"
-    :publish-time="store.state.audioInfo.publishTime"
-    :artist="store.state.audioInfo.artist"
-    :pic-url="store.state.audioInfo.picUrl"
-    @reload="reload"
-  />
-
   <div id="default-layout">
-    <!-- 左侧导航栏 -->
-    <the-navigation-left />
-    <!-- <the-navigation-top /> -->
+    <!-- <div
+      style="
+        position: fixed;
+        top: 0;
+        right: 0;
+        z-index: 9999;
+        background: #ccc;
+        padding: 10px;
+      "
+      v-html="store.state.debugInfo"
+    ></div> -->
+    <!-- <div id="default-mask" v-if="store.state.playerDisplay"></div> -->
 
     <main id="main">
       <!-- 头部 -->
-      <the-header :class="'m_hide'" />
+      <the-header />
 
+      <!-- 加载框 -->
       <the-loading v-if="store.state.loading" />
+
+      <!-- 提示框 -->
+      <the-tips />
+
+      <!-- 错误提示 -->
       <page-error v-if="store.state.error.status" />
 
       <router-view
@@ -67,35 +144,56 @@ function reload() {
         <component :is="Component" />
       </router-view>
     </main>
+
+    <!-- 播放器 -->
+    <transition name="fade">
+      <the-audio-player
+        v-show="playerFade"
+        :url="store.state.audioUrl"
+        :title="store.state.audioInfo.title"
+        :album="store.state.audioInfo.album"
+        :publish-time="store.state.audioInfo.publishTime"
+        :artist="store.state.audioInfo.artist"
+        :pic-url="store.state.audioInfo.picUrl"
+      />
+    </transition>
+
+    <!-- 底部tabbar -->
+    <the-tabbar></the-tabbar>
   </div>
 </template>
 
 <style lang="less">
 #default-layout {
-  width: 100%;
-  min-height: 100vh;
   display: flex;
-  padding: 0 0 72px;
+  padding: 0 0 calc(72px + 80px + 10px);
+
+  // 遮罩
+  // #default-mask {
+  //   position: fixed;
+  //   top: 0;
+  //   left: 0;
+  //   right: 0;
+  //   bottom: 0;
+  //   background: rgba(255, 255, 255, 0.5);
+  //   backdrop-filter: blur(40px);
+  //   -webkit-backdrop-filter: blur(40px);
+  //   z-index: 997;
+  // }
 
   #main {
-    min-width: 350px;
-    width: calc(100% - var(--nav-left-width));
-    margin-left: var(--nav-left-width);
+    width: 100%;
     position: relative;
   }
-  @media screen and (max-width: 728px) {
-    & {
-      .m_hide {
-        display: none;
-      }
-      .m_show {
-        display: block;
-      }
-      #main {
-        width: 100%;
-        margin-left: 0;
-      }
-    }
-  }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity cubic-bezier(0.333, 0.93, 0.667, 1) 0.2s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

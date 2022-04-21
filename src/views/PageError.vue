@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 20:53:25
-LastEditTime: 2022-04-13 13:34:57
+LastEditTime: 2022-04-19 21:48:51
 Description: 错误提示页面
 FilePath: \vite-music-player\src\views\PageError.vue
 -->
@@ -44,7 +44,7 @@ const goBack = () => {
 
 <style lang="less">
 #error-page {
-  position: absolute;
+  position: fixed;
   width: 100%;
   height: 100%;
   display: flex;

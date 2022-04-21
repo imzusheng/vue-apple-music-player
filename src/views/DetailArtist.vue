@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-11 18:15:50
-LastEditTime: 2022-04-16 22:29:03
+LastEditTime: 2022-04-21 11:41:21
 Description: 歌单详情页
 FilePath: \vite-music-player\src\views\DetailArtist.vue
 -->
@@ -11,8 +11,10 @@ import { useStore } from '@/store'
 import { useRoute } from 'vue-router'
 import { reactive, toRaw } from 'vue'
 import { mapActionsHelpers } from '@/common/util'
+import TheFrameArtist from '@/components/TheFrameArtist.vue'
 import SectionListGrid from '@/components/SectionListGrid.vue'
-import TheDetailFrame from '@/components/TheDetailFrame.vue'
+import TableListSongs from '@/components/TableListSongs.vue'
+import SectionTitle from '@/components/SectionTitle.vue'
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // 以下获取数据
@@ -28,15 +30,16 @@ const data = reactive<any>({
     picUrl: '',
     sub: ''
   },
-  ArtistFans: {}
+  ArtistFans: {},
+  ArtistSong: []
 })
 // 取出action函数
-const { getArtistDetail, getArtistFans } = mapActionsHelpers(null, [
-  'getArtistDetail',
-  'getArtistFans'
-])
-// 批量请求
-Promise.allSettled([getArtistDetail(id), getArtistFans(id)])
+const { getArtistDetail, getArtistFans, getArtistSong } = mapActionsHelpers(
+  null,
+  ['getArtistDetail', 'getArtistFans', 'getArtistSong']
+)
+// 批量请求详情和粉丝数据
+Promise.allSettled([getArtistDetail(id), getArtistFans(id), getArtistSong(id)])
   .then((resArr) => {
     resArr.forEach((res: any) => {
       if (res.status === 'fulfilled') {
@@ -54,13 +57,24 @@ Promise.allSettled([getArtistDetail(id), getArtistFans(id)])
 
 <template>
   <div id="detail-artist">
-    <the-detail-frame
+    <the-frame-artist
       :title="data.ArtistDetail.title"
       :desc="data.ArtistDetail.desc"
       :picUrl="data.ArtistDetail.picUrl"
     >
-      <!-- 作品列表 -->
       <template #list>
+        <div class="artist-song">
+          <section-title sectionTitle="歌曲排行" actionName="查看全部" />
+
+          <table-list-songs
+            :songs="data.ArtistSong"
+            :virtualScroll="false"
+            :index="false"
+            :title="false"
+            size="m"
+          />
+        </div>
+
         <section-list-grid
           action="ArtistAlbum"
           :actionParams="{ id }"
@@ -87,7 +101,7 @@ Promise.allSettled([getArtistDetail(id), getArtistFans(id)])
           :round="true"
         />
       </template>
-    </the-detail-frame>
+    </the-frame-artist>
   </div>
 </template>
 
@@ -95,6 +109,10 @@ Promise.allSettled([getArtistDetail(id), getArtistFans(id)])
 #detail-artist {
   width: 100%;
   height: 100%;
+
+  .artist-song {
+    margin-bottom: 36px;
+  }
 }
 </style>
 

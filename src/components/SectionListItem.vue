@@ -1,11 +1,13 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 12:12:08
-LastEditTime: 2022-04-13 12:59:10
+LastEditTime: 2022-04-19 22:05:22
 Description: li单项
 FilePath: \vite-music-player\src\components\SectionListItem.vue
 -->
 <script lang="ts" setup>
+import { computed } from 'vue'
+
 const props = defineProps<{
   // 是否显示播放按钮
   playBtn?: boolean
@@ -14,21 +16,30 @@ const props = defineProps<{
   // 数据
   data: any
 }>()
+
+const vLazyLoad = computed(() => {
+  return function (url: string) {
+    return `${url}?param=50y50`
+  }
+})
 </script>
 
 <template>
   <li class="list-item user-not-select">
-    <!-- 遮罩 -->
+
     <div class="list-item-poster">
+
+      <!-- 遮罩 -->
       <div class="list-item-overlay">
         <!-- 播放按钮 -->
         <button class="overlay-btn-play flex-center" v-if="props.playBtn">
           <img src="@/assets/player-controls-pause.svg" alt="" />
         </button>
       </div>
+
       <!-- 封面 -->
       <img
-        v-lazy:[props.data.picUrl]
+        v-lazy="vLazyLoad(props.data.picUrl)"
         class="list-item-poster"
         src="@/assets/empty_white.png"
         :style="{ borderRadius: props.round ? '50%' : '3px' }"
@@ -101,20 +112,11 @@ const props = defineProps<{
         background: rgba(0, 0, 0, 0.4);
       }
     }
-
-    // 发生了什么：遮罩层出现、播放按钮出现
-    .list-item-overlay:hover {
-      opacity: 1;
-    }
   }
 
   // desc
   .list-item-desc {
     padding: 10px 0 4px;
-    .list-item-desc-h3:hover {
-      cursor: pointer;
-      text-decoration: underline;
-    }
     .list-item-desc-h3 {
       font-size: 15px;
       color: rgba(0, 0, 0, 0.8);

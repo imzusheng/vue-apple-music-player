@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-11 11:08:36
-LastEditTime: 2022-04-15 12:00:25
+LastEditTime: 2022-04-21 13:51:36
 Description: 歌单展示列表grid布局
 FilePath: \vite-music-player\src\components\SectionListGrid.vue
 -->
@@ -79,7 +79,7 @@ const toDetail = (routeName: string, payload: string | number) => {
       :sectionTitle="sectionTitle"
       :subTitle="subTitle"
       :actionName="listData.data.length > 6 || more ? action : null"
-    ></section-title>
+    />
 
     <!-- 列表 -->
     <ul class="list">
@@ -101,7 +101,7 @@ const toDetail = (routeName: string, payload: string | number) => {
 
 <style lang="less">
 .section-list-grid {
-  margin-bottom: 72px;
+  margin-bottom: 36px;
   // h2
   .list-title {
     width: 100%;
@@ -127,9 +127,6 @@ const toDetail = (routeName: string, payload: string | number) => {
       font-weight: 400;
       line-height: calc((28px * 1.6) - 8px);
       color: rgba(0, 0, 0, 0.8);
-      &:hover {
-        text-decoration: underline;
-      }
     }
   }
 

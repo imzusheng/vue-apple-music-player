@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 20:43:36
- * @LastEditTime: 2022-04-16 21:41:34
+ * @LastEditTime: 2022-04-21 11:46:41
  * @Description: 路由
  * @FilePath: \vite-music-player\src\router\index.ts
  */
@@ -16,28 +16,34 @@ const routes = [
     children: [
       {
         path: '',
-        redirect: '/discovery'
+        redirect: '/home'
       },
       {
-        path: 'recommend',
+        path: 'home',
         name: 'home',
         meta: { description: '主页' },
         component: () => import('@/views/PageHome.vue')
       },
       {
-        path: 'discovery',
-        name: 'discovery',
+        path: 'browse',
+        name: 'browse',
         meta: { description: '探索' },
         component: () => import('@/views/pageDiscovery.vue')
       },
       {
-        path: '',
+        path: 'broadcast',
+        name: 'broadcast',
+        meta: { description: '广播' },
+        component: () => import('@/views/pageDiscovery.vue')
+      },
+      {
+        path: 'library',
         name: 'library',
         meta: { description: '媒体库' },
         component: () => import('@/views/PageHome.vue')
       },
       {
-        path: '',
+        path: 'search',
         name: 'search',
         meta: { description: '搜索' },
         component: () => import('@/views/PageHome.vue')
@@ -82,7 +88,7 @@ const routes = [
         path: 'more',
         name: 'more',
         meta: { description: '查看更多' },
-        component: () => import('@/views/DetailArtist.vue')
+        component: () => import('@/views/DetailMore.vue')
       }
     ]
   }

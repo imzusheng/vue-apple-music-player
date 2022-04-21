@@ -1,20 +1,19 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-11 09:15:16
- * @LastEditTime: 2022-04-17 20:51:09
+ * @LastEditTime: 2022-04-21 13:41:08
  * @Description: 所有请求
  * @FilePath: \vite-music-player\src\store\actions.ts
  */
 import API from '@/common/api'
-import { countConvert, timeStampConvert, pickUpName, durationConvert } from '@/common/util'
+import { countConvert, durationConvert, pickUpName, timeStampConvert } from '@/common/util'
 import moment from 'moment'
 import { get } from '@/common/apiService'
-import { Args, RmdItem, ResRmd, SongTableRow } from '@/common/types'
+import { Args, ResRmd, RmdItem, SongTableRow } from '@/common/types'
 
 // 定义参数默认值
 const initArgs: Args = {
-  limit: 7,
-  pageIndex: 0
+  limit: 7
 }
 
 /**
@@ -30,8 +29,7 @@ const notArgs = {
   },
   // 所有榜单详情
   async getToplistDetail({}): Promise<any> {
-    const resJson = await get(API.GET_TOPLIST_DETAIL, {})
-    return resJson
+    return await get(API.GET_TOPLIST_DETAIL, {})
   },
   // 获取banner图片
   async getBanner({}): Promise<any> {
@@ -179,7 +177,7 @@ const song = {
                 artist: pickUpName(v.ar),
 
                 // 歌曲封面
-                picUrl: v.al.picUrl + '?param=50y50',
+                picUrl: v.al.picUrl,
 
                 // 歌曲名
                 title: v.name,
@@ -191,7 +189,7 @@ const song = {
                 publishTime: v.publishTime ? moment(v.publishTime).year().toString() : '',
 
                 // 歌曲时长，单位分钟
-                duration: durationConvert(v.dt / 1000),
+                duration: v.dt,
 
                 // 是否需要会员
                 fee: v.fee.toString()
@@ -260,16 +258,13 @@ const playlist = {
 
     return {
       // 歌曲id集合
+      createTime: moment(data.playlist.createTime).format('YYYY年M月D日'),
+      artist: data.playlist.creator.nickname,
       trackIds: data.playlist.trackIds.map((v: any) => v.id),
       title: data.playlist.name,
       desc: data.playlist.description,
       picUrl: data.playlist.coverImgUrl + '?param=800y800',
-      sub: `共${data.playlist.trackCount}首音乐`,
-      actionBtn: [
-        {
-          text: `${countConvert(data.playlist.playCount)}人听过`
-        }
-      ]
+      sub: `共${data.playlist.trackCount}首音乐`
     }
   }
 }
@@ -307,6 +302,35 @@ const artist = {
     return {
       data: data,
       type: 'ToplistArtist'
+    }
+  },
+  // 获取歌手单曲
+  async getArtistSong({}, id: string | number): Promise<ResRmd> {
+    const resJson = await get(API.ART.GET_ARTIST_SONG, { id })
+    const data: Array<SongTableRow> = resJson.hotSongs.slice(0, 5).map((v: any) => {
+      return {
+        payload: v.id,
+
+        // 歌曲封面
+        picUrl: v.al.picUrl,
+
+        // 歌曲名
+        title: v.name,
+
+        // 来自专辑
+        album: v.al.name,
+
+        artist: v.al.name,
+
+        // 是否需要会员
+        fee: v.fee.toString(),
+
+        routeName: 'playlist'
+      }
+    })
+    return {
+      data,
+      type: 'ArtistSong'
     }
   },
   // 获取歌手信息
@@ -426,9 +450,11 @@ const radio = {
     // 单曲详情没啥用，需要节目ID然后再获取整个节目列表
 
     return {
+      artist: resJson.data.dj.nickname,
+      createTime: moment(resJson.data.createTime).format('YYYY-M-D'),
       title: resJson.data.name,
       desc: resJson.data.desc,
-      picUrl: resJson.data.picUrl + '?param=800y800',
+      picUrl: resJson.data.picUrl + '?param=400y400',
       sub: resJson.data.category,
       radioId: resJson.data.id
     }
@@ -438,11 +464,11 @@ const radio = {
     const resJson = await get(API.DJ.GET_DJP, Object.assign(initArgs, args))
     const data: Array<SongTableRow> = resJson.programs.map((row: any): SongTableRow => {
       return {
-        payload: row.id,
+        payload: row.mainSong.id,
         artist: row.dj.nickname,
         title: row.mainSong.name,
         album: row.radio?.name || row.mainSong.album.name,
-        picUrl: row.coverUrl + '?param=50y50',
+        picUrl: row.coverUrl,
         duration: durationConvert(row.duration / 1000),
         fee: row.fee
       }

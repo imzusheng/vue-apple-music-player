@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-11 18:23:23
-LastEditTime: 2022-04-15 12:01:28
+LastEditTime: 2022-04-21 13:25:58
 Description: 主页
 FilePath: \vite-music-player\src\views\PageHome.vue
 -->
@@ -63,12 +63,12 @@ const sectionOnload = (payload: any) => {
       :actionParams="{ limit: 7 }"
       action="communitys"
     />
-    <section-list-grid
+    <!-- <section-list-grid
       @onload="sectionOnload"
       sectionTitle="推荐的MV"
       :playBtn="true"
       action="mvs"
-    />
+    /> -->
     <section-list-grid
       @onload="sectionOnload"
       sectionTitle="热门歌手"
@@ -100,15 +100,6 @@ const sectionOnload = (payload: any) => {
       :playBtn="true"
       :actionParams="{ limit: 7 }"
       action="RecommendsDjp"
-    />
-    <section-list-grid
-      @onload="sectionOnload"
-      sectionTitle="独家放送"
-      subTitle="电台"
-      :playBtn="true"
-      :more="true"
-      action="RecommendsPrivate"
-      :actionParams="{ limit: 6 }"
     />
   </div>
 </template>

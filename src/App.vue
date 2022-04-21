@@ -1,32 +1,10 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 20:15:36
-LastEditTime: 2022-04-17 19:29:35
+LastEditTime: 2022-04-20 13:59:20
 Description: 入口
 FilePath: \vite-music-player\src\App.vue
 -->
-
-<script setup lang="ts">
-import { mapMutationsHelpers } from '@/common/util'
-
-const { setAudioDisplay, setAudioInfo } = mapMutationsHelpers(null, [
-  'setAudioUrl',
-  'setAudioDisplay',
-  'setAudioInfo'
-])
-
-// 恢复localStorage中的数据
-function restore() {
-  const audioInfo = localStorage.getItem('audioInfo')
-  if (audioInfo) {
-    const parsedInfo = JSON.parse(audioInfo)
-    setAudioInfo(parsedInfo)
-    setAudioDisplay(true)
-  }
-}
-
-restore()
-</script>
 
 <template>
   <!-- v-columnMatch指令 js响应式布局，计算gird列数 -->
@@ -42,6 +20,7 @@ restore()
   -moz-osx-font-smoothing: grayscale;
   -webkit-overflow-scrolling: touch;
   -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
 
   padding: 0;
   margin: 0;
@@ -54,9 +33,20 @@ restore()
 }
 
 html {
-  overflow-y: scroll;
   scrollbar-color: rgba(0, 0, 0, 0.2) #fff;
   scrollbar-width: auto;
+  width: 100vw;
+  position: relative;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  body {
+    width: 100%;
+    // 播放器Y偏移
+    --player-translate: calc(100vh - 72px - 72px);
+  }
 
   a {
     -webkit-tap-highlight-color: rgba(255, 255, 255, 0) !important;
@@ -92,7 +82,7 @@ html {
   --animation-target: 0;
 
   // 主题色
-  --theme-color: rgba(212, 42, 42, 0.8);
+  --theme-color: rgba(250, 35, 59, 1);
 
   // gap间隙
   --grid-gap: 24px;
@@ -131,8 +121,7 @@ html {
 }
 
 .spacing {
-  padding: calc(var(--header-height) + 16px) var(--page-spacing)
-    var(--page-spacing);
+  padding: 32px var(--page-spacing) 0;
 }
 
 ::-webkit-scrollbar {

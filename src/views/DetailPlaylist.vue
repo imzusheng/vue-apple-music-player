@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 20:51:30
-LastEditTime: 2022-04-17 20:52:09
+LastEditTime: 2022-04-21 10:00:11
 Description: 专辑详情
 FilePath: \vite-music-player\src\views\DetailPlaylist.vue
 -->
@@ -11,8 +11,7 @@ import { mapActionsHelpers } from '@/common/util'
 import { reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from '@/store'
-import TheDetailFrame from '@/components/TheDetailFrame.vue'
-import TableListSongs from '@/components/TableListSongs.vue'
+import TheFramePlaylist from '@/components/TheFramePlaylist.vue'
 
 const route = useRoute()
 const store = useStore()
@@ -27,7 +26,8 @@ const playlistInfo = reactive<any>({
     desc: '',
     picUrl: '',
     sub: '',
-    actionBtn: []
+    artist: '',
+    createTime: ''
   },
   // 专辑内歌曲
   songs: []
@@ -57,28 +57,21 @@ getPlaylistDetail(id)
 
 
 <template>
-  <div id="detail-album">
-    <the-detail-frame
+  <div id="detail-playlist">
+    <the-frame-playlist
       :title="playlistInfo.data.title"
       :desc="playlistInfo.data.desc"
+      :artist="playlistInfo.data.artist"
       :picUrl="playlistInfo.data.picUrl"
-      :sub="`${playlistInfo.data.sub}`"
-      :actionBtn="playlistInfo.data.actionBtn"
-    >
-      <template #list>
-        <table-list-songs
-          :virtualScroll="true"
-          :songs="playlistInfo.songs"
-          :title="true"
-          size="L"
-        />
-      </template>
-    </the-detail-frame>
+      :sub="playlistInfo.data.sub"
+      :createTime="playlistInfo.data.createTime"
+      :songs="playlistInfo.songs"
+    />
   </div>
 </template>
 
 <style lang="less">
-#detail-album {
+#detail-playlist {
   width: 100%;
   height: 100%;
 }
