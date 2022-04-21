@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 17:31:44
-LastEditTime: 2022-04-21 09:58:04
+LastEditTime: 2022-04-21 17:23:03
 Description: detail页面的基本框架
 FilePath: \vite-music-player\src\components\TheFramePlaylist.vue
 -->
@@ -36,11 +36,10 @@ const data = reactive({
 })
 
 const { getSongUrl } = mapActionsHelpers(null, ['getSongUrl'])
-const { setAudioUrl, setAudioInfo, setLoading } = mapMutationsHelpers(null, [
-  'setAudioUrl',
-  'setAudioInfo',
-  'setLoading'
-])
+const { setAudioUrl, setAudioInfo, setLoading, setTips } = mapMutationsHelpers(
+  null,
+  ['setAudioUrl', 'setAudioInfo', 'setLoading', 'setTips']
+)
 
 setLoading(true)
 
@@ -72,7 +71,8 @@ function toPlaySong(songInfo: any) {
 
   // 获取歌曲url
   getSongUrl(songInfo.payload).then((url: string) => {
-    setAudioUrl(url)
+    if (url) setAudioUrl(url)
+    else setTips('需要购买数字专辑')
   })
 }
 </script>
@@ -128,7 +128,12 @@ function toPlaySong(songInfo: any) {
             <img class="list-index-icon" src="@/assets/equaliser.svg" alt="" />
           </div>
           <div class="list-desc">
-            <div class="list-desc-title">{{ songItem.title }}</div>
+            <div class="list-desc-title">
+              {{ songItem.title }}
+              <span class="fee-tips" v-if="songItem.fee === '4'"
+                >(数字专辑)</span
+              >
+            </div>
             <div class="list-desc-sub">{{ songItem.artist }}</div>
           </div>
           <div class="list-select">...</div>
@@ -249,11 +254,6 @@ function toPlaySong(songInfo: any) {
         }
       }
     }
-
-    // .detail-frame-poster-main {
-    //   .detail-frame-poster-desc {
-    //   }
-    // }
   }
 
   //  下
@@ -302,6 +302,11 @@ function toPlaySong(songInfo: any) {
 
           .list-desc-title {
             font-size: 16px;
+
+            .fee-tips {
+              font-size: 16px;
+              color: rgba(0, 0, 0, 0.45);
+            }
           }
 
           .list-desc-sub {

@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 23:22:44
- * @LastEditTime: 2022-04-21 11:54:29
+ * @LastEditTime: 2022-04-21 17:22:12
  * @Description: vuex
  * @FilePath: \vite-music-player\src\store\index.ts
  */
@@ -37,6 +37,8 @@ export interface State {
     msg?: string
     info?: string
   }
+
+  tips: string
 
   debugInfo: any
 }
@@ -74,6 +76,8 @@ export const store = createStore<State>({
       payload: ''
     },
 
+    tips: '',
+
     // 错误页面
     error: {
       status: false,
@@ -87,6 +91,9 @@ export const store = createStore<State>({
   mutations: {
     setDebugInfo(state, payload) {
       state.debugInfo = payload
+    },
+    setTips(state, payload) {
+      state.tips = payload
     },
     setPlayerDisplay(state, payload) {
       if (state.playerDisplay !== payload) {

@@ -3,7 +3,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-18 13:09:20
-LastEditTime: 2022-04-21 16:39:38
+LastEditTime: 2022-04-21 17:07:04
 Description: 播放器
 FilePath: \vite-music-player\src\components\TheAudioPlayer\TheAudioPlayer.vue
 -->
@@ -532,8 +532,9 @@ function controlPlay() {
 </script>
 
 <template>
-  <div ref="playerRef" id="player" v-show="props.url">
+  <div ref="playerRef" id="player">
     <div
+      v-show="props.url.length > 0"
       ref="player"
       class="player-spacing"
       :class="{ 'player-poster-show': data.posterDisplay }"

@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 21:10:50
-LastEditTime: 2022-04-21 10:38:12
+LastEditTime: 2022-04-21 17:24:52
 Description: 默认布局
 FilePath: \vite-music-player\src\views\LayoutDefault.vue
 -->
@@ -11,6 +11,7 @@ import TheAudioPlayer from '@/components/TheAudioPlayer/TheAudioPlayer.vue'
 import TheHeader from '@/components/TheHeader.vue'
 import TheLoading from '@/components/TheLoading.vue'
 import TheTabbar from '@/components/TheTabbar.vue'
+import TheTips from '@/components/TheTips.vue'
 import PageError from '@/views/PageError.vue'
 import { computed, onMounted, onUnmounted, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
@@ -46,7 +47,7 @@ function restore() {
     setAudioDisplay(true)
 
     getSongUrl(parsedInfo.payload).then((url: string) => {
-      setAudioUrl(url)
+      if (url) setAudioUrl(url)
     })
   }
 }
@@ -128,6 +129,9 @@ onUnmounted(() => {
 
       <!-- 加载框 -->
       <the-loading v-if="store.state.loading" />
+
+      <!-- 提示框 -->
+      <the-tips />
 
       <!-- 错误提示 -->
       <page-error v-if="store.state.error.status" />
