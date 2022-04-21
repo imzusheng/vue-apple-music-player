@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-11 15:06:54
- * @LastEditTime: 2022-04-19 16:28:58
+ * @LastEditTime: 2022-04-21 19:08:57
  * @Description: 自定义指令，利用插件安装
  * @FilePath: \vite-music-player\src\common\directive.ts
  */
@@ -57,7 +57,8 @@ export const lazyloadDirective = {
         if (!src) return
         // IntersectionObserver
         const intersectionObserver = new IntersectionObserver(
-          entries => {
+          // callback
+          function (entries: any) {
             entries.forEach((item: any) => {
               // 图片出现，挂上src
               if (item.intersectionRatio > 0) {

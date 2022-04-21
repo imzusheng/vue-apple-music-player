@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-18 12:37:17
-LastEditTime: 2022-04-20 20:10:36
+LastEditTime: 2022-04-21 18:03:32
 Description: 底部tabbar
 FilePath: \vite-music-player\src\components\TheTabbar.vue
 -->
@@ -22,6 +22,9 @@ import iconSearch from '@/assets/icon-uni-search.png'
 
 import iconPlayCheck from '@/assets/icon-uni-play-checked.png'
 import iconvViewCheck from '@/assets/icon-uni-view-checked.png'
+import iconBroadcastCheck from '@/assets/icon-uni-dj-checked.png'
+import iconLibraryCheck from '@/assets/icon-uni-media-checked.png'
+import iconSearchCheck from '@/assets/icon-uni-search-checked.png'
 
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -47,19 +50,19 @@ const navConfig = [
   {
     title: '广播',
     icon: iconBroadcast,
-    iconChecked: iconPlayCheck,
+    iconChecked: iconBroadcastCheck,
     routerName: 'broadcast'
   },
   {
     title: '媒体库',
     icon: iconLibrary,
-    iconChecked: iconPlayCheck,
+    iconChecked: iconLibraryCheck,
     routerName: 'library'
   },
   {
     title: '搜索',
     icon: iconSearch,
-    iconChecked: iconPlayCheck,
+    iconChecked: iconSearchCheck,
     routerName: 'search'
   }
 ]
