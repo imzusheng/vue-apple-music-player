@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-13 10:05:17
-LastEditTime: 2022-04-21 00:10:39
+LastEditTime: 2022-04-21 09:59:48
 Description: 电台节目详情页
 FilePath: \vite-music-player\src\views\DetailDjp.vue
 -->
@@ -11,8 +11,7 @@ import { useStore } from '@/store'
 import { useRoute } from 'vue-router'
 import { reactive } from 'vue'
 import { mapActionsHelpers } from '@/common/util'
-import TheDetailFrame from '@/components/TheDetailFrame.vue'
-import TableListSongs from '@/components/TableListSongs.vue'
+import TheFramePlaylist from '@/components/TheFramePlaylist.vue'
 import { SongTableRow } from '@/common/types'
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,7 +54,7 @@ getDjpDetail({ id }).then((res: any) => {
 
 <template>
   <div id="detail-radio">
-    <the-detail-frame
+    <the-frame-playlist
       :title="data.info.title"
       :desc="data.info.desc"
       :sub="data.info.sub"

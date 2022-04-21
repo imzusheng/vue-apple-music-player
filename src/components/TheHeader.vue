@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 11:22:11
-LastEditTime: 2022-04-16 22:25:58
+LastEditTime: 2022-04-21 10:51:08
 Description: 头部
 FilePath: \vite-music-player\src\components\TheHeader.vue
 -->
@@ -34,12 +34,6 @@ const routerNext = () => {
       <button class="header-action-prev flex-center" @click="routerPrev">
         <img class="icon" src="@/assets/icon-prev.svg" alt="" />
       </button>
-      <button class="header-action-next flex-center" @click="routerNext">
-        <img class="icon" src="@/assets/icon-next.svg" alt="" />
-      </button>
-      <button aria-label="播放全部" class="header-action-play flex-center">
-        <img class="icon" src="@/assets/icon-song-play.svg" alt="" />
-      </button>
       <div class="artist-action-title">{{ store.state.headerText }}</div>
     </div>
   </header>
@@ -48,39 +42,29 @@ const routerNext = () => {
 <style lang="less">
 #header {
   position: fixed;
-  width: calc(100% - var(--nav-left-width));
-  height: var(--header-height);
+  width: 100%;
   background: rgba(246, 246, 246, calc(var(--animation-ratio) * 1));
   z-index: 999;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
   .header-action {
     width: 100%;
-    padding: 0 16px;
     display: flex;
     justify-content: flex-start;
-    .header-action-prev,
-    .header-action-next,
-    .header-action-play {
+    .header-action-prev {
       flex-shrink: 0;
       border: none;
-      background: rgba(0, 0, 0, 0.1);
-      padding: 8px;
+      background: rgba(0, 0, 0, 0.2);
       border-radius: 50%;
-      margin: 0 10px;
       cursor: pointer;
+      height: 30px;
+      width: 30px;
       .icon {
-        height: 24px;
-        width: 24px;
+        height: 16px;
+        width: 16px;
       }
-    }
-    // 播放按钮
-    .header-action-play {
-      height: 52px;
-      width: 52px;
-      background: var(--theme-color);
-      opacity: var(--animation-target);
-      transition: opacity 0.2s;
     }
     .artist-action-title {
       font-size: 26px;

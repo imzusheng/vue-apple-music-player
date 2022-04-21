@@ -1,15 +1,16 @@
 <!--
 Author: zusheng
 Date: 2022-04-10 21:10:50
-LastEditTime: 2022-04-20 22:49:57
+LastEditTime: 2022-04-21 10:38:12
 Description: 默认布局
 FilePath: \vite-music-player\src\views\LayoutDefault.vue
 -->
 <script lang="ts" setup>
 import { mapActionsHelpers, mapMutationsHelpers } from '@/common/util'
 import TheAudioPlayer from '@/components/TheAudioPlayer/TheAudioPlayer.vue'
-import TheTabbar from '@/components/TheTabbar.vue'
+import TheHeader from '@/components/TheHeader.vue'
 import TheLoading from '@/components/TheLoading.vue'
+import TheTabbar from '@/components/TheTabbar.vue'
 import PageError from '@/views/PageError.vue'
 import { computed, onMounted, onUnmounted, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
@@ -25,8 +26,11 @@ const { setAudioUrl, setDebugInfo, setAudioInfo, setAudioDisplay } =
   ])
 const store = useStore()
 const route = useRoute()
+
 // 播放器在滚动时隐藏
 const playerFade = ref<boolean>(true)
+
+// 解决路由name相同但参数改变时不刷新的问题
 const viewKey = computed(() => {
   const payload = route.query.payload ?? ''
   return Date.now().toString() + payload
@@ -120,9 +124,12 @@ onUnmounted(() => {
 
     <main id="main">
       <!-- 头部 -->
+      <the-header />
 
+      <!-- 加载框 -->
       <the-loading v-if="store.state.loading" />
 
+      <!-- 错误提示 -->
       <page-error v-if="store.state.error.status" />
 
       <router-view
@@ -134,8 +141,8 @@ onUnmounted(() => {
       </router-view>
     </main>
 
+    <!-- 播放器 -->
     <transition name="fade">
-      <!-- 播放器 -->
       <the-audio-player
         v-show="playerFade"
         :url="store.state.audioUrl"

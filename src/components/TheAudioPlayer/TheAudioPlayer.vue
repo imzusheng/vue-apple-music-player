@@ -3,7 +3,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-18 13:09:20
-LastEditTime: 2022-04-21 00:25:58
+LastEditTime: 2022-04-21 16:39:38
 Description: 播放器
 FilePath: \vite-music-player\src\components\TheAudioPlayer\TheAudioPlayer.vue
 -->
@@ -114,12 +114,27 @@ onMounted(() => {
   resizeHandler()
   window.addEventListener('resize', resizeHandler)
 
-  player.value.addEventListener('touchstart', touchStartHandler, {
-    passive: false
-  })
-  player.value.addEventListener('mousedown', touchStartHandler, {
-    passive: false
-  })
+  if ('ontouchstart' in window) {
+    player.value.addEventListener(
+      'touchstart',
+      (e: any) => {
+        touchStartHandler(e)
+      },
+      {
+        passive: false
+      }
+    )
+  } else {
+    player.value.addEventListener(
+      'mousedown',
+      (e: any) => {
+        touchStartHandler(e)
+      },
+      {
+        passive: false
+      }
+    )
+  }
 })
 
 onUnmounted(() => {
@@ -184,10 +199,11 @@ function resizeHandler() {
 function touchStartHandler(e: any) {
   if (e.target.tagName.toLowerCase() === 'button') {
     // 触发调整按钮
-    if (e.target.dataset.funcVolume === 'on') {
+    if (e.target.dataset?.funcVolume === 'on') {
       // 调整音量
       volumeChangeHandler()
-    } else if (e.target.dataset.funcProgress === 'on') {
+    } else if (e.target.dataset?.funcProgress === 'on') {
+      // 调整进度条
       progressChangeHandler()
     }
   } else {
@@ -258,32 +274,34 @@ function playerChangeHandler(e: any) {
     document.body.style.setProperty('--player-translate', `${curY}px`)
   }
 
-  player.value.addEventListener('touchmove', touchMoveHandler, {
-    passive: false
-  })
-  document.addEventListener('mousemove', touchMoveHandler, {
-    passive: false
-  })
-
-  // 只监听一次
-  player.value.addEventListener(
-    'touchend',
-    () => {
-      // 移除监听
-      player.value.removeEventListener('touchmove', touchMoveHandler)
-      end()
-    },
-    { once: true }
-  )
-  document.addEventListener(
-    'mouseup',
-    () => {
-      // 移除监听
-      document.removeEventListener('mousemove', touchMoveHandler)
-      end()
-    },
-    { once: true }
-  )
+  if ('ontouchstart' in window) {
+    player.value.addEventListener('touchmove', touchMoveHandler, {
+      passive: false
+    })
+    // 移除监听
+    player.value.addEventListener(
+      'touchend',
+      () => {
+        player.value.removeEventListener('touchmove', touchMoveHandler)
+        end()
+      },
+      { once: true }
+    )
+  } else {
+    document.addEventListener('mousemove', touchMoveHandler, {
+      passive: false
+    })
+    // 移除监听
+    document.addEventListener(
+      'mouseup',
+      () => {
+        // 移除监听
+        document.removeEventListener('mousemove', touchMoveHandler)
+        end()
+      },
+      { once: true }
+    )
+  }
   // 结束后要做的事
   function end() {
     // 重新设置回动画
@@ -368,7 +386,7 @@ function progressChangeHandler() {
   const end = rect.right
 
   const moveHandler = (e: any) => {
-    const moveX = e.changedTouches[0].clientX
+    const moveX = e.clientX || e?.changedTouches[0]?.clientX
     // 计算拖动时坐标
     let ratio = (moveX - start) / (end - start)
     if (ratio > 1) {
@@ -564,18 +582,18 @@ function controlPlay() {
 
         <!-- 中控 -->
         <div class="player-controls-btn">
-          <button class="player-controls-btn-prev"></button>
+          <button class="player-controls-btn-prev" />
           <button
             v-show="data.playStatus"
-            class="player-controls-btn-play"
             @click="controlPlay"
-          ></button>
+            class="player-controls-btn-play"
+          />
           <button
             v-show="!data.playStatus"
-            class="player-controls-btn-pause"
             @click="controlPlay"
-          ></button>
-          <button class="player-controls-btn-next"></button>
+            class="player-controls-btn-pause"
+          />
+          <button class="player-controls-btn-next" />
         </div>
 
         <!-- 音量调整 -->

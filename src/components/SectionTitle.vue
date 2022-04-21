@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-13 18:39:01
-LastEditTime: 2022-04-13 18:45:43
+LastEditTime: 2022-04-21 11:53:47
 Description: 标题组件，可选更多
 FilePath: \vite-music-player\src\components\SectionTitle.vue
 -->
@@ -26,7 +26,7 @@ defineProps<{
       :to="{
         name: 'more',
         query: {
-          type: actionName
+          action: actionName
         }
       }"
       v-text="'查看更多'"
@@ -40,7 +40,7 @@ defineProps<{
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  padding: 16px 0;
+  padding: 16px 0 8px;
   .section-title-content {
     .section-title-h2 {
       font-size: 28px;

@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 16:04:42
-LastEditTime: 2022-04-20 22:14:09
+LastEditTime: 2022-04-21 09:58:58
 Description: 专辑详情
 FilePath: \vite-music-player\src\views\DetailAlbum.vue
 -->
@@ -10,8 +10,7 @@ import { mapActionsHelpers, durationConvert, pickUpName } from '@/common/util'
 import { reactive, toRaw } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from '@/store'
-import TheDetailFrame from '@/components/TheDetailFrame.vue'
-import TableListSongs from '@/components/TableListSongs.vue'
+import TheFramePlaylist from '@/components/TheFramePlaylist.vue'
 import { SongTableRow } from '@/common/types'
 import moment from 'moment'
 
@@ -79,7 +78,7 @@ async function getData() {
 
 <template>
   <div id="detail-album">
-    <the-detail-frame
+    <the-frame-playlist
       :title="albumInfo.data.title"
       :desc="albumInfo.data.desc"
       :picUrl="albumInfo.data.picUrl"
@@ -88,7 +87,7 @@ async function getData() {
       :createTime="albumInfo.data.createTime"
       :songs="albumInfo.songs"
     >
-    </the-detail-frame>
+    </the-frame-playlist>
   </div>
 </template>
 

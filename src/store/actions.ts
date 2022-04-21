@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-11 09:15:16
- * @LastEditTime: 2022-04-21 00:09:03
+ * @LastEditTime: 2022-04-21 13:41:08
  * @Description: 所有请求
  * @FilePath: \vite-music-player\src\store\actions.ts
  */
@@ -13,8 +13,7 @@ import { Args, ResRmd, RmdItem, SongTableRow } from '@/common/types'
 
 // 定义参数默认值
 const initArgs: Args = {
-  limit: 7,
-  pageIndex: 0
+  limit: 7
 }
 
 /**
@@ -303,6 +302,35 @@ const artist = {
     return {
       data: data,
       type: 'ToplistArtist'
+    }
+  },
+  // 获取歌手单曲
+  async getArtistSong({}, id: string | number): Promise<ResRmd> {
+    const resJson = await get(API.ART.GET_ARTIST_SONG, { id })
+    const data: Array<SongTableRow> = resJson.hotSongs.slice(0, 5).map((v: any) => {
+      return {
+        payload: v.id,
+
+        // 歌曲封面
+        picUrl: v.al.picUrl,
+
+        // 歌曲名
+        title: v.name,
+
+        // 来自专辑
+        album: v.al.name,
+
+        artist: v.al.name,
+
+        // 是否需要会员
+        fee: v.fee.toString(),
+
+        routeName: 'playlist'
+      }
+    })
+    return {
+      data,
+      type: 'ArtistSong'
     }
   },
   // 获取歌手信息

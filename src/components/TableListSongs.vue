@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 18:47:25
-LastEditTime: 2022-04-19 21:52:01
+LastEditTime: 2022-04-21 11:39:44
 Description: 歌曲表格展示 单击切歌，有XL/L/M/S四种尺寸
                 L: 封面，歌名，专辑，发布时间，时长
                 L: 封面，歌名，专辑，时长
@@ -325,7 +325,7 @@ const vLazyLoad = computed(() => {
       > div {
         display: flex;
         align-items: center;
-        padding: 4px 0;
+        // padding: 4px 0;
 
         .table-cell-dt {
           justify-content: flex-end;

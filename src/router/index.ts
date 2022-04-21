@@ -1,7 +1,7 @@
 /*
  * @Author: zusheng
  * @Date: 2022-04-10 20:43:36
- * @LastEditTime: 2022-04-18 12:47:57
+ * @LastEditTime: 2022-04-21 11:46:41
  * @Description: 路由
  * @FilePath: \vite-music-player\src\router\index.ts
  */
@@ -88,7 +88,7 @@ const routes = [
         path: 'more',
         name: 'more',
         meta: { description: '查看更多' },
-        component: () => import('@/views/DetailArtist.vue')
+        component: () => import('@/views/DetailMore.vue')
       }
     ]
   }

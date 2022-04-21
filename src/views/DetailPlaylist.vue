@@ -1,7 +1,7 @@
 <!--
 Author: zusheng
 Date: 2022-04-12 20:51:30
-LastEditTime: 2022-04-20 14:18:52
+LastEditTime: 2022-04-21 10:00:11
 Description: 专辑详情
 FilePath: \vite-music-player\src\views\DetailPlaylist.vue
 -->
@@ -11,7 +11,7 @@ import { mapActionsHelpers } from '@/common/util'
 import { reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from '@/store'
-import TheDetailFrame from '@/components/TheDetailFrame.vue'
+import TheFramePlaylist from '@/components/TheFramePlaylist.vue'
 
 const route = useRoute()
 const store = useStore()
@@ -58,7 +58,7 @@ getPlaylistDetail(id)
 
 <template>
   <div id="detail-playlist">
-    <the-detail-frame
+    <the-frame-playlist
       :title="playlistInfo.data.title"
       :desc="playlistInfo.data.desc"
       :artist="playlistInfo.data.artist"
